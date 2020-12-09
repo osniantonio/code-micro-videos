@@ -14,4 +14,3 @@ class Category extends Model
         'id' => 'string'
     ];
 }
-
