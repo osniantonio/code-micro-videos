@@ -1,25 +1,13 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="http://maratona.fullcycle.com.br/public/img/logo-maratona.png"/></a>
-</p>
+## Nesta primeira fase de projeto, crie o recurso de Category como descrito nas aulas:
 
-## Descrição
+Model
+Factory e seeder
+Controller
+E crie mais um recurso, que chamaremos de Gênero.
+Lembrando que o Gênero no sistema significa: Terror, ação, comédia e etc. Ele será relacionado com o Vídeo mais tarde.
 
-Microsserviço de catálogo
+O Gênero deverá ter os seguintes campos: nome, is_active (Se está ativo ou não).
 
-## Rodar a aplicação
+Se divirta com a fase e ao final envie o projeto para correção como de costume.
 
-#### Crie os containers com Docker
-
-```bash
-$ docker-compose up
-```
-
-#### Accesse no browser
-
-```
-http://localhost:8000
-```
-
-## Apéndice
-
-Nosso aluno [Yuri Koster](https://github.com/yurikoster1) criou outra opção do repositório organizando melhor os arquivos Docker, se quiserem utilizar basta clonar o branch ```more_organized```.
+Boa sorte!

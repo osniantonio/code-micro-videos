@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Category;
+use App\Models\Genre;
 use Illuminate\Http\Request;
 
-class CategoryController extends Controller
+class GenreController extends Controller
 {
     private $rules = [
         'name' => 'required|max:255',
@@ -15,30 +15,30 @@ class CategoryController extends Controller
 
     public function index()
     {
-        return Category::all();
+        return Genre::all();
     }
 
     public function store(Request $request)
     {
         $this->validate($request, $this->rules);
-        return Category::create($request->all());
+        return Genre::create($request->all());
     }
 
-    public function show(Category $category)
+    public function show(Genre $genre)
     {
-        return $category;
+        return $genre;
     }
 
-    public function update(Request $request, Category $category)
+    public function update(Request $request, Genre $genre)
     {
         $this->validate($request, $this->rules);
-        $category->update($request->all());
-        return $category;
+        $genre->update($request->all());
+        return $genre;
     }
 
-    public function destroy(Category $category)
+    public function destroy(Genre $genre)
     {
-        $category->delete();
+        $genre->delete();
         return response()->noContent();
     }
 }
