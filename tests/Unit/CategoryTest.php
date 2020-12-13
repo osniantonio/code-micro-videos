@@ -8,6 +8,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
+# Classe específica - vendor/bin/phpunit tests/Unit/CategoryTest.php
+# Método específico em um arquivo - vendor/bin/phpunit --filter testeIfUseTraits tests/Unit/CategoryTest.php
+# Método específico em uma classe - vendor/bin/phpunit --filter CategoryTest::testeIfUseTraits
+
 class CategoryTest extends TestCase
 {
 
