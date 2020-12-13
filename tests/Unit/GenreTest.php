@@ -5,15 +5,19 @@ namespace Tests\Unit;
 use App\Models\Genre;
 use App\Models\Traits\Uuid;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class GenreTest extends TestCase
 {
-    /**
-     * A basic unit test example.
-     *
-     * @return void
-     */
+    use DatabaseMigrations;
+
+    public function testCreate()
+    {
+        $genre = Genre::create(['name' => 'test']);
+        $this->assertNotNull($genre);
+    }
+
     public function testFillable()
     {
         $fillable = ['name', 'is_active'];

@@ -5,15 +5,20 @@ namespace Tests\Unit;
 use App\Models\Category;
 use App\Models\Traits\Uuid;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Tests\TestCase;
 
 class CategoryTest extends TestCase
 {
-    /**
-     * A basic unit test example.
-     *
-     * @return void
-     */
+
+    use DatabaseMigrations;
+
+    public function testCreate()
+    {
+        $category = Category::create(['name' => 'name value', 'description' => 'description value']);
+        $this->assertNotNull($category);
+    }
+
     public function testFillable()
     {
         $fillable = ['name', 'description', 'is_active'];
