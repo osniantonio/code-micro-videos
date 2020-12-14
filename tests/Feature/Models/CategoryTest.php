@@ -32,7 +32,39 @@ class CategoryTest extends TestCase
 
     public function testCreate()
     {
-        $category = Category::create(['name' => 'name value', 'description' => 'description value']);
-        $this->assertNotNull($category);
+        $category = Category::create(['name' => 'test1']);
+        $category->refresh();
+        $this->assertEquals('test1', $category->name);
+        $this->assertNull($category->description);
+        $this->assertTrue($category->is_active);
+
+        $category = Category::create(['name' => 'test1', 'description' => null]);
+        $this->assertNull($category->description);
+
+        $category = Category::create(['name' => 'test1', 'description' => 'test_description']);
+        $this->assertEquals('test_description', $category->description);
+
+        $category = Category::create(['name' => 'test1', 'is_active' => false]);
+        $this->assertFalse($category->is_active);
+
+        $category = Category::create(['name' => 'test1', 'is_active' => true]);
+        $this->assertTrue($category->is_active);
+    }
+
+    public function testUpdate()
+    {
+        $category = factory(Category::class)->create([
+            'description' => 'test_description',
+            'is_active' => false
+        ])->first();
+        $data = [
+            'name' => 'test_name_updated',
+            'description' => 'test_description_updated',
+            'is_active' => true
+        ];
+        $category->update($data);
+        foreach ($data as $key => $value) {
+            $this->assertEquals($value, $category->{$key});
+        }
     }
 }
