@@ -11,6 +11,28 @@ use Tests\TestCase;
 class GenreTest extends TestCase
 {
     use DatabaseMigrations;
+    private $genre;
+
+    public static function setUpBeforeClass(): void
+    {
+        parent::setUpBeforeClass();
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->genre = new Genre();
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+    }
+
+    public static function tearDownAfterClass(): void
+    {
+        parent::tearDownAfterClass();
+    }
 
     public function testCreate()
     {
@@ -21,8 +43,7 @@ class GenreTest extends TestCase
     public function testFillable()
     {
         $fillable = ['name', 'is_active'];
-        $genre = new Genre();
-        $this->assertEquals($fillable, $genre->getFillable());
+        $this->assertEquals($fillable, $this->genre->getFillable());
     }
 
     public function testeIfUseTraits() {
@@ -34,23 +55,20 @@ class GenreTest extends TestCase
     public function testCastsAttribute()
     {
         $casts = ['id' => 'string'];
-        $genre = new Genre();
-        $this->assertEquals($casts, $genre->getCasts());
+        $this->assertEquals($casts, $this->genre->getCasts());
     }
 
     public function testIncrementingAttribute()
     {
-        $genre = new Genre();
-        $this->assertFalse($genre->getIncrementing());
+        $this->assertFalse($this->genre->getIncrementing());
     }
 
     public function testDatesAttribute()
     {
         $dates = ['deleted_at', 'created_at', 'updated_at'];
-        $genre = new Genre();
         foreach ($dates as $date) {
-            $this->assertContains($date, $genre->getDates());
+            $this->assertContains($date, $this->genre->getDates());
         }
-        $this->assertCount(count($dates), $genre->getDates());
+        $this->assertCount(count($dates), $this->genre->getDates());
     }
 }
