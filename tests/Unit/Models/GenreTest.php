@@ -1,16 +1,14 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests\Unit\Models;
 
 use App\Models\Genre;
 use App\Models\Traits\Uuid;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 class GenreTest extends TestCase
 {
-    use DatabaseMigrations;
     private $genre;
 
     public static function setUpBeforeClass(): void
@@ -32,12 +30,6 @@ class GenreTest extends TestCase
     public static function tearDownAfterClass(): void
     {
         parent::tearDownAfterClass();
-    }
-
-    public function testCreate()
-    {
-        $genre = Genre::create(['name' => 'test']);
-        $this->assertNotNull($genre);
     }
 
     public function testFillable()

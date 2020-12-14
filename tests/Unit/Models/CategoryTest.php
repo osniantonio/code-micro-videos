@@ -1,11 +1,10 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests\Unit\Models;
 
 use App\Models\Category;
 use App\Models\Traits\Uuid;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
 
 # Classe específica - vendor/bin/phpunit tests/Unit/CategoryTest.php
@@ -14,8 +13,6 @@ use Tests\TestCase;
 
 class CategoryTest extends TestCase
 {
-
-    use DatabaseMigrations;
     private $category;
 
     public static function setUpBeforeClass(): void
@@ -37,12 +34,6 @@ class CategoryTest extends TestCase
     public static function tearDownAfterClass(): void
     {
         parent::tearDownAfterClass();
-    }
-
-    public function testCreate()
-    {
-        $category = Category::create(['name' => 'name value', 'description' => 'description value']);
-        $this->assertNotNull($category);
     }
 
     public function testFillable()
