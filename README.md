@@ -1,13 +1,5 @@
-## Nesta primeira fase de projeto, crie o recurso de Category como descrito nas aulas:
+## Testes de integração em categorias e gêneros
 
-Model
-Factory e seeder
-Controller
-E crie mais um recurso, que chamaremos de Gênero.
-Lembrando que o Gênero no sistema significa: Terror, ação, comédia e etc. Ele será relacionado com o Vídeo mais tarde.
+Nesta fase você deverá aplicar os testes de integração nos models Category e Genre.
 
-O Gênero deverá ter os seguintes campos: nome, is_active (Se está ativo ou não).
-
-Se divirta com a fase e ao final envie o projeto para correção como de costume.
-
-Boa sorte!
+Implemente também o teste na exclusão dos registros e crie no teste de criação do registro, uma verificação se o UUID foi gerado corretamente (seja criativo, pense em como testar se o UUID está correto).
