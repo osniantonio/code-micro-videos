@@ -136,4 +136,13 @@ class GenreControllerTest extends TestCase
                 'is_active' => true
             ]);
     }
+
+    public function testDelete()
+    {
+        $genre = factory(Genre::class)->create();
+        $this->deleteJson('/api/genres/'.$genre->id)
+            ->assertStatus(204);
+        $genre = Genre::find($genre->id);
+        $this->assertNull($genre);
+    }
 }
