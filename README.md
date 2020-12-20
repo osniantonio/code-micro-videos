@@ -1,5 +1,6 @@
-## Testes de integração em categorias e gêneros
+## Testes com HTTP
+Nesta fase você deverá aplicar os testes de http nos controllers de Category e Genre.
 
-Nesta fase você deverá aplicar os testes de integração nos models Category e Genre.
+Lembre-se de implementar o teste de exclusão que não foi mostrado nas aulas.
 
-Implemente também o teste na exclusão dos registros e crie no teste de criação do registro, uma verificação se o UUID foi gerado corretamente (seja criativo, pense em como testar se o UUID está correto).
+Boa sorte
