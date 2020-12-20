@@ -34,6 +34,7 @@ class GenreTest extends TestCase
     {
         $genre = Genre::create(['name' => 'test1']);
         $genre->refresh();
+        $this->assertEquals(36, strlen($genre->id));
         $this->assertEquals('test1', $genre->name);
         $this->assertTrue($genre->is_active);
 
@@ -48,7 +49,7 @@ class GenreTest extends TestCase
     {
         $genre = factory(Genre::class)->create([
             'is_active' => false
-        ])->first();
+        ]);
         $data = [
             'name' => 'test_name_updated',
             'is_active' => true
