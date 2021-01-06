@@ -2,7 +2,9 @@
 
 namespace Tests\Feature\Http\Controllers\Api;
 
+use App\Http\Controllers\Api\BasicCrudController;
 use App\Models\Category;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\TestResponse;
@@ -33,27 +35,27 @@ class BasicCrudControllerTest extends TestCase
         parent::tearDown();
     }
 
-    public function testIndex() 
+    public function testIndex()
     {
         $category = CategorySub::create(['name' => 'test_name', 'description' => 'test_description']);
         $result = $this->controller->index()->toArray();
         $this->assertEquals([$category->toArray()], $result);
     }
 
-    public function testInvalidationDataInStore() 
+    public function testInvalidationDataInStore()
     {
         $this->expectException(ValidationException::class);
-        $request =  Mockery::mock(Request::class);
+        $request = \Mockery::mock(Request::class);
         $request
             ->shouldReceive('all')
             ->once()
             ->andReturn(['name' => '']);
-        $this->controller->store($request);        
+        $this->controller->store($request);
     }
 
-    public function testStore() 
+    public function testStore()
     {
-        $request =  Mockery::mock(Request::class);
+        $request = \Mockery::mock(Request::class);
         $request
             ->shouldReceive('all')
             ->once()
@@ -65,4 +67,27 @@ class BasicCrudControllerTest extends TestCase
         );
     }
 
+    public function testIfFindOrFailFetchModel()
+    {
+        $category = CategorySub::create(['name' => 'test_name', 'description' => 'test_description']);
+
+        $reflectionClass = new \ReflectionClass(BasicCrudController::class);
+        $reflectionMethod = $reflectionClass->getMethod('findOrFail');
+        $reflectionMethod->setAccessible(true);
+
+        $result = $reflectionMethod->invokeArgs($this->controller, [$category->id]);
+        $this->assertInstanceOf(CategorySub::class, $result);
+    }
+
+    public function testIfFindOrFailThrowExceptionWhenIdInvalid()
+    {
+        $this->expectException(ModelNotFoundException::class);
+
+        $reflectionClass = new \ReflectionClass(BasicCrudController::class);
+        $reflectionMethod = $reflectionClass->getMethod('findOrFail');
+        $reflectionMethod->setAccessible(true);
+
+        $result = $reflectionMethod->invokeArgs($this->controller, [0]);
+        $this->assertInstanceOf(CategorySub::class, $result);
+    }
 }
