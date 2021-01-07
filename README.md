@@ -1,6 +1,6 @@
-## Testes com HTTP
-Nesta fase você deverá aplicar os testes de http nos controllers de Category e Genre.
+## Abstract CRUD e Resource CastMember
+Neste fase de projeto, você deve implementar e testar:
 
-Lembre-se de implementar o teste de exclusão que não foi mostrado nas aulas.
-
-Boa sorte
+O controller abstrato de CRUD com todos os métodos
+O resource CastMember com os dados: name - string, type - smallInteger (1 - Diretor, 2 - Actor)
+Ao final, submeta o código ao CI e deixe o registro dele no seu repositório Git através de uma pull request.
