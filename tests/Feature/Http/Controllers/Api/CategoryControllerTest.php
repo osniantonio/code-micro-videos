@@ -26,6 +26,7 @@ class CategoryControllerTest extends TestCase
     public function testIndex()
     {
         $response = $this->get(route('categories.index'));
+        //dd($response);
         $response
             ->assertStatus(200)
             ->assertJson([$this->category->toArray()]);

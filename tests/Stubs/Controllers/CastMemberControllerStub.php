@@ -3,23 +3,21 @@
 namespace Tests\Stubs\Controllers;
 
 use App\Http\Controllers\Api\BasicCrudController;
-use App\Http\Controllers\Controller;
-use App\Models\Category;
-use Illuminate\Http\Request;
-use Tests\Stubs\Models\CategorySub;
+use App\Models\CastMember;
+use Tests\Stubs\Models\CastMemberStub;
 
-class CategoryControllerStub extends BasicCrudController
+class CastMemberControllerStub extends BasicCrudController
 {
     protected function model() 
     {
-        return CategorySub::class;
+        return CastMemberStub::class;
     }
 
     protected function rulesStore() 
     {
         return [
             'name' => 'required|max:255',
-            'description' => 'nullable'
+            'type' => 'required|in:' . implode(',', [CastMember::TYPE_ACTOR, CastMember::TYPE_DIRECTOR])
         ];
     }
 
@@ -27,7 +25,7 @@ class CategoryControllerStub extends BasicCrudController
     {
         return [
             'name' => 'required|max:255',
-            'description' => 'nullable'
+            'type' => 'required|in:' . implode(',', [CastMember::TYPE_ACTOR, CastMember::TYPE_DIRECTOR])
         ];
     }
 }
