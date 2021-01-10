@@ -7,11 +7,11 @@ use App\Models\Traits\Uuid;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Tests\TestCase;
 
-# Classe específica - vendor/bin/phpunit tests/Unit/CategoryTest.php
-# Método específico em um arquivo - vendor/bin/phpunit --filter testeIfUseTraits tests/Unit/CategoryTest.php
-# Método específico em uma classe - vendor/bin/phpunit --filter CategoryTest::testeIfUseTraits
+# Classe específica - vendor/bin/phpunit tests/Unit/CategoryUnitTest.php
+# Método específico em um arquivo - vendor/bin/phpunit --filter testeIfUseTraits tests/Unit/CategoryUnitTest.php
+# Método específico em uma classe - vendor/bin/phpunit --filter CategoryUnitTest::testeIfUseTraits
 
-class CategoryTest extends TestCase
+class CategoryUnitTest extends TestCase
 {
     private $category;
 
