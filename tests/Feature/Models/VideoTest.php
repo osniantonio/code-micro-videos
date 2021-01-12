@@ -36,7 +36,7 @@ class VideoTest extends TestCase
 
     public function testCreate()
     {
-        $rating = Video::RATINT_LIST[0];
+        $rating = Video::RATING_LIST[0];
         $data = [
             'title' => 'test1',
             'description' => 'description 1',

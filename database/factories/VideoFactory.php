@@ -6,7 +6,7 @@ use App\Models\Video;
 use Faker\Generator as Faker;
 
 $factory->define(Video::class, function (Faker $faker) {
-    $rating = Video::RATINT_LIST[array_rand(Video::RATINT_LIST)];
+    $rating = Video::RATING_LIST[array_rand(Video::RATING_LIST)];
     return [
         'title' => $faker->sentence(3),
         'description' => $faker->sentence(10),

@@ -2,7 +2,10 @@
 
 namespace Tests\Feature\Http\Controllers\Api;
 
+use App\Models\Category;
+use App\Models\Genre;
 use App\Models\Video;
+use Arr;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use Tests\Traits\TestSaves;
@@ -17,13 +20,15 @@ class VideoControllerTest extends TestCase
 
     protected function setUp(): void
     {
-        parent::setUp();
-        $this->video = factory(Video::class)->create();
+        parent::setup();
+        $this->video = factory(Video::class)->create([
+            'opened' => false
+        ]);
         $this->sendData = [
             'title' => 'title',
             'description' => 'description',
-            'year_launched' => 2021,
-            'rating' => Video::RATINT_LIST[0],
+            'year_launched' => 1992,
+            'rating' => Video::RATING_LIST[0],
             'duration' => 90,
         ];
     }
@@ -31,8 +36,7 @@ class VideoControllerTest extends TestCase
     public function testIndex()
     {
         $response = $this->get(route('videos.index'));
-        $response
-            ->assertStatus(200)
+        $response->assertStatus(200)
             ->assertJson([$this->video->toArray()]);
     }
 
@@ -52,6 +56,8 @@ class VideoControllerTest extends TestCase
             'year_launched' => '',
             'rating' => '',
             'duration' => '',
+            'categories_id' => '',
+            'genres_id' => '',
         ];
         $this->assertInvalidationInStoreAction($data, 'required');
         $this->assertInvalidationInUpdateAction($data, 'required');
@@ -65,6 +71,7 @@ class VideoControllerTest extends TestCase
         $this->assertInvalidationInStoreAction($data, 'max.string', ['max' => 255]);
         $this->assertInvalidationInUpdateAction($data, 'max.string', ['max' => 255]);
     }
+
     public function testInvalidationDurationField()
     {
         $data = [
@@ -101,25 +108,70 @@ class VideoControllerTest extends TestCase
         $this->assertInvalidationInUpdateAction($data, 'in');
     }
 
-    public function testSave()
+    public function testInvalidationCategoriesIdField()
     {
         $data = [
+            'categories_id' => 'a'
+        ];
+        $this->assertInvalidationInStoreAction($data, 'array');
+        $this->assertInvalidationInUpdateAction($data, 'array');
+
+        $data = [
+            'categories_id' => [100]
+        ];
+        $this->assertInvalidationInStoreAction($data, 'exists');
+        $this->assertInvalidationInUpdateAction($data, 'exists');
+    }
+
+    public function testInvalidationGenresIdField()
+    {
+        $data = [
+            'genres_id' => 'a'
+        ];
+        $this->assertInvalidationInStoreAction($data, 'array');
+        $this->assertInvalidationInUpdateAction($data, 'array');
+
+        $data = [
+            'genres_id' => [100]
+        ];
+        $this->assertInvalidationInStoreAction($data, 'exists');
+        $this->assertInvalidationInUpdateAction($data, 'exists');
+    }
+
+    public function testSave()
+    {
+        $category = factory(Category::class)->create();
+        $genre = factory(Genre::class)->create();
+
+        $data = [
             [
-                'send_data' => $this->sendData,
-                'test_data' => $this->sendData + ['opened' => false]
+                'send_data' => $this->sendData + [
+                    'genres_id' => [$genre->id],
+                    'categories_id' => [$category->id],
+                ],
+                'test_data' => $this->sendData + ['opened' => false,]
             ],
             [
-                'send_data' => $this->sendData + ['opened' => true],
+                'send_data' => $this->sendData + [
+                    'genres_id' => [$genre->id],
+                    'categories_id' => [$category->id],
+                    'opened' => true
+                ],
                 'test_data' => $this->sendData + ['opened' => true]
             ],
             [
-                'send_data' => $this->sendData + ['rating' => Video::RATINT_LIST[1]],
-                'test_data' => $this->sendData + ['rating' => Video::RATINT_LIST[1]]
-            ]
+                'send_data' => $this->sendData + [
+                    'rating' => Video::RATING_LIST[1],
+                    'genres_id' => [$genre->id],
+                    'categories_id' => [$category->id],
+                ],
+                'test_data' => $this->sendData + ['rating' => Video::RATING_LIST[1]]
+            ],
         ];
+
         foreach ($data as $key => $value) {
             $response = $this->assertStore(
-                $value['send_data'], 
+                $value['send_data'],
                 $value['test_data'] + ['deleted_at' => null]
             );
             $response->assertJsonStructure([
@@ -127,8 +179,8 @@ class VideoControllerTest extends TestCase
                 'updated_at'
             ]);
 
-            $response = $this->assertStore(
-                $value['send_data'], 
+            $response = $this->assertUpdate(
+                $value['send_data'],
                 $value['test_data'] + ['deleted_at' => null]
             );
             $response->assertJsonStructure([

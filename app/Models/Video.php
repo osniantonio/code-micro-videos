@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Video extends Model
 {
     use SoftDeletes, Traits\Uuid;
-    const RATINT_LIST = ['L', '10', '12', '14', '16', '18'];
+    const RATING_LIST = ['L', '10', '12', '14', '16', '18'];
     protected $fillable = [
         'title',
         'description',
@@ -25,5 +25,15 @@ class Video extends Model
         'duration' => 'integer'
     ];
     public $incrementing = false;
+
+    public function categories() 
+    {
+        return $this->belongsToMany(Category::class);
+    }
+
+    public function genres() 
+    {
+        return $this->belongsToMany(Genre::class);
+    }
 }
 
