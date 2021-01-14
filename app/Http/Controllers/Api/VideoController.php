@@ -22,7 +22,7 @@ class VideoController extends BasicCrudController
             'genres_id' => 'required|array|exists:genres,id,deleted_at,NULL',
         ];
     }
-    
+
     public function store(Request $request)
     {
         $validateData = $this->validate($request, $this->rulesStore());

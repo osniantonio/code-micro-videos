@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Http\Controllers\Api;
 
+use App\Models\Category;
 use App\Models\Genre;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -15,12 +16,17 @@ class GenreControllerTest extends TestCase
 {
     use DatabaseMigrations, TestValidations, TestSaves;
 
+    private $sendData;
     private $genre;
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->genre = factory(Genre::class)->create();
+        $this->sendData = [
+            'name' => 'name',
+            'is_active' => true
+        ];
     }
 
     public function testIndex()
@@ -42,61 +48,93 @@ class GenreControllerTest extends TestCase
     public function testInvalidationData()
     {
         $data = [
-            'name' => ''
+            'name' => '',
+            'categories_id' => '',
         ];
         $this->assertInvalidationInStoreAction($data, 'required');
         $this->assertInvalidationInUpdateAction($data, 'required');
 
         $data = [
-            'name' => str_repeat('a', 256)
+            'name' => str_repeat('a', 256),
         ];
         $this->assertInvalidationInStoreAction($data, 'max.string', ['max' => 255]);
         $this->assertInvalidationInUpdateAction($data, 'max.string', ['max' => 255]);
 
         $data = [
-            'is_active' => 'a'
+            'is_active' => 'a',
         ];
         $this->assertInvalidationInStoreAction($data, 'boolean');
         $this->assertInvalidationInUpdateAction($data, 'boolean');
+
+        $data = [
+            'categories_id' => 'a',
+        ];
+        $this->assertInvalidationInStoreAction($data, 'array');
+        $this->assertInvalidationInUpdateAction($data, 'array');
+
+        $data = [
+            'categories_id' => [100],
+        ];
+        $this->assertInvalidationInStoreAction($data, 'exists');
+        $this->assertInvalidationInUpdateAction($data, 'exists');
+
+        $category = factory(Category::class)->create();
+        $category->delete();
+        $data = [
+            'categories_id' => [$category->id],
+        ];
+        $this->assertInvalidationInStoreAction($data, 'exists');
+        $this->assertInvalidationInUpdateAction($data, 'exists');
     }
 
-    public function testStore()
+    public function testSave()
     {
+        $category = factory(Category::class)->create();
         $data = [
-            'name' => 'test'
+            [
+                'send_data' => $this->sendData + [
+                    'categories_id' => [$category->id],
+                    'is_active' => true
+                ],
+                'test_data' => $this->sendData + ['is_active' => true,]
+            ],
+            [
+                'send_data' => $this->sendData + [
+                    'categories_id' => [$category->id],
+                    'is_active' => false
+                ],
+                'test_data' => $this->sendData + ['is_active' => false]
+            ]
         ];
-        $response = $this->assertStore($data, $data + ['is_active' => true, 'deleted_at' => null]);
-        $response->assertJsonStructure([
-            'created_at', 'updated_at'
-        ]);
+        foreach ($data as $key => $value) {
+            $response = $this->assertStore(
+                $value['send_data'],
+                $value['test_data'] + ['deleted_at' => null]
+            );
+            $response->assertJsonStructure([
+                'created_at',
+                'updated_at'
+            ]);
+            $this->assertHasCategory($response->json('id'), $category->id);
 
-        $data = [
-            'name' => 'test',
-            'is_active' => false
-        ];
-        $this->assertStore($data, $data + ['is_active' => false]);
+            $response = $this->assertUpdate(
+                $value['send_data'],
+                $value['test_data'] + ['deleted_at' => null]
+            );
+            $response->assertJsonStructure([
+                'created_at',
+                'updated_at'
+            ]);
+            $this->assertHasCategory($response->json('id'), $category->id);
+        }
     }
 
-    public function testUpdate()
+    protected function assertHasCategory($genreId, $categoryId)
     {
-        $this->genre = factory(Genre::class)->create([
-            'name' => 'test',
-            'is_active' => false
+        $this->assertDatabaseHas('category_genre', [
+            'genre_id' => $genreId,
+            'category_id' => $categoryId
         ]);
-        $data = [
-            'name' => 'test',
-            'is_active' => false
-        ];
-        $response = $this->assertUpdate($data, $data + ['deleted_at' => null]);
-        $response->assertJsonStructure([
-            'created_at', 'updated_at'
-        ]);
-
-        $data = [
-            'name' => 'test1',
-            'is_active' => true
-        ];
-        $this->assertUpdate($data, array_merge($data, ['name' => 'test1', 'is_active' => true]));
     }
 
     public function testDeleteJson()

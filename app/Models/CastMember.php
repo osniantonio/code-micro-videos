@@ -14,4 +14,12 @@ class CastMember extends Model
     protected $dates = ['deleted_at'];
     protected $casts = ['id' => 'string', 'type' => 'smallInteger'];
     public $incrementing = false;
+
+    public static function types()
+    {
+        return [
+            self::TYPE_DIRECTOR,
+            self::TYPE_ACTOR,
+        ];
+    }
 }
