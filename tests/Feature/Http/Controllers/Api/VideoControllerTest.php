@@ -301,9 +301,84 @@ class VideoControllerTest extends TestCase
         $this->assertNotNull(Video::withTrashed()->find($this->video->id));
     }
 
+    public function testSyncCategories()
+    {
+        $categoriesId = factory(Category::class, 3)->create()->pluck('id')->toArray();
+        $genre = factory(Genre::class)->create();
+        $genre->categories()->sync($categoriesId);
+        $genreId = $genre->id;
+
+        $response = $this->json('POST', 
+            $this->routeStore(), 
+            $this->sendData + [
+                'genres_id' => [$genreId],
+                'categories_id' => [$categoriesId[0]],
+            ]
+        );
+
+        $this->assertHasCategory($response->json('id'), $categoriesId[0]);
+        
+        $response = $this->json(
+            'PUT',
+            route('videos.update', ['video' => $response->json('id')]),
+            $this->sendData + [
+                'genres_id' => [$genreId],
+                'categories_id' => [$categoriesId[1], $categoriesId[2]],
+            ]
+        );
+
+        $this->assertDatabaseMissingHasCategory($response->json('id'), $categoriesId[0]);
+        $this->assertHasCategory($response->json('id'), $categoriesId[1]);
+        $this->assertHasCategory($response->json('id'), $categoriesId[2]);
+    }
+
+    public function testSyncGenres()
+    {
+        /** @var Collection $genres */
+        $genres = factory(Genre::class, 3)->create();
+        $genresId = $genres->pluck('id')->toArray();
+        $categoryId = factory(Category::class)->create()->id;
+        $genres->each(function ($genre) use ($categoryId) {
+            $genre->categories()->sync($categoryId);
+        });
+
+        $response = $this->json('POST', 
+            $this->routeStore(), 
+            $this->sendData + [
+                'categories_id' => [$categoryId],
+                'genres_id' => [$genresId[0]],                
+            ]
+        );
+
+        $this->assertHasGenre($response->json('id'), $genresId[0]);
+        
+        $response = $this->json(
+            'PUT',
+            route('videos.update', ['video' => $response->json('id')]),
+            $this->sendData + [
+                'genres_id' => [$genresId[1], $genresId[2]],
+                'categories_id' => [$categoryId],
+            ]
+        );
+
+        $this->assertDatabaseMissingHasGenre($response->json('id'), $genresId[0]);
+        $this->assertHasGenre($response->json('id'), $genresId[1]);
+        $this->assertHasGenre($response->json('id'), $genresId[2]);
+    }
+
+    public function assertDatabaseMissingHasGenre($videoId, $genreId)
+    {
+        $this->assertDatabaseMissing('genre_video', ['genre_id' => $genreId, 'video_id' => $videoId]);
+    }
+
+    public function assertDatabaseMissingHasCategory($videoId, $categoryId)
+    {
+        $this->assertDatabaseMissing('category_video', ['category_id' => $categoryId, 'video_id' => $videoId]);
+    }
+
     public function assertHasCategory($videoId, $categoryId)
     {
-        $this->assertDatabaseHas('category_video', ['video_id' => $videoId, 'category_id' => $categoryId]);
+        $this->assertDatabaseHas('category_video', ['category_id' => $categoryId, 'video_id' => $videoId]);
     }
 
     public function assertHasGenre($videoId, $genreId)
