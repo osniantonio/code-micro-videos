@@ -13,7 +13,7 @@ class GenreSub extends Model
     public static function createTable() {
         \Schema::create('genre_stubs', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('name');
+            $table->string('name')->unique();
             $table->timestamps();
         });
     }
