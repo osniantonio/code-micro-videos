@@ -152,11 +152,14 @@ class GenreControllerTest extends TestCase
             ->once()
             ->andThrow(new TestException());
 
+        $hasError = false;
         try {
             $controller->store($request);
         } catch (TestException $exception) {
             $this->assertCount(1, Genre::all());
+            $hasError = true;
         }
+        $this->assertTrue($hasError);
     }
 
     public function testRollBackUpdate()
@@ -198,13 +201,12 @@ class GenreControllerTest extends TestCase
             $this->assertCount(1, Genre::all());
             $hasError = true;
         }
-
         $this->assertTrue($hasError);
     }
 
     public function testSyncCategories()
     {
-        $categoriesId =  factory(Category::class, 3)->create()->pluck('id')->toArray();
+        $categoriesId = factory(Category::class, 3)->create()->pluck('id')->toArray();
 
         $sendData = [
             'name' => 'test',
