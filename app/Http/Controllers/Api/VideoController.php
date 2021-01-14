@@ -49,10 +49,10 @@ class VideoController extends BasicCrudController
         return $obj;
     }
 
-    protected function handleRelations($video, Request $request)
+    protected function handleRelations($obj, Request $request)
     {
-        $video->categories()->sync($request->get('categories_id'));
-        $video->genres()->sync($request->get('genres_id'));
+        $obj->categories()->sync($request->get('categories_id'));
+        $obj->genres()->sync($request->get('genres_id'));
     }
 
     public function model()

@@ -20,7 +20,7 @@ class GenreController extends BasicCrudController
         $self = $this;
         $obj = \DB::transaction(function () use ($request, $validatedData, $self) {
             $obj = $this->model()::create($validatedData);
-            $self->handleRelations($request, $obj);
+            $self->handleRelations($obj, $request);
             return $obj;
         });
         $obj->refresh();
@@ -34,13 +34,13 @@ class GenreController extends BasicCrudController
         $self = $this;
         $obj = \DB::transaction(function () use ($request, $validatedData, $self, $obj) {
             $obj->update($validatedData);
-            $self->handleRelations($request, $obj);
+            $self->handleRelations($obj, $request);
             return $obj;
         });
         return $obj;
     }
 
-    protected function handleRelations(Request $request, $obj)
+    protected function handleRelations($obj, Request $request)
     {
         $obj->categories()->sync($request->get('categories_id'));
     }
