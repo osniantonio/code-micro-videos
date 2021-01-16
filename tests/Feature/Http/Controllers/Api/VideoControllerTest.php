@@ -228,12 +228,17 @@ class VideoControllerTest extends TestCase
             ->withAnyArgs()
             ->andReturn([]);
 
-        $request = \Mockery::mock(Request::class);
-
         $controller
             ->shouldReceive('handleRelations')
             ->once()
             ->andThrow(new TestException());
+
+        $request = \Mockery::mock(Request::class);
+
+        $request
+            ->shouldReceive('get')
+            ->withAnyArgs()
+            ->andReturnNull();
 
         $hasError = false;
         try {
@@ -273,6 +278,11 @@ class VideoControllerTest extends TestCase
 
         $request = \Mockery::mock(Request::class);
 
+        $request
+            ->shouldReceive('get')
+            ->withAnyArgs()
+            ->andReturnNull();
+
         $hasError = false;
         try {
             $controller->update($request, 1);
@@ -308,8 +318,9 @@ class VideoControllerTest extends TestCase
         $genre->categories()->sync($categoriesId);
         $genreId = $genre->id;
 
-        $response = $this->json('POST', 
-            $this->routeStore(), 
+        $response = $this->json(
+            'POST',
+            $this->routeStore(),
             $this->sendData + [
                 'genres_id' => [$genreId],
                 'categories_id' => [$categoriesId[0]],
@@ -317,7 +328,7 @@ class VideoControllerTest extends TestCase
         );
 
         $this->assertHasCategory($response->json('id'), $categoriesId[0]);
-        
+
         $response = $this->json(
             'PUT',
             route('videos.update', ['video' => $response->json('id')]),
@@ -342,16 +353,17 @@ class VideoControllerTest extends TestCase
             $genre->categories()->sync($categoryId);
         });
 
-        $response = $this->json('POST', 
-            $this->routeStore(), 
+        $response = $this->json(
+            'POST',
+            $this->routeStore(),
             $this->sendData + [
                 'categories_id' => [$categoryId],
-                'genres_id' => [$genresId[0]],                
+                'genres_id' => [$genresId[0]],
             ]
         );
 
         $this->assertHasGenre($response->json('id'), $genresId[0]);
-        
+
         $response = $this->json(
             'PUT',
             route('videos.update', ['video' => $response->json('id')]),
