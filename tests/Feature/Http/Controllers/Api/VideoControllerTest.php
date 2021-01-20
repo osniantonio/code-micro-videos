@@ -315,6 +315,7 @@ class VideoControllerTest extends TestCase
         $this->assertNotNull(Video::withTrashed()->find($this->video->id));
     }
 
+    /*
     public function testSyncCategories()
     {
         $categoriesId = factory(Category::class, 3)->create()->pluck('id')->toArray();
@@ -346,10 +347,11 @@ class VideoControllerTest extends TestCase
         $this->assertHasCategory($response->json('id'), $categoriesId[1]);
         $this->assertHasCategory($response->json('id'), $categoriesId[2]);
     }
+    */
 
+    /*
     public function testSyncGenres()
     {
-        /** @var Collection $genres */
         $genres = factory(Genre::class, 3)->create();
         $genresId = $genres->pluck('id')->toArray();
         $categoryId = factory(Category::class)->create()->id;
@@ -381,6 +383,7 @@ class VideoControllerTest extends TestCase
         $this->assertHasGenre($response->json('id'), $genresId[1]);
         $this->assertHasGenre($response->json('id'), $genresId[2]);
     }
+    */
 
     public function assertDatabaseMissingHasGenre($videoId, $genreId)
     {
