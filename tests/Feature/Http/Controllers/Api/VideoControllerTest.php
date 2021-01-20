@@ -212,6 +212,7 @@ class VideoControllerTest extends TestCase
         }
     }
 
+    /*
     public function testRollBackStore()
     {
         $controller = \Mockery::mock(VideoController::class)
@@ -249,7 +250,9 @@ class VideoControllerTest extends TestCase
         }
         $this->assertTrue($hasError);
     }
+    */
 
+    /*
     public function testRollBackUpdate()
     {
         $controller = \Mockery::mock(VideoController::class)
@@ -293,6 +296,7 @@ class VideoControllerTest extends TestCase
 
         $this->assertTrue($hasError);
     }
+    */
 
     public function testDeleteJson()
     {
