@@ -228,7 +228,7 @@ class GenreControllerTest extends TestCase
             $sendData
         );
 
-        $this->assertMissingHasCategory($response->json('id'), $categoriesId[0]);
+        $this->assertDatabaseMissingHasCategory($response->json('id'), $categoriesId[0]);
         $this->assertHasCategory($response->json('id'), $categoriesId[1]);
         $this->assertHasCategory($response->json('id'), $categoriesId[2]);
     }
@@ -238,7 +238,7 @@ class GenreControllerTest extends TestCase
         $this->assertDatabaseHas('category_genre', ['genre_id' => $genreId, 'category_id' => $categoryId]);
     }
 
-    public function assertMissingHasCategory($genreId, $categoryId)
+    public function assertDatabaseMissingHasCategory($genreId, $categoryId)
     {
         $this->assertDatabaseMissing('category_genre', ['genre_id' => $genreId, 'category_id' => $categoryId]);
     }
