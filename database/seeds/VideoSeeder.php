@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Genre;
+use App\Models\Video;
 use Illuminate\Database\Seeder;
 
 class VideoSeeder extends Seeder
@@ -15,7 +16,7 @@ class VideoSeeder extends Seeder
         $genres = Genre::all();
         factory(\App\Models\Video::class, 100)
             ->create()
-            ->each(function($video) use($genres) {
+            ->each(function(Video $video) use($genres) {
                 $subGenres = $genres->random(5)->load('categories');
                 $categoriesId = [];
                 foreach ($subGenres as $genre) {

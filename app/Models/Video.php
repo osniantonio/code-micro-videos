@@ -9,7 +9,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Video extends Model
 {
     use SoftDeletes, Traits\Uuid, UploadFiles;
+
     const RATING_LIST = ['L', '10', '12', '14', '16', '18'];
+    const THUMB_FILE_MAX_SIZE = 1024 * 5; // 5MB
+    const BANNER_FILE_MAX_SIZE = 1024 * 10; // 10MB
+    const TRAILER_FILE_MAX_SIZE = 1024 * 100; // 100MB
+    const VIDEO_FILE_MAX_SIZE = 1024 * 50; // 50MB
+
     protected $fillable = [
         'title',
         'description',
@@ -31,7 +37,7 @@ class Video extends Model
         'video_file',
         'thumb_file',
         'trailer_file',
-        'banner_file',
+        'banner_file'
     ];
 
     public static function create(array $attributes = [])
@@ -46,7 +52,7 @@ class Video extends Model
             return $obj;
         } catch (\Exception $e) {
             if (isset($obj)) {
-                //$obj->deleteFiles($files);
+                $obj->deleteFiles($files);
             }
             \DB::rollBack();
             throw $e;
@@ -55,21 +61,21 @@ class Video extends Model
 
     public function update(array $attributes = [], array $options = [])
     {
-        //$files = self::extractFiles($attributes);
+        $files = self::extractFiles($attributes);
         try {
             \DB::beginTransaction();
             $saved = parent::update($attributes, $options);
             static::handleRelations($this, $attributes);
             if ($saved) {
-            //    $this->uploadFiles($files);
+                $this->uploadFiles($files);
             }
             \DB::commit();
-            //if ($saved && count($files)) {
-            //    $this->deleteOldFiles();
-            //}
+            if ($saved && count($files)) {
+                $this->deleteOldFiles();
+            }
             return $saved;
         } catch (\Exception $e) {
-            //$this->deleteFiles($files);
+            $this->deleteFiles($files);
             \DB::rollBack();
             throw $e;
         }
