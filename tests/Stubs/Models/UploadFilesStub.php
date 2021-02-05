@@ -11,25 +11,26 @@ class UploadFilesStub extends Model
 {
     use UploadFiles;
 
+    protected $table = 'upload_file_stubs';
+    protected $fillable = ['name', 'file1', 'file2'];
+
     protected static $fileFields = ['file1', 'file2'];
 
-    /*public static function createTable()
+    public static function makeTable()
     {
-        Schema::create('videos_stubs', function (Blueprint $table) {
+        \Schema::create('upload_file_stubs', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('title');
-            $table->text('description');
-            $table->smallInteger('year_launched');
-            $table->string('rating', 3);
-            $table->smallInteger('duration');
+            $table->string('name');
+            $table->string('file1')->nullable();
+            $table->string('file2')->nullable();
             $table->timestamps();
         });
     }
 
     public static function dropTable()
     {
-        Schema::dropIfExists('videos_stubs');
-    }*/
+        \Schema::dropIfExists('upload_file_stubs');
+    }
 
     protected function uploadDir()
     {

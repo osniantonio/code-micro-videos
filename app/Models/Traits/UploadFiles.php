@@ -19,6 +19,7 @@ trait UploadFiles
             $filesFiltered = Arr::where($filesUpdated, function ($fileField) use ($model) {
                 return $model->getOriginal($fileField);
             });
+
             $model->oldFiles = array_map(function ($fileField) use ($model) {
                 return $model->getOriginal($fileField);
             }, $filesFiltered);

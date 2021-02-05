@@ -9,7 +9,6 @@ use Tests\Exceptions\TestException;
 
 class VideoUploadTest extends BaseVideoTestCase
 {
-
     public function testCreatedWithFiles()
     {
         \Storage::fake();
@@ -27,7 +26,7 @@ class VideoUploadTest extends BaseVideoTestCase
 
         $hasError = false;
         try {
-            $video = Video::create($this->data + $this->getFiles());
+            Video::create($this->data + $this->getFiles());
         } catch (TestException $e) {
             $this->assertCount(0, \Storage::allFiles());
             $hasError = true;
@@ -39,9 +38,8 @@ class VideoUploadTest extends BaseVideoTestCase
     {
         \Storage::fake();
         $video = factory(Video::class)->create();
-        $thumbFile = $this->getFiles()['thumb_file'];
-        $videoFile = $this->getFiles()['video_file'];
-
+        $thumbFile = UploadedFile::fake()->image('thumb.jpg');
+        $videoFile = UploadedFile::fake()->create('video.mp4');
         $video->update(
             $this->data + [
                 'thumb_file' => $thumbFile,
@@ -51,7 +49,7 @@ class VideoUploadTest extends BaseVideoTestCase
         \Storage::assertExists("{$video->id}/{$video->thumb_file}");
         \Storage::assertExists("{$video->id}/{$video->video_file}");
 
-        $newVideoFile = UploadedFile::fake()->create('video_file.mp4');
+        $newVideoFile = UploadedFile::fake()->image('video.mp4');
         $video->update(
             $this->data + [
                 'video_file' => $newVideoFile,

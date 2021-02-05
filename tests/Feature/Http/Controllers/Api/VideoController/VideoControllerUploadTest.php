@@ -31,7 +31,7 @@ class VideoControllerUploadTest extends BaseVideoControllerTestCase
     {
         \Storage::fake();
         $files = $this->getFiles();
-
+        
         $category = factory(Category::class)->create();
         $genre = factory(Genre::class)->create();
         $genre->categories()->sync($category->id);

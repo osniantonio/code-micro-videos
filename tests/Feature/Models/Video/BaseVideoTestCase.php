@@ -11,7 +11,7 @@ abstract class BaseVideoTestCase extends TestCase
 {
     use DatabaseMigrations;
 
-    protected $data;    
+    protected $data;  
 
     protected function setUp(): void
     {
@@ -21,7 +21,7 @@ abstract class BaseVideoTestCase extends TestCase
             'description' => 'description',
             'year_launched' => 2010,
             'rating' => Video::RATING_LIST[0],
-            'duration' => 90,
+            'duration' => 90
         ];
     }
 
@@ -29,8 +29,8 @@ abstract class BaseVideoTestCase extends TestCase
     {
         return
             [
-                'thumb_file' => UploadedFile::fake()->create('thumb_file.jpg'),
-                'banner_file' => UploadedFile::fake()->create('banner_file.jpg'),
+                'thumb_file' => UploadedFile::fake()->image('thumb_file.jpg'),
+                'banner_file' => UploadedFile::fake()->image('banner_file.jpg'),
                 'video_file' => UploadedFile::fake()->create('video_file.mp4'),
                 'trailer_file' => UploadedFile::fake()->create('trailer_file.mp4')
             ];

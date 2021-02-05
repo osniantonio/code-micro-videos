@@ -70,7 +70,7 @@ class Video extends Model
                 $this->uploadFiles($files);
             }
             \DB::commit();
-            if ($saved && count($files)) {
+            if($saved && count($files)) {
                 $this->deleteOldFiles();
             }
             return $saved;

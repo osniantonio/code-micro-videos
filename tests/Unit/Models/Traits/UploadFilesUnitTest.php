@@ -16,6 +16,14 @@ class UploadFilesUnitTest extends TestCase
         $this->obj = new UploadFilesStub();
     }
 
+    public function testUploadFile()
+    {
+        //\Storage::fake();
+        $file = UploadedFile::fake()->create('video.mp4');
+        $this->obj->uploadFile($file);
+        \Storage::assertExists("1/{$file->hashName()}");
+    }
+
     public function testUploadFiles()
     {
         \Storage::fake();
@@ -25,14 +33,6 @@ class UploadFilesUnitTest extends TestCase
         \Storage::assertExists("1/{$file1->hashName()}");
         \Storage::assertExists("1/{$file2->hashName()}");
     }
-
-    public function testUploadFile()
-    {
-        \Storage::fake();
-        $file = UploadedFile::fake()->create('video.mp4');
-        $this->obj->uploadFile($file);
-        \Storage::assertExists("1/{$file->hashName()}");
-    }    
 
     public function testUploadDeleteFile()
     {
