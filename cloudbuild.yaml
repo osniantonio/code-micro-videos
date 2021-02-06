@@ -1,7 +1,26 @@
 steps:
+
+- id: "Descriptografando a chave service-account "
+    name: 'gcr.io/cloud-builders/gcloud'
+    args:
+      - kms
+      - decrypt
+      - --ciphertext-file=./storage/credentials/google/my-project-17-01-1983-ea83fbc638a2.json.enc
+      - --plaintext-file=./storage/credentials/google/my-project-17-01-1983-ea83fbc638a2.json
+      - --location=global
+      - --keyring=testing-lesson
+      - --key=service-account
+	    - --project=$PROJECT_ID
+
 - id: "Rodando-docker-compose"
   name: 'gcr.io/$PROJECT_ID/docker-compose:1.25.5'
   args: ['-f','docker-compose.prod.yaml','up','-d']
+  env:
+      - GOOGLE_CLOUD_PROJECT_ID=$PROJECT_ID
+      - GOOGLE_CLOUD_KEY_FILE=my-project-17-01-1983-ea83fbc638a2.json
+      - GOOGLE_CLOUD_STORAGE_BUCKET=code-micro-videos-osniantonio
+      - GOOGLE_CLOUD_STORAGE_API_URI=https://storage.cloud.google.com/code-micro-videos-osniantonio
+      - TESTING_PROD=true
 
 - id: "Chown in /var/www"
   name: 'gcr.io/cloud-builders/docker'
