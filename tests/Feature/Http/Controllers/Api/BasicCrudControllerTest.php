@@ -20,6 +20,8 @@ use \Mockery;
 
 class BasicCrudControllerTest extends TestCase
 {
+    use DatabaseMigrations;
+    
     private $controller;
     protected function setUp(): void
     {

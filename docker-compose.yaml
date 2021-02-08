@@ -27,7 +27,7 @@ services:
             - app-network
         depends_on:
             - app
-
+    
     db:
         image: library/mysql:5.7
         command: --innodb-use-native-aio=0
