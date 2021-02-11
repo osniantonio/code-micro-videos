@@ -36,7 +36,11 @@ steps:
 
 - id: 'Rodando config:clear'
   name: 'gcr.io/cloud-builders/docker'
-  args: ['exec','-t','app','php','/var/www/artisan','config:clear'] 
+  args: ['exec','-t','app','php','/var/www/artisan','config:clear']
+  
+- id: 'Rodando config:cache'
+  name: 'gcr.io/cloud-builders/docker'
+  args: ['exec','-t','app','php','/var/www/artisan','config:cache']
 
 - id: 'Copiando .env'
   name: 'gcr.io/cloud-builders/docker'
