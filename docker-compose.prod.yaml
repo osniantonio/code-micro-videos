@@ -4,13 +4,8 @@ services:
 
     app:
         build: .
-        environment:
-            - GOOGLE_CLOUD_PROJECT_ID=${GOOGLE_CLOUD_PROJECT_ID}
-            - GOOGLE_CLOUD_KEY_FILE=${GOOGLE_CLOUD_KEY_FILE}
-            - GOOGLE_CLOUD_STORAGE_BUCKET=${GOOGLE_CLOUD_STORAGE_BUCKET}
-            - GOOGLE_CLOUD_STORAGE_API_URI=${GOOGLE_CLOUD_STORAGE_API_URI}
-            - TESTING_PROD=${TESTING_PROD}
         container_name: app
+        entrypoint: dockerize -wait tcp://db:3306 -timeout 40s /entrypoint.prod.sh
         volumes:
             - .:/var/www
         networks:
@@ -18,6 +13,12 @@ services:
         depends_on:
             - db
             - redis
+        environment:
+            - GOOGLE_CLOUD_PROJECT_ID=${GOOGLE_CLOUD_PROJECT_ID}
+            - GOOGLE_CLOUD_KEY_FILE=${GOOGLE_CLOUD_KEY_FILE}
+            - GOOGLE_CLOUD_STORAGE_BUCKET=${GOOGLE_CLOUD_STORAGE_BUCKET}
+            - GOOGLE_CLOUD_STORAGE_API_URI=${GOOGLE_CLOUD_STORAGE_API_URI}
+            - TESTING_PROD=${TESTING_PROD}
 
     nginx:
         build: .docker/nginx
