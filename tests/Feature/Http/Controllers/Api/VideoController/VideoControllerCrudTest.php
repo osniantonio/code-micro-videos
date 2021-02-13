@@ -7,11 +7,12 @@ use App\Models\Category;
 use App\Models\Genre;
 use App\Models\Video;
 use Tests\Traits\TestValidations;
+use Illuminate\Support\Arr;
 
 class VideoControllerCrudTest extends BaseVideoControllerTestCase
 {
     use TestValidations, TestSaves;
-
+    
     public function testIndex()
     {
         $response = $this->get(route('videos.index'));
@@ -135,33 +136,19 @@ class VideoControllerCrudTest extends BaseVideoControllerTestCase
 
     public function testSaveWithoutFiles()
     {
-        $category = factory(Category::class)->create();
-        $genre = factory(Genre::class)->create();
-        $genre->categories()->sync($category->id);
-
+        $testData = Arr::except($this->sendData, ['categories_id', 'genres_id']);
         $data = [
             [
-                'send_data' => $this->sendData + [
-                    'genres_id' => [$genre->id],
-                    'categories_id' => [$category->id],
-                ],
-                'test_data' => $this->sendData + ['opened' => false,]
+                'send_data' => $this->sendData,
+                'test_data' => $testData + ['opened' => false],
             ],
             [
-                'send_data' => $this->sendData + [
-                    'genres_id' => [$genre->id],
-                    'categories_id' => [$category->id],
-                    'opened' => true
-                ],
-                'test_data' => $this->sendData + ['opened' => true]
+                'send_data' => $this->sendData + ['opened' => true],
+                'test_data' => $testData + ['opened' => true],
             ],
             [
-                'send_data' => $this->sendData + [
-                    'rating' => Video::RATING_LIST[1],
-                    'genres_id' => [$genre->id],
-                    'categories_id' => [$category->id],
-                ],
-                'test_data' => $this->sendData + ['rating' => Video::RATING_LIST[1]]
+                'send_data' => $this->sendData,
+                'test_data' => $testData + ['rating' => Video::RATING_LIST[1]],
             ],
         ];
 

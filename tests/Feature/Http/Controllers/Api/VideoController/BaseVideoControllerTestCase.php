@@ -9,6 +9,7 @@ use App\Models\Genre;
 use App\Models\Video;
 use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
+use Illuminate\Foundation\Testing\TestResponse;
 
 abstract class BaseVideoControllerTestCase extends TestCase
 {
@@ -19,16 +20,19 @@ abstract class BaseVideoControllerTestCase extends TestCase
 
     protected function setUp(): void
     {
-        parent::setup();
-        $this->video = factory(Video::class)->create([
-            'opened' => false
-        ]);
+        parent::setUp();
+        $this->video = factory(Video::class)->create(['opened' => false]);
+        $category = factory(Category::class)->create();
+        $genre = factory(Genre::class)->create();
+        $genre->categories()->sync($category->id);
         $this->sendData = [
             'title' => 'title',
             'description' => 'description',
-            'year_launched' => 1992,
+            'year_launched' => 2010,
             'rating' => Video::RATING_LIST[0],
             'duration' => 90,
+            'categories_id' => [$category->id],
+            'genres_id' => [$genre->id],
         ];
     }
 
@@ -41,6 +45,21 @@ abstract class BaseVideoControllerTestCase extends TestCase
                 'video_file' => UploadedFile::fake()->create('video_file.mp4'),
                 'trailer_file' => UploadedFile::fake()->create('trailer_file.mp4')
             ];
+    }
+
+    protected function assertIfFileUrlExists(Video $video, TestResponse $response)
+    {
+        $fileFields = Video::$fileFields;
+        $data = $response->json('data');
+        $data = array_key_exists(0, $data) ? $data[0] : $data;
+        foreach ($fileFields as $field) {
+            $file = $video->{$field};
+            $fileUrl = filled($file) ? \Storage::url($video->relativeFilePath($file)) : null;
+            $this->assertEquals(
+                $fileUrl,
+                $data[$field.'_url']
+            );
+        }
     }
 
     public function assertHasCategory($videoId, $categoryId)

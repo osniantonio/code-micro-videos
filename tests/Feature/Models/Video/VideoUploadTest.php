@@ -95,6 +95,22 @@ class VideoUploadTest extends BaseVideoTestCase
         }
     }
 
+    public function testFileUrlsWithGcsDriver()
+    {
+        $fileFields = [];
+        $files = $this->getFiles();
+        foreach (Video::$fileFields as $field) {
+            $fileFields[$field] = $files[$field]->hashName();
+        }
+        $video = factory(Video::class)->create($fileFields + $files);
+        $baseUrl = config("filesystems.disks.gcs.storage_api_uri");
+        \Config::set("filesystems.default", 'gcs');
+        foreach ($fileFields as $field => $value) {
+            $fileUrl = $video->{"{$field}_url"};
+            $this->assertEquals("{$baseUrl}/$video->id/$value", $fileUrl);
+        }
+    }
+
     public function testFileUrlsIfNullWhenFiledAreNull()
     {
         $video = factory(Video::class)->create();
