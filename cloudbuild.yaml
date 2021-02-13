@@ -55,8 +55,8 @@ steps:
   args: ['exec','-t','app','php','/var/www/artisan','migrate']
 
 - id: 'Rodando o comando docker-ps'
-    name: gcr.io/cloud-builders/docker
-    args: ['ps', '-a']
+  name: 'gcr.io/cloud-builders/docker'
+  args: ['ps', '-a']
 
 - id: 'Rodando PHPUnit'
   name: 'gcr.io/cloud-builders/docker'
