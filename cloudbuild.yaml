@@ -62,6 +62,15 @@ steps:
   name: 'gcr.io/cloud-builders/docker'
   args: ['logs', 'db']
 
+- id: 'Executando: docker-compose exec db bash'
+  name: 'gcr.io/cloud-builders/docker'
+  args: ['exec','-t','db','bash']
+
+- id: 'Criando a base de dados de teste'
+  name: 'gcr.io/cloud-builders/docker'
+  args: ['exec', 'bd', 'mysql', '-c', 'CREATE DATABASE roadkill;', '-U', 'postgres']
+  waitFor: ['sleep']
+
 - id: 'Rodando PHPUnit'
   name: 'gcr.io/cloud-builders/docker'
   args: ['exec','-t','app','php','/var/www/vendor/bin/phpunit','-c','/var/www/phpunit.xml']
