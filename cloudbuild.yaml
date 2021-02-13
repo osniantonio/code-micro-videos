@@ -66,6 +66,10 @@ steps:
   name: 'gcr.io/cloud-builders/docker'
   args: ['exec','-t','db','bash']
 
+- id: 'Comando: mysql -u root -p'
+  name: 'gcr.io/cloud-builders/docker'
+  args: ['mysql','-u','root','-p']
+
 - id: 'Rodando PHPUnit'
   name: 'gcr.io/cloud-builders/docker'
   args: ['exec','-t','app','php','/var/www/vendor/bin/phpunit','-c','/var/www/phpunit.xml']
