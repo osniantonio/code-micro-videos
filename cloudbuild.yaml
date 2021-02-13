@@ -65,8 +65,3 @@ steps:
 - id: 'Rodando PHPUnit'
   name: 'gcr.io/cloud-builders/docker'
   args: ['exec','-t','app','php','/var/www/vendor/bin/phpunit','-c','/var/www/phpunit.xml']
-  env:
-      - MYSQL_DATABASE=code_micro_videos_test
-      - MYSQL_PASSWORD=root
-      - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_USER=root
