@@ -22,6 +22,16 @@ steps:
       - GOOGLE_CLOUD_STORAGE_API_URI=https://storage.cloud.google.com/code-micro-videos-osniantonio
       - TESTING_PROD=true
 
+- id: 'Executando script de banco'      
+  name: 'gcr.io/cloud-builders/gcloud'
+  entrypoint: 'bash'
+  args:
+  - '-c'
+  - |
+    apt update
+    apt install -y mysql-client
+    ./.docker/mysql/initdb.sql
+
 - id: 'Chown in /var/www'
   name: 'gcr.io/cloud-builders/docker'
   args: ['exec','-u','root','-t','app','chown','-R','www-data:www-data','/var/www']
@@ -52,7 +62,7 @@ steps:
 
 - id: 'Rodando migrations'
   name: 'gcr.io/cloud-builders/docker'
-  args: ['exec','-t','app','php','/var/www/artisan','migrate:install']
+  args: ['exec','-t','app','php','/var/www/artisan','migrate']
 
 - id: 'Rodando o comando docker-ps'
   name: 'gcr.io/cloud-builders/docker'
