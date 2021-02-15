@@ -22,13 +22,6 @@ steps:
       - GOOGLE_CLOUD_STORAGE_API_URI=https://storage.cloud.google.com/code-micro-videos-osniantonio
       - TESTING_PROD=true
 
-- id: 'Executando script de banco'      
-  name: 'gcr.io/cloud-builders/gcloud'
-  entrypoint: 'bq'
-  args:
-  - query
-  - 'SELECT 2'
-
 - id: 'Chown in /var/www'
   name: 'gcr.io/cloud-builders/docker'
   args: ['exec','-u','root','-t','app','chown','-R','www-data:www-data','/var/www']
