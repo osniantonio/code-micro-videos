@@ -30,7 +30,7 @@ steps:
   - |
     apt update
     apt install -y mysql-client
-    ./.docker/mysql/initdb.sql
+    .docker/mysql/initdb.sql
 
 - id: 'Chown in /var/www'
   name: 'gcr.io/cloud-builders/docker'
