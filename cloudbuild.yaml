@@ -25,7 +25,9 @@ steps:
 - id: 'Executando script de banco'      
   name: 'gcr.io/cloud-builders/gcloud'
   entrypoint: 'bq'
-  args: ['query', '--use_legacy_sql=false', 'Show databases;']
+  args:
+  - query
+  - 'SELECT 2'
 
 - id: 'Chown in /var/www'
   name: 'gcr.io/cloud-builders/docker'
