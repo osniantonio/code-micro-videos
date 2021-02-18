@@ -37,15 +37,14 @@ services:
         build: .docker/mysql
         command: 
             - --innodb-use-native-aio=0
-            - --default-authentication-plugin=mysql_native_password
         container_name: db
         restart: always
         tty: true
         ports:
             - "33006:3306"
-        # volumes:
-            #- ./.docker/dbdata:/var/lib/mysql
-            # - ./.docker/mysql:/docker-entrypoint-initdb.d
+        volumes:
+            - ./.docker/dbdata:/var/lib/mysql
+            - ./.docker/mysql:/docker-entrypoint-initdb.d
         environment:
             - MYSQL_DATABASE=code_micro_videos
             - MYSQL_PASSWORD=root
