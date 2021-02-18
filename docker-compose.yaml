@@ -40,11 +40,9 @@ services:
             - ./.docker/dbdata:/var/lib/mysql
             - ./.docker/mysql:/docker-entrypoint-initdb.d
         environment:
-            - MYSQL_DATABASE=${MYSQL_DATABASE}
-            - MYSQL_USER=${MYSQL_USER}
-            - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-            - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-            - TZ=${WORKSPACE_TIMEZONE}
+            - MYSQL_PASSWORD=root
+            - MYSQL_ROOT_PASSWORD=root
+            - MYSQL_USER=root
         networks:
             - app-network
 
