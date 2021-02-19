@@ -35,6 +35,7 @@ services:
 
     db:
         build: .docker/mysql
+        driver: local
         command: 
             - --innodb-use-native-aio=0
         container_name: db
@@ -42,9 +43,9 @@ services:
         tty: true
         ports:
             - "33006:3306"
-        #volumes:
+        volumes:
         #    - ./.docker/dbdata:/var/lib/mysql
-        #    - ./.docker/mysql:/docker-entrypoint-initdb.d
+            - ./.docker/mysql:/docker-entrypoint-initdb.d
         environment:
             - MYSQL_DATABASE=code_micro_videos
             - MYSQL_PASSWORD=root
