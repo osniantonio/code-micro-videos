@@ -37,14 +37,16 @@ services:
         build: .docker/mysql
         command: 
             - --innodb-use-native-aio=0
+            - --init-file ./.docker/mysql/initdb.sql    
         container_name: db
         restart: always
         tty: true
         ports:
             - "33006:3306"
         volumes:
+             - ./initdb.sql:./.docker/mysql/initdb.sql
         #    - ./.docker/dbdata:/var/lib/mysql
-            - ./.docker/mysql:/initdb.d
+        #    - ./.docker/mysql:/docker-entrypoint-initdb.d
         environment:
             - MYSQL_DATABASE=code_micro_videos
             - MYSQL_PASSWORD=root
