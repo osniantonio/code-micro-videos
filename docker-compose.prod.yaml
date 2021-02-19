@@ -35,7 +35,6 @@ services:
 
     db:
         build: .docker/mysql
-        driver: local
         command: 
             - --innodb-use-native-aio=0
         container_name: db
