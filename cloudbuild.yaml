@@ -62,10 +62,6 @@ steps:
   name: 'gcr.io/cloud-builders/docker'
   args: ['logs', 'db']
 
-- id: 'Apresentando os logs: dbtest'
-  name: 'gcr.io/cloud-builders/docker'
-  args: ['logs', 'dbtest']  
-
 - id: 'Rodando PHPUnit'
   name: 'gcr.io/cloud-builders/docker'
   args: ['exec','-t','app','php','/var/www/vendor/bin/phpunit','-c','/var/www/phpunit.xml']
