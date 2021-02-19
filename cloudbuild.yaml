@@ -1,32 +1,71 @@
 steps:
-- id: "Rodando-docker-compose"
+
+- id: 'Gerando my-project-17-01-1983-ea83fbc638a2.json'
+  name: 'gcr.io/cloud-builders/gcloud'
+  args:
+    - kms
+    - decrypt
+    - --ciphertext-file=./storage/credentials/google/my-project-17-01-1983-ea83fbc638a2.json.enc
+    - --plaintext-file=./storage/credentials/google/my-project-17-01-1983-ea83fbc638a2.json
+    - --location=global
+    - --keyring=testing-lesson
+    - --key=service-account
+    - --project=$PROJECT_ID
+
+- id: 'Rodando-docker-compose'
   name: 'gcr.io/$PROJECT_ID/docker-compose:1.25.5'
   args: ['-f','docker-compose.prod.yaml','up','-d']
+  env:
+      - GOOGLE_CLOUD_PROJECT_ID=$PROJECT_ID
+      - GOOGLE_CLOUD_KEY_FILE=my-project-17-01-1983-ea83fbc638a2.json
+      - GOOGLE_CLOUD_STORAGE_BUCKET=code-micro-videos-osniantonio
+      - GOOGLE_CLOUD_STORAGE_API_URI=https://storage.cloud.google.com/code-micro-videos-osniantonio
+      - TESTING_PROD=true
 
-- id: "Chown in /var/www"
+- id: 'Chown in /var/www'
   name: 'gcr.io/cloud-builders/docker'
   args: ['exec','-u','root','-t','app','chown','-R','www-data:www-data','/var/www']
 
-- id: "Rodando composer"
+- id: 'Rodando composer'
   name: 'gcr.io/cloud-builders/docker'
   args: ['exec','-t','app','composer','install']
 
-- id: "Copiando .env"
+- id: 'Copiando .env'
   name: 'gcr.io/cloud-builders/docker'
   args: ['exec','-t','app','cp','.env.example','.env']
 
-- id: "Copiando .env.testing"
+- id: 'Copiando .env.testing'
   name: 'gcr.io/cloud-builders/docker'
   args: ['exec','-t','app','cp','.env.testing.example','.env.testing']
 
-- id: "Rodando key:generate"
+- id: 'Rodando key:generate'
   name: 'gcr.io/cloud-builders/docker'
   args: ['exec','-t','app','php','/var/www/artisan','key:generate']
 
-- id: "Rodando migrations"
+- id: 'Rodando config:clear'
+  name: 'gcr.io/cloud-builders/docker'
+  args: ['exec','-t','app','php','/var/www/artisan','config:clear']
+
+- id: 'Rodando cache:clear'
+  name: 'gcr.io/cloud-builders/docker'
+  args: ['exec','-t','app','php','/var/www/artisan','cache:clear']
+
+- id: 'Rodando migrations'
   name: 'gcr.io/cloud-builders/docker'
   args: ['exec','-t','app','php','/var/www/artisan','migrate']
 
-- id: "Rodando PHPUnit"
+- id: 'Rodando o comando docker-ps'
+  name: 'gcr.io/cloud-builders/docker'
+  args: ['ps', '-a']
+
+- id: 'Apresentando os logs: db'
+  name: 'gcr.io/cloud-builders/docker'
+  args: ['logs', 'db']
+
+- id: 'Apresentando os logs: dbtest'
+  name: 'gcr.io/cloud-builders/docker'
+  args: ['logs', 'dbtest']  
+
+- id: 'Rodando PHPUnit'
   name: 'gcr.io/cloud-builders/docker'
   args: ['exec','-t','app','php','/var/www/vendor/bin/phpunit','-c','/var/www/phpunit.xml']

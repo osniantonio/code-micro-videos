@@ -11,7 +11,14 @@ services:
             - app-network
         depends_on:
             - db
+            - dbtest
             - redis
+        environment:
+            - GOOGLE_CLOUD_PROJECT_ID=${GOOGLE_CLOUD_PROJECT_ID}
+            - GOOGLE_CLOUD_KEY_FILE=${GOOGLE_CLOUD_KEY_FILE}
+            - GOOGLE_CLOUD_STORAGE_BUCKET=${GOOGLE_CLOUD_STORAGE_BUCKET}
+            - GOOGLE_CLOUD_STORAGE_API_URI=${GOOGLE_CLOUD_STORAGE_API_URI}
+            - TESTING_PROD=${TESTING_PROD}
 
     nginx:
         build: .docker/nginx
@@ -29,16 +36,39 @@ services:
 
     db:
         build: .docker/mysql
-        command: --innodb-use-native-aio=0
+        command: 
+            - --innodb-use-native-aio=0
         container_name: db
         restart: always
         tty: true
         ports:
             - "33006:3306"
         volumes:
-            - ./.docker/dbdata:/var/lib/mysql
+         #   - ./.docker/dbdata:/var/lib/mysql
             - ./.docker/mysql:/docker-entrypoint-initdb.d
         environment:
+            - MYSQL_DATABASE=code_micro_videos
+            - MYSQL_PASSWORD=root
+            - MYSQL_ROOT_PASSWORD=root
+            - MYSQL_USER=root
+        networks:
+            - app-network
+
+    dbtest:
+        build: .docker/mysql
+        command: 
+            - --innodb-use-native-aio=0
+        container_name: dbtest
+        restart: always
+        tty: true
+        ports:
+            - "33007:3306"
+        volumes:
+         #   - ./.docker/dbdata:/var/lib/mysql
+            - ./.docker/mysql:/docker-entrypoint-initdb.d
+        environment:
+            - MYSQL_DATABASE=code_micro_videos_test
+            - MYSQL_PASSWORD=root
             - MYSQL_ROOT_PASSWORD=root
             - MYSQL_USER=root
         networks:

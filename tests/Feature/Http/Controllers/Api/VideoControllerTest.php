@@ -273,29 +273,23 @@ class VideoControllerTest extends TestCase
         $controller = \Mockery::mock(VideoController::class)
             ->makePartial()
             ->shouldAllowMockingProtectedMethods();
-
         $controller
             ->shouldReceive('validate')
             ->withAnyArgs()
             ->andReturn($this->sendData);
-
         $controller
             ->shouldReceive('rulesStore')
             ->withAnyArgs()
             ->andReturn([]);
-
         $controller
             ->shouldReceive('handleRelations')
             ->once()
             ->andThrow(new TestException());
-
         $request = \Mockery::mock(Request::class);
-
         $request
             ->shouldReceive('get')
             ->withAnyArgs()
             ->andReturnNull();
-
         $hasError = false;
         try {
             $controller->store($request);
@@ -313,34 +307,27 @@ class VideoControllerTest extends TestCase
         $controller = \Mockery::mock(VideoController::class)
             ->makePartial()
             ->shouldAllowMockingProtectedMethods();
-
         $controller
             ->shouldReceive('findOrFail')
             ->withAnyArgs()
             ->andReturn($this->video);
-
         $controller
             ->shouldReceive('validate')
             ->withAnyArgs()
             ->andReturn(['name' => 'test']);
-
         $controller
             ->shouldReceive('rulesUpdate')
             ->withAnyArgs()
             ->andReturn([]);
-
         $controller
             ->shouldReceive('handleRelations')
             ->once()
             ->andThrow(new TestException());
-
         $request = \Mockery::mock(Request::class);
-
         $request
             ->shouldReceive('get')
             ->withAnyArgs()
             ->andReturnNull();
-
         $hasError = false;
         try {
             $controller->update($request, 1);
@@ -348,7 +335,6 @@ class VideoControllerTest extends TestCase
             $this->assertCount(1, Video::all());
             $hasError = true;
         }
-
         $this->assertTrue($hasError);
     }
     */
@@ -377,7 +363,6 @@ class VideoControllerTest extends TestCase
         $genre = factory(Genre::class)->create();
         $genre->categories()->sync($categoriesId);
         $genreId = $genre->id;
-
         $response = $this->json(
             'POST',
             $this->routeStore(),
@@ -386,9 +371,7 @@ class VideoControllerTest extends TestCase
                 'categories_id' => [$categoriesId[0]],
             ]
         );
-
         $this->assertHasCategory($response->json('id'), $categoriesId[0]);
-
         $response = $this->json(
             'PUT',
             route('videos.update', ['video' => $response->json('id')]),
@@ -397,7 +380,6 @@ class VideoControllerTest extends TestCase
                 'categories_id' => [$categoriesId[1], $categoriesId[2]],
             ]
         );
-
         $this->assertDatabaseMissingHasCategory($response->json('id'), $categoriesId[0]);
         $this->assertHasCategory($response->json('id'), $categoriesId[1]);
         $this->assertHasCategory($response->json('id'), $categoriesId[2]);
@@ -413,7 +395,6 @@ class VideoControllerTest extends TestCase
         $genres->each(function ($genre) use ($categoryId) {
             $genre->categories()->sync($categoryId);
         });
-
         $response = $this->json(
             'POST',
             $this->routeStore(),
@@ -422,9 +403,7 @@ class VideoControllerTest extends TestCase
                 'genres_id' => [$genresId[0]],
             ]
         );
-
         $this->assertHasGenre($response->json('id'), $genresId[0]);
-
         $response = $this->json(
             'PUT',
             route('videos.update', ['video' => $response->json('id')]),
@@ -433,7 +412,6 @@ class VideoControllerTest extends TestCase
                 'categories_id' => [$categoryId],
             ]
         );
-
         $this->assertDatabaseMissingHasGenre($response->json('id'), $genresId[0]);
         $this->assertHasGenre($response->json('id'), $genresId[1]);
         $this->assertHasGenre($response->json('id'), $genresId[2]);
