@@ -126,5 +126,5 @@ class Video extends Model
     public function getVideoFileUrlAttribute()
     {
         return $this->video_file ? $this->getFileUrl($this->video_file) : null;
-    }    
+    }   
 }

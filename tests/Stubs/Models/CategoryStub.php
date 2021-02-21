@@ -5,7 +5,7 @@ namespace Tests\Stubs\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 
-class CategorySub extends Model
+class CategoryStub extends Model
 {
     protected $table = 'category_stubs';
     protected $fillable = ['name', 'description'];

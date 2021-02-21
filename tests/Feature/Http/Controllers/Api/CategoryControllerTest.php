@@ -2,60 +2,97 @@
 
 namespace Tests\Feature\Http\Controllers\Api;
 
+use App\Http\Resources\CategoryResource;
 use App\Models\Category;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\TestResponse;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
+use Tests\Traits\TestResources;
 use Tests\Traits\TestSaves;
 use Tests\Traits\TestValidations;
 
 class CategoryControllerTest extends TestCase
 {
-    use DatabaseMigrations, TestValidations, TestSaves;
+    use DatabaseMigrations, TestValidations, TestSaves, TestResources;
 
     private $category;
+    private $serializedFields = [
+        'id',
+        'name',
+        'description',
+        'is_active',
+        'created_at',
+        'updated_at',
+        'deleted_at',
+    ];
 
     protected function setUp(): void
     {
         parent::setUp();
+
         $this->category = factory(Category::class)->create();
+        $this->routeUpdateParam = ['category' => $this->category->id];
+    }
+
+    protected function model()
+    {
+        return Category::class;
+    }
+
+    protected function route($routeName, array $params = [])
+    {
+        return route("api.categories.{$routeName}", $params);
     }
 
     public function testIndex()
     {
-        $response = $this->get(route('categories.index'));
-        //dd($response);
+        $response = $this->get($this->route('index'));
         $response
             ->assertStatus(200)
-            ->assertJson([$this->category->toArray()]);
+            ->assertJson([
+                'meta' => ['per_page' => 15]
+            ])
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => $this->serializedFields,
+                ],
+                'meta' => [],
+                'links' => [],
+            ]);
+
+        $resource = CategoryResource::collection([$this->category]);
+        $this->assertResource($response, $resource);
     }
 
     public function testShow()
     {
-        $response = $this->get(route('categories.show', ['category' => $this->category->id]));
+        $response = $this->get($this->route('show', ['category' => $this->category->id]));
         $response
             ->assertStatus(200)
-            ->assertJson($this->category->toArray());
+            ->assertJsonStructure([
+                'data' => $this->serializedFields,
+            ]);
+
+        $id = $response->json('data.id');
+        $resource = new CategoryResource(Category::find($id));
+        $this->assertResource($response, $resource);
     }
 
     public function testInvalidationData()
     {
         $data = [
-            'name' => ''
+            'name' => '',
         ];
         $this->assertInvalidationInStoreAction($data, 'required');
         $this->assertInvalidationInUpdateAction($data, 'required');
 
         $data = [
-            'name' => str_repeat('a', 256)
+            'name' => str_repeat('a', 256),
         ];
         $this->assertInvalidationInStoreAction($data, 'max.string', ['max' => 255]);
         $this->assertInvalidationInUpdateAction($data, 'max.string', ['max' => 255]);
 
         $data = [
-            'is_active' => 'a'
+            'is_active' => 'a',
         ];
         $this->assertInvalidationInStoreAction($data, 'boolean');
         $this->assertInvalidationInUpdateAction($data, 'boolean');
@@ -64,79 +101,57 @@ class CategoryControllerTest extends TestCase
     public function testStore()
     {
         $data = [
-            'name' => 'test'
+            'name' => 'test',
         ];
         $response = $this->assertStore($data, $data + ['description' => null, 'is_active' => true, 'deleted_at' => null]);
         $response->assertJsonStructure([
-            'created_at', 'updated_at'
+            'data' => $this->serializedFields,
         ]);
 
         $data = [
             'name' => 'test',
-            'description' => 'description',
-            'is_active' => false
+            'description' => 'test_description',
+            'is_active' => false,
         ];
-        $this->assertStore($data, $data + ['description' => 'description', 'is_active' => false]);
+        $this->assertStore($data, $data + ['description' => 'test_description', 'is_active' => false]);
+        $id = $response->json('data.id');
+        $resource = new CategoryResource(Category::find($id));
+        $this->assertResource($response, $resource);
     }
 
     public function testUpdate()
     {
-        $this->category = factory(Category::class)->create([
-            'description' => 'description',
-            'is_active' => false
-        ]);
         $data = [
             'name' => 'test',
-            'description' => 'description',
-            'is_active' => false
+            'description' => 'test_description',
+            'is_active' => true,
         ];
         $response = $this->assertUpdate($data, $data + ['deleted_at' => null]);
         $response->assertJsonStructure([
-            'created_at', 'updated_at'
+            'data' => $this->serializedFields,
         ]);
+        $id = $response->json('data.id');
+        $resource = new CategoryResource(Category::find($id));
+        $this->assertResource($response, $resource);
 
         $data = [
             'name' => 'test',
-            'description' => ''
+            'description' => '',
         ];
         $this->assertUpdate($data, array_merge($data, ['description' => null]));
 
-        $data['description'] = 'test';
-        $this->assertUpdate($data, array_merge($data, ['description' => 'test']));
+        $data['description'] = 'test desc';
+        $this->assertUpdate($data, array_merge($data, ['description' => 'test desc']));
 
         $data['description'] = null;
         $this->assertUpdate($data, array_merge($data, ['description' => null]));
     }
 
-    public function testDeleteJson()
-    {
-        $category = factory(Category::class)->create();
-        $this->deleteJson('/api/categories/' . $category->id)
-            ->assertStatus(204);
-        $this->assertNull(Category::find($category->id));
-        $this->assertNotNull(Category::withTrashed()->find($category->id));
-    }
-
     public function testDestroy()
     {
-        $response = $this->json('DELETE', route('categories.destroy', ['category' => $this->category->id]));
+        $response = $this->json('DELETE', $this->route('destroy', ['category' => $this->category->id]));
         $response->assertStatus(204);
         $this->assertNull(Category::find($this->category->id));
         $this->assertNotNull(Category::withTrashed()->find($this->category->id));
-    }
-
-    protected function routeStore()
-    {
-        return route('categories.store');
-    }
-
-    protected function routeUpdate()
-    {
-        return route('categories.update', ['category' => $this->category->id]);
-    }
-
-    protected function model()
-    {
-        return Category::class;
     }
 }

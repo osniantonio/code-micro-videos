@@ -10,10 +10,11 @@ use App\Models\Video;
 use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\TestResponse;
+use Tests\Traits\TestParameters;
 
 abstract class BaseVideoControllerTestCase extends TestCase
 {
-    use DatabaseMigrations;
+    use DatabaseMigrations, TestParameters;
 
     protected $video;
     protected $sendData;
@@ -21,7 +22,10 @@ abstract class BaseVideoControllerTestCase extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->video = factory(Video::class)->create(['opened' => false]);
+
+        $this->video = factory(Video::class)->create([
+            'opened' => false,
+        ]);
         $category = factory(Category::class)->create();
         $genre = factory(Genre::class)->create();
         $genre->categories()->sync($category->id);
@@ -34,6 +38,8 @@ abstract class BaseVideoControllerTestCase extends TestCase
             'categories_id' => [$category->id],
             'genres_id' => [$genre->id],
         ];
+
+        $this->routeUpdateParam = ['video' => $this->video->id];
     }
 
     protected function getFiles()
@@ -57,7 +63,7 @@ abstract class BaseVideoControllerTestCase extends TestCase
             $fileUrl = filled($file) ? \Storage::url($video->relativeFilePath($file)) : null;
             $this->assertEquals(
                 $fileUrl,
-                $data[$field.'_url']
+                $data[$field . '_url']
             );
         }
     }
@@ -72,18 +78,23 @@ abstract class BaseVideoControllerTestCase extends TestCase
         $this->assertDatabaseHas('genre_video', ['video_id' => $videoId, 'genre_id' => $genreId]);
     }
 
+    protected function model()
+    {
+        return Video::class;
+    }
+
+    protected function route($routeName, array $params = [])
+    {
+        return route("api.videos.{$routeName}", $params);
+    }
+
     protected function routeStore()
     {
-        return route('videos.store');
+        return $this->route('store');
     }
 
     protected function routeUpdate()
     {
-        return route('videos.update', ['video' => $this->video->id]);
-    }
-
-    protected function model()
-    {
-        return Video::class;
+        return $this->route('update', $this->routeUpdateParam);
     }
 }
