@@ -8,6 +8,7 @@ class VideoResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
+     * No resource de Video, você deve incluir na serialização, as categorias e gêneros relacionados e as urls dos arquivos.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return array

@@ -33,31 +33,6 @@ class VideoController extends BasicCrudController
         ];
     }
 
-    protected function resource()
-    {
-        return VideoResource::class;
-    }
-
-    protected function resourceCollection()
-    {
-        return $this->resource();
-    }
-
-    protected function model()
-    {
-        return Video::class;
-    }
-
-    protected function rulesStore()
-    {
-        return $this->rules;
-    }
-
-    protected function rulesUpdate()
-    {
-        return $this->rules;
-    }
-
     protected function addRuleIfGenreHasCategories(Request $request)
     {
         $categoriesId = collect($request->get('categories_id'))->toArray();
@@ -84,5 +59,30 @@ class VideoController extends BasicCrudController
         $obj->update($validatedData);
         $resource = $this->resource();
         return new $resource($obj);
+    }
+
+    protected function resource()
+    {
+        return VideoResource::class;
+    }
+
+    protected function resourceCollection()
+    {
+        return $this->resource();
+    }
+
+    protected function model()
+    {
+        return Video::class;
+    }
+
+    protected function rulesStore()
+    {
+        return $this->rules;
+    }
+
+    protected function rulesUpdate()
+    {
+        return $this->rules;
     }
 }

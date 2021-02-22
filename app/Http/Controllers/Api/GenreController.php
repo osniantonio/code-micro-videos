@@ -14,31 +14,6 @@ class GenreController extends BasicCrudController
         'categories_id' => 'required|array|exists:categories,id,deleted_at,NULL',
     ];
 
-    protected function resource()
-    {
-        return GenreResource::class;
-    }
-
-    protected function resourceCollection()
-    {
-        return $this->resource();
-    }
-
-    protected function model()
-    {
-        return Genre::class;
-    }
-
-    protected function rulesStore()
-    {
-        return $this->rules;
-    }
-
-    protected function rulesUpdate()
-    {
-        return $this->rules;
-    }
-
     public function store(Request $request)
     {
         $validatedData = $this->validate($request, $this->rulesStore());
@@ -72,5 +47,30 @@ class GenreController extends BasicCrudController
     protected function handleRelations(Request $request, $obj)
     {
         $obj->categories()->sync($request->get('categories_id'));
+    }
+
+    protected function resource()
+    {
+        return GenreResource::class;
+    }
+
+    protected function resourceCollection()
+    {
+        return $this->resource();
+    }
+
+    protected function model()
+    {
+        return Genre::class;
+    }
+
+    protected function rulesStore()
+    {
+        return $this->rules;
+    }
+
+    protected function rulesUpdate()
+    {
+        return $this->rules;
     }
 }

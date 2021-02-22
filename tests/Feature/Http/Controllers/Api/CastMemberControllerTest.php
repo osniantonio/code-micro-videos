@@ -49,13 +49,16 @@ class CastMemberControllerTest extends TestCase
         $response = $this->get($this->route('index'));
         $response
             ->assertStatus(200)
+            ->assertJson([
+                'meta' => ['per_page' => 15]
+            ])
             ->assertJsonStructure([
                 'data' => [
                     '*' => $this->serializedFields,
                 ],
                 'meta' => [],
                 'links' => [],
-            ]);;
+            ]);
     }
 
     public function testShow()

@@ -8,6 +8,7 @@ class GenreResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
+     * No resource de Genre, você deve incluir na serialização, as categorias relacionadas.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return array

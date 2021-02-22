@@ -60,6 +60,9 @@ class VideoControllerCrudTest extends BaseVideoControllerTestCase
         $response = $this->get($this->route('index'));
         $response
             ->assertStatus(200)
+            ->assertJson([
+                'meta' => ['per_page' => 15]
+            ])
             ->assertJsonStructure([
                 'data' => [
                     '*' => $this->serializedFields,
