@@ -1,18 +1,19 @@
-## Terminando uploads do model vídeo
-Nesta fase, você deverá acrescentar mais campos de upload na tabela e no model Vídeo. Já temos video_file e thumb_file.
+## Catálogo de vídeos: Implementando API Resource
 
-## Agora teremos:
-banner_file
-trailer_file
-Você deve criar também os testes de validação de tamanho máximo para os 4 campos. Abaixo está o tamanho máximo permitido:
+    Nesta fase, você deve implementar o recurso API Resource nos controllers e testa-los;
 
-    video_file - 50GB
-    thumb_file - 5MB
-    banner_file - 10MB
-    trailer_file - 1GB
+    Crie os resources para: Category, CastMember, Genre e Video;
 
-Agora com todos estes arquivos em mãos, consolide os testes de upload no teste de integração do model Vídeo. Precisamos saber se no próprio model Video, os uploads estão funcionando. Você pode criar 4 testes: testCreateWithBasicFields e testUpdateWithBasicFields para testar somente a criação ou atualização do vídeo sem upload e testCreateWithFiles  e testUpdateWithFiles para focar somente no upload. 
+    No resource de Genre, você deve incluir na serialização, as categorias relacionadas;
 
-Desafio (Opcional): Na trait de uploads, crie um método que receba o nome de um arquivo e devolva o endereço correto do arquivo, ou seja, o endereço WEB de acesso ao arquivo. Este método servirá como base para gerar qualquer endereço de qualquer arquivo do vídeo.
+    No resource de Video, você deve incluir na serialização, as categorias e gêneros relacionados e as urls dos arquivos; 
 
-Você deve criar o teste deste método e criar mutators do Eloquent para permitir que os endereços sejam acessíveis como campos, exemplo: $video->thumb_file_url ou $video->video_file_url.
+    Aplique todos os resources nos controllers e faça os testes em todos os métodos do CRUD, exceto no destroy. Lembre-se de testar sempre a estrutura do JSON, com o método jsonStructure e também usando o método assertResource;
+
+    Desafio (Opcional): Agora com a mudança para o API Resource, o controller básico de CRUD foi modificado, será necessário testa-lo também;
+
+    Aplique os testes em todos os métodos, exceto no destroy. Lembre-se que neste controller não temos resposta HTTP, logo em cada retorno de cada ação do controller, teremos a instância do Resource para avaliar;
+
+    Somente avalie se os dados do resource são iguais ao toArray do model CategoryStub.
+ 
+Boa sorte!

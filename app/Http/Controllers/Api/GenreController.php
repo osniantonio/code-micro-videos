@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
+use App\Http\Resources\GenreResource;
 use App\Models\Genre;
 use Illuminate\Http\Request;
 
@@ -19,12 +19,14 @@ class GenreController extends BasicCrudController
         $validatedData = $this->validate($request, $this->rulesStore());
         $self = $this;
         $obj = \DB::transaction(function () use ($request, $validatedData, $self) {
+            /** @var Genre $obj */
             $obj = $this->model()::create($validatedData);
-            $self->handleRelations($obj, $request);
+            $self->handleRelations($request, $obj);
             return $obj;
         });
         $obj->refresh();
-        return $obj;
+        $resource = $this->resource();
+        return new $resource($obj);
     }
 
     public function update(Request $request, $id)
@@ -33,29 +35,41 @@ class GenreController extends BasicCrudController
         $validatedData = $this->validate($request, $this->rulesUpdate());
         $self = $this;
         $obj = \DB::transaction(function () use ($request, $validatedData, $self, $obj) {
+            /** @var Genre $obj */
             $obj->update($validatedData);
-            $self->handleRelations($obj, $request);
+            $self->handleRelations($request, $obj);
             return $obj;
         });
-        return $obj;
+        $resource = $this->resource();
+        return new $resource($obj);
     }
 
-    protected function handleRelations($obj, Request $request)
+    protected function handleRelations(Request $request, $obj)
     {
         $obj->categories()->sync($request->get('categories_id'));
     }
 
-    public function model()
+    protected function resource()
+    {
+        return GenreResource::class;
+    }
+
+    protected function resourceCollection()
+    {
+        return $this->resource();
+    }
+
+    protected function model()
     {
         return Genre::class;
     }
 
-    public function rulesStore()
+    protected function rulesStore()
     {
         return $this->rules;
     }
 
-    public function rulesUpdate()
+    protected function rulesUpdate()
     {
         return $this->rules;
     }

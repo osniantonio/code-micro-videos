@@ -5,7 +5,7 @@ namespace Tests\Stubs\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 
-class VideoSub extends Model
+class VideoStub extends Model
 {
     protected $table = 'video_stubs';
     protected $fillable = [

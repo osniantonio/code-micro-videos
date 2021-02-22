@@ -5,7 +5,7 @@ namespace Tests\Stubs\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
 
-class GenreSub extends Model
+class GenreStub extends Model
 {
     protected $table = 'genre_stubs';
     protected $fillable = ['name'];

@@ -3,29 +3,37 @@
 namespace Tests\Stubs\Controllers;
 
 use App\Http\Controllers\Api\BasicCrudController;
-use App\Http\Controllers\Controller;
-use App\Models\Category;
-use Illuminate\Http\Request;
-use Tests\Stubs\Models\GenreSub;
+use App\Http\Resources\GenreResource;
+use Tests\Stubs\Models\GenreStub;
 
 class GenreControllerStub extends BasicCrudController
 {
-    protected function model() 
+    protected function resource()
     {
-        return GenreSub::class;
+        return GenreResource::class;
     }
 
-    protected function rulesStore() 
+    protected function resourceCollection()
+    {
+        return $this->resource();
+    }
+
+    protected function model()
+    {
+        return GenreStub::class;
+    }
+
+    protected function rulesStore()
     {
         return [
-            'name' => 'required|max:255'
+            'name' => 'required|max:255',
         ];
     }
 
-    protected function rulesUpdate() 
+    protected function rulesUpdate()
     {
         return [
-            'name' => 'required|max:255'
+            'name' => 'required|max:255',
         ];
     }
 }

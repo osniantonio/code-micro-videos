@@ -3,26 +3,47 @@
 namespace Tests\Stubs\Controllers;
 
 use App\Http\Controllers\Api\BasicCrudController;
-use Tests\Stubs\Models\VideoSub;
+use App\Http\Resources\VideoResource;
+use Tests\Stubs\Models\VideoStub;
 
 class VideoControllerStub extends BasicCrudController
 {
-    protected function model() 
+    protected function resource()
     {
-        return VideoSub::class;
+        return VideoResource::class;
     }
 
-    protected function rulesStore() 
+    protected function resourceCollection()
+    {
+        return $this->resource();
+    }
+
+    protected function model()
+    {
+        return VideoStub::class;
+    }
+
+    protected function rulesStore()
     {
         return [
-            'name' => 'required|max:255'
+            'title' => 'required|max:255',
+            'description' => 'required',
+            'year_launched' => 'required|date_format:Y',
+            'opened' => 'boolean',
+            'rating' => 'required|in:' . implode(',', VideoStub::RATING_LIST),
+            'duration' => 'required|integer',
         ];
     }
 
-    protected function rulesUpdate() 
+    protected function rulesUpdate()
     {
         return [
-            'name' => 'required|max:255'
+            'title' => 'required|max:255',
+            'description' => 'required',
+            'year_launched' => 'required|date_format:Y',
+            'opened' => 'boolean',
+            'rating' => 'required|in:' . implode(',', VideoStub::RATING_LIST),
+            'duration' => 'required|integer',
         ];
     }
 }

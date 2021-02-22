@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Resources\VideoResource;
 use App\Models\Video;
 use App\Rules\GenresHasCategoriesRule;
 use Illuminate\Http\Request;
@@ -25,51 +26,62 @@ class VideoController extends BasicCrudController
                 'array',
                 'exists:genres,id,deleted_at,NULL',
             ],
-            'thumb_file' => 'image|max:' . Video::THUMB_FILE_MAX_SIZE,
-            'banner_file' => 'image|max:' . Video::BANNER_FILE_MAX_SIZE,
-            'video_file' => 'mimetypes:video/mp4|max:' . Video::VIDEO_FILE_MAX_SIZE,
-            'trailer_file' => 'mimetypes:video/mp4|max:' . Video::TRAILER_FILE_MAX_SIZE,
+            'thumb_file' => 'image|max:' . Video::THUMB_FILE_MAX_SIZE, //max é kilobytes
+            'banner_file' => 'image|max:' . Video::BANNER_FILE_MAX_SIZE, //max é kilobytes
+            'trailer_file' => 'mimetypes:video/mp4|max:' . Video::TRAILER_FILE_MAX_SIZE, //max é kilobytes
+            'video_file' => 'mimetypes:video/mp4|max:' . Video::VIDEO_FILE_MAX_SIZE, //max é kilobytes
         ];
+    }
+
+    protected function addRuleIfGenreHasCategories(Request $request)
+    {
+        $categoriesId = collect($request->get('categories_id'))->toArray();
+        $this->rules['genres_id'][] = new GenresHasCategoriesRule(
+            $categoriesId
+        );
     }
 
     public function store(Request $request)
     {
         $this->addRuleIfGenreHasCategories($request);
-        $validateData = $this->validate($request, $this->rulesStore());
-        $obj = $this->model()::create($validateData);
+        $validatedData = $this->validate($request, $this->rulesStore());
+        $obj = $this->model()::create($validatedData);
         $obj->refresh();
-        return $obj;
+        $resource = $this->resource();
+        return new $resource($obj);
     }
 
     public function update(Request $request, $id)
     {
         $obj = $this->findOrFail($id);
         $this->addRuleIfGenreHasCategories($request);
-        $validateData = $this->validate($request, $this->rulesUpdate());
-        $obj->update($validateData);
-        return $obj;
+        $validatedData = $this->validate($request, $this->rulesUpdate());
+        $obj->update($validatedData);
+        $resource = $this->resource();
+        return new $resource($obj);
     }
 
-    protected function addRuleIfGenreHasCategories(Request $request)
+    protected function resource()
     {
-        $categoriesId = $request->get('categories_id');
-        $categoriesId = is_array($categoriesId) ? $categoriesId : [];
-        $this->rules['genres_id'][] = new GenresHasCategoriesRule(
-            $categoriesId
-        );
+        return VideoResource::class;
     }
 
-    public function model()
+    protected function resourceCollection()
+    {
+        return $this->resource();
+    }
+
+    protected function model()
     {
         return Video::class;
     }
 
-    public function rulesStore()
+    protected function rulesStore()
     {
         return $this->rules;
     }
 
-    public function rulesUpdate()
+    protected function rulesUpdate()
     {
         return $this->rules;
     }
