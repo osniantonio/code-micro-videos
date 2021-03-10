@@ -1,19 +1,20 @@
-## Catálogo de vídeos: Implementando API Resource
+## Construindo listagens no front-end
+Parabéns por chegar até aqui! Já temos nossa aplicação backend e vamos implementar o front-end com React.js.
 
-    Nesta fase, você deve implementar o recurso API Resource nos controllers e testa-los;
+Agora que entendemos como desenvolver com Laravel e React dentro do Docker, realizaremos a integração da SPA com a API Rest.
 
-    Crie os resources para: Category, CastMember, Genre e Video;
+Nesta fase crie o ambiente do React mostrado no curso e crie três listagens:
 
-    No resource de Genre, você deve incluir na serialização, as categorias relacionadas;
-
-    No resource de Video, você deve incluir na serialização, as categorias e gêneros relacionados e as urls dos arquivos; 
-
-    Aplique todos os resources nos controllers e faça os testes em todos os métodos do CRUD, exceto no destroy. Lembre-se de testar sempre a estrutura do JSON, com o método jsonStructure e também usando o método assertResource;
-
-    Desafio (Opcional): Agora com a mudança para o API Resource, o controller básico de CRUD foi modificado, será necessário testa-lo também;
-
-    Aplique os testes em todos os métodos, exceto no destroy. Lembre-se que neste controller não temos resposta HTTP, logo em cada retorno de cada ação do controller, teremos a instância do Resource para avaliar;
-
-    Somente avalie se os dados do resource são iguais ao toArray do model CategoryStub.
- 
-Boa sorte!
+Listagem de categorias com os dados:
+ name
+ is_active (formate se é ativo ou não para Sim ou Não)
+created_at (formate a data no formato brasileiro)
+Listagem de membros do elenco com os dados:
+name
+type (mostre o texto correspondente ao tipo, 1 - Diretor, 2 - Ator, encontre uma maneira de fazer isto com o TypeScript sem usar IFs).
+created_at (formate a data no formato brasileiro)
+Listagem de gêneros com os dados:
+name
+categories (Mostre todos os nomes das categorias separados por vírgula).
+ is_active (formate se é ativo ou não para Sim ou Não)
+created_at (formate a data no formato brasileiro)
