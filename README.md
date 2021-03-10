@@ -6,15 +6,17 @@ Agora que entendemos como desenvolver com Laravel e React dentro do Docker, real
 Nesta fase crie o ambiente do React mostrado no curso e crie três listagens:
 
 Listagem de categorias com os dados:
- name
- is_active (formate se é ativo ou não para Sim ou Não)
-created_at (formate a data no formato brasileiro)
+    name
+    is_active (formate se é ativo ou não para Sim ou Não)
+    created_at (formate a data no formato brasileiro)
+
 Listagem de membros do elenco com os dados:
-name
-type (mostre o texto correspondente ao tipo, 1 - Diretor, 2 - Ator, encontre uma maneira de fazer isto com o TypeScript sem usar IFs).
-created_at (formate a data no formato brasileiro)
+    name
+    type (mostre o texto correspondente ao tipo, 1 - Diretor, 2 - Ator, encontre uma maneira de fazer isto com o TypeScript sem usar IFs).
+    created_at (formate a data no formato brasileiro)
+
 Listagem de gêneros com os dados:
-name
-categories (Mostre todos os nomes das categorias separados por vírgula).
- is_active (formate se é ativo ou não para Sim ou Não)
-created_at (formate a data no formato brasileiro)
+    name
+    categories (Mostre todos os nomes das categorias separados por vírgula).
+    is_active (formate se é ativo ou não para Sim ou Não)
+    created_at (formate a data no formato brasileiro)
