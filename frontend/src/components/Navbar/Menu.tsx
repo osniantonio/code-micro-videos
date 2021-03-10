@@ -6,7 +6,9 @@ import { Link } from 'react-router-dom'
 
 const listRoutes = [
     'dashboard',
-    'categories.list'
+    'categories.list',
+    'cast_members.list',
+    'genres.list'
 ];
 
 export const Menu : React.FC = () => {

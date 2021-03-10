@@ -6,11 +6,21 @@ import { httpVideo } from '../../util/http';
 import { Chip } from '@material-ui/core';
 import parseISO from "date-fns/parseISO";
 import format from "date-fns/format";
+import { Category } from '../../util/models';
 
-const columnsDefinitions:MUIDataTableColumn[] = [    
-    {
+const columnsDefinitions:MUIDataTableColumn[] = [
+   {
         name: "name",
         label: "Nome",
+    },
+    {
+        name: "categories",
+        label: "Categorias",
+        options: {
+            customBodyRender(value, tableMeta, updateValue) {
+                return value.map((category: Category) => category.name).join(',')
+            }
+        }
     },
     {
         name: "is_active",
@@ -40,13 +50,13 @@ type Props = {};
 export const Table = (props: Props) => {
     const [data, setData] = useState([]);
     useEffect( () => {
-        httpVideo.get('categories').then(
+        httpVideo.get('genres').then(
             response => setData(response.data.data)
         );
     }, []);
     return (
         <MUIDataTable 
-            title="Listagem de categorias"
+            title="Listagem de gêneros"
             columns={columnsDefinitions} 
             data={data}
         />
