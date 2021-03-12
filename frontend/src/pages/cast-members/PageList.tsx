@@ -10,7 +10,7 @@ const PageList = () => {
         <Page title={'Listar membros de elencos'}>
             <Box dir={'rtl'} paddingBottom={2}>
                 <Fab
-                 title="Adicionar membro"
+                 title="Adicionar membro de elenco"
                  color={"secondary"}
                  size="small"
                  component={Link}
