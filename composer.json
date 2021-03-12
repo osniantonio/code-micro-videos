@@ -1,5 +1,0 @@
-{
-    "require": {
-        "barryvdh/laravel-cors": "^2.0"
-    }
-}
