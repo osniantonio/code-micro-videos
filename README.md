@@ -1,22 +1,15 @@
-## Construindo listagens no front-end
-Parabéns por chegar até aqui! Já temos nossa aplicação backend e vamos implementar o front-end com React.js.
+## CRUD de cast member e genre no front-end
+Nesta fase de projeto, você deverá criar os CRUDs de genre e cast member no front-end.
 
-Agora que entendemos como desenvolver com Laravel e React dentro do Docker, realizaremos a integração da SPA com a API Rest.
+Detalhes importantes para cast member:
 
-Nesta fase crie o ambiente do React mostrado no curso e crie três listagens:
+Para o campo type você poderá usar o componente Radio ou RadioGroup (preferível). Vide doc do Material UI
+Você deverá usar o conceito de Controlled Components do React para lidar com o campo type, pois não será um campo HTML nativo e necessitará de especificação do evento onChage para pegar o novo valor e guardar no react-hook-form via setValue.
+Detalhes importantes para genre:
 
-Listagem de categorias com os dados:
-    name
-    is_active (formate se é ativo ou não para Sim ou Não)
-    created_at (formate a data no formato brasileiro)
+Para o campo categories você poderá usar o componente Select ou Select nativo. Vide doc do Material UI
+Você deverá usar o conceito de Controlled Components do React para lidar com o campo categories, pois não será um campo HTML nativo e necessita de especificação do evento onChage para pegar o novo valor e guardar no react-hook-form via setValue.
+Este campo Select necessitará de uma alimentação do que o usuário escolhe, logo será necessário sempre atualizar a propriedade value dele, senão as opções escolhidas não serão de fato selecionadas. Use o método watch do react-hook-form no value do campo para mante-lo atualizado.
+Use AJAX para pegar as categorias e hidratar o campo Select.
 
-Listagem de membros do elenco com os dados:
-    name
-    type (mostre o texto correspondente ao tipo, 1 - Diretor, 2 - Ator, encontre uma maneira de fazer isto com o TypeScript sem usar IFs).
-    created_at (formate a data no formato brasileiro)
-
-Listagem de gêneros com os dados:
-    name
-    categories (Mostre todos os nomes das categorias separados por vírgula).
-    is_active (formate se é ativo ou não para Sim ou Não)
-    created_at (formate a data no formato brasileiro)
+Boa sorte!
