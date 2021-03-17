@@ -15,10 +15,10 @@ class Cors
      */
     public function handle($request, Closure $next)
     {
-        //header('Access-Control-Allow-Origin:  *');
-        $response = $next($request);
-        $response->header('Access-Control-Allow-Origin', 'http://localhost:3000');
-        $response->header('Access-Control-Allow-Methods', 'HEAD, GET, PUT, PATCH, POST');
-        return $response;
+        $origins = env('CORS_ORIGINS', []);
+        return $next($request)
+            ->header('Access-Control-Allow-Origin', is_string($origins) ? explode(",", $origins) : $origins)
+            ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS')
+            ->header('Access-Control-Allow-Headers', 'Accept, Content-Type, Authorization');
     }
 }
