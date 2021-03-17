@@ -15,6 +15,7 @@ import { useHistory, useParams } from "react-router";
 import { useEffect, useState } from "react";
 import { Category, Genre } from "../../util/models";
 import genreHttp from "../../util/http/genre-http";
+import categoryHttp from "../../util/http/category-http";
 
 const useStyles = makeStyles((theme: Theme) => {
   return {
@@ -27,6 +28,13 @@ const useStyles = makeStyles((theme: Theme) => {
 export const Form = () => {
   const history = useHistory();
   const classes = useStyles();
+
+  const { register, handleSubmit, getValues, setValue, watch } = useForm({
+    defaultValues: {
+      categories_id: []
+   }
+  });
+
   const { id }: any = useParams();
   const [genre, setGenre] = useState<Genre | null>(null);
   const [ categories, setCategories] = useState<Category[]>([]);
@@ -34,15 +42,16 @@ export const Form = () => {
     className: classes.submit,
     variant: "outlined",
   };
-  const { register, handleSubmit, getValues, setValue, watch } = useForm({
-    defaultValues: {
-      categories_id: []
-   }
-  });
 
   useEffect(() => {
     register({name: "categories_id"})
   }, [register]);
+
+  useEffect(() => {
+    categoryHttp
+      .list()
+      .then(({data}) => setCategories(data.data))
+  }, []);
 
   async function onSubmit(formData, event) {
     const http = !genre
@@ -88,7 +97,7 @@ export const Form = () => {
         margin={"normal"}
         fullWidth
         onChange={(e) => {
-          setValue("categories_id", e.target.value);
+          setValue('categories_id', e.target.value);
         }}
         SelectProps={{
           multiple: true,
