@@ -30,7 +30,7 @@ export const Form = () => {
   const [category, setCategory] = useState<Category | null>(null);
   const buttonProps: ButtonProps = {
     className: classes.submit,
-    variant: "outlined",
+    variant: "contained",
   };
   const { register, handleSubmit, getValues } = useForm({
     defaultValues: {
@@ -83,7 +83,11 @@ export const Form = () => {
       />
       Ativo?
       <Box dir={"rtl"}>
-        <Button {...buttonProps} onClick={() => onSubmit(getValues(), null)}>
+        <Button 
+          color={"primary"}
+          {...buttonProps} 
+          onClick={() => onSubmit(getValues(), null)}
+        >
           Salvar
         </Button>
         <Button {...buttonProps} type="submit">
