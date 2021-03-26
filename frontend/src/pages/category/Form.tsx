@@ -9,11 +9,13 @@ import {
   TextField,
   Theme,
 } from "@material-ui/core";
-import { useForm } from "react-hook-form";
 import categoryHttp from "../../util/http/category-http";
 import { useHistory, useParams } from "react-router";
 import { Category } from "../../util/models";
-import {useEffect, useState} from "react";
+import { useState } from "react";
+import * as yup from '../../util/vendor/yup';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
 
 const useStyles = makeStyles((theme: Theme) => {
   return {
@@ -23,16 +25,31 @@ const useStyles = makeStyles((theme: Theme) => {
   };
 });
 
+const validationSchema = yup.object().shape({
+  name: yup.string().label("Nome").required().max(255),
+});
+
 export const Form = () => {
   const history = useHistory();
   const classes = useStyles();
-  const { id } : any = useParams();
+  const { id }: any = useParams();
   const [category, setCategory] = useState<Category | null>(null);
   const buttonProps: ButtonProps = {
     className: classes.submit,
+    color: "secondary",
     variant: "contained",
   };
-  const { register, handleSubmit, getValues } = useForm({
+
+  const {
+    register,
+    getValues,
+    setValue,
+    handleSubmit,
+    errors,
+    reset,
+    watch,
+  } = useForm({
+    resolver: yupResolver(validationSchema),
     defaultValues: {
       is_active: true,
     },
@@ -43,7 +60,7 @@ export const Form = () => {
       ? categoryHttp.create(formData)
       : categoryHttp.update(category.id, formData);
 
-    const { data } = await http;
+    const { data } = await http;    
 
     setTimeout(() => {
       event
@@ -56,12 +73,15 @@ export const Form = () => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
+
       <TextField
         name={"name"}
         label={"Nome"}
         variant={"outlined"}
         fullWidth
         InputLabelProps={{ shrink: true }}
+        error={errors['name'] !== undefined}
+        helperText={errors['name'] !== undefined && errors['name'].message}
         inputRef={register}
       />
       <TextField
@@ -78,16 +98,12 @@ export const Form = () => {
       <Checkbox
         name={"is_active"}
         color={"primary"}
-        inputRef={register}
         defaultChecked
+        inputRef={register}
       />
       Ativo?
       <Box dir={"rtl"}>
-        <Button 
-          color={"primary"}
-          {...buttonProps} 
-          onClick={() => onSubmit(getValues(), null)}
-        >
+        <Button {...buttonProps} onClick={() => onSubmit(getValues(), null)}>
           Salvar
         </Button>
         <Button {...buttonProps} type="submit">
