@@ -5,6 +5,7 @@ import {
   Button,
   ButtonProps,
   Checkbox,
+  FormControlLabel,
   makeStyles,
   TextField,
   Theme,
@@ -13,9 +14,11 @@ import categoryHttp from "../../util/http/category-http";
 import { useHistory, useParams } from "react-router";
 import { Category } from "../../util/models";
 import { useState } from "react";
-import * as yup from '../../util/vendor/yup';
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from "../../util/vendor/yup";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useEffect } from "react";
+import { useSnackbar } from "notistack";
 
 const useStyles = makeStyles((theme: Theme) => {
   return {
@@ -30,14 +33,18 @@ const validationSchema = yup.object().shape({
 });
 
 export const Form = () => {
+  //const snackbar = useSnackbar();
   const history = useHistory();
   const classes = useStyles();
   const { id }: any = useParams();
   const [category, setCategory] = useState<Category | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  
   const buttonProps: ButtonProps = {
     className: classes.submit,
     color: "secondary",
     variant: "contained",
+    disabled: loading
   };
 
   const {
@@ -55,12 +62,37 @@ export const Form = () => {
     },
   });
 
+  useEffect(() => {
+    register({ name: "is_active" });
+  }, [register]);
+
+  useEffect(() => {
+    if (!id) {
+      return;
+    }
+    async function getCategory() {
+      try {
+        const { data } = await categoryHttp.get(id);
+        setCategory(data.data);
+        reset(data.data);
+      } catch (error) {
+        console.log(error);
+        // snackbar.enqueueSnackbar("Nāo foi possível carregar as informações", { variant: "error", });
+      } finally {
+        setLoading(false);
+      }
+    }
+    setLoading(true);
+    getCategory();
+  }, []);
+
   async function onSubmit(formData, event) {
+    setLoading(true);
     const http = !category
       ? categoryHttp.create(formData)
       : categoryHttp.update(category.id, formData);
 
-    const { data } = await http;    
+    const { data } = await http;
 
     setTimeout(() => {
       event
@@ -69,19 +101,20 @@ export const Form = () => {
           : history.push(`/categories/${data.data.id}/edit`)
         : history.push("/categories");
     });
+    setLoading(false);
   }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-
       <TextField
         name={"name"}
         label={"Nome"}
         variant={"outlined"}
         fullWidth
         InputLabelProps={{ shrink: true }}
-        error={errors['name'] !== undefined}
-        helperText={errors['name'] !== undefined && errors['name'].message}
+        error={errors["name"] !== undefined}
+        helperText={errors["name"] !== undefined && errors["name"].message}
+        disabled={loading}
         inputRef={register}
       />
       <TextField
@@ -93,15 +126,22 @@ export const Form = () => {
         InputLabelProps={{ shrink: true }}
         multiline
         rows="4"
+        disabled={loading}
         inputRef={register}
       />
-      <Checkbox
-        name={"is_active"}
-        color={"primary"}
-        defaultChecked
-        inputRef={register}
+      <FormControlLabel
+        disabled={loading}
+        control={
+          <Checkbox
+            name={"is_active"}
+            color={"primary"}
+            onChange={() => setValue("is_active", !getValues()["is_active"])}
+            checked={watch("is_active")}
+          />
+        }
+        label={"Ativo?"}
+        labelPlacement={"end"}
       />
-      Ativo?
       <Box dir={"rtl"}>
         <Button {...buttonProps} onClick={() => onSubmit(getValues(), null)}>
           Salvar

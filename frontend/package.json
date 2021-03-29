@@ -17,6 +17,7 @@
     "date-fns": "^2.19.0",
     "mui-data-table": "^0.1.7",
     "mui-datatables": "^3.7.6",
+    "notistack": "^1.0.5",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-hook-form": "^6.15.5",
