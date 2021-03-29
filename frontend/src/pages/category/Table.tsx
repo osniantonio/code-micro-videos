@@ -8,6 +8,7 @@ import parseISO from "date-fns/parseISO";
 import format from "date-fns/format";
 import categoryHttp from "../../util/http/category-http";
 import { Category } from "../../util/models";
+import { BadgeNo, BadgeYes } from "../../components/Badge";
 
 const columnsDefinitions: MUIDataTableColumn[] = [
   {
@@ -22,11 +23,7 @@ const columnsDefinitions: MUIDataTableColumn[] = [
         names: ["Sim", "Nāo"],
       },
       customBodyRender(value, tableMeta, updateValue) {
-        return value ? (
-          <Chip label="Sim" color="primary" />
-        ) : (
-          <Chip label="Não" color="secondary" />
-        );
+        return value ? <BadgeYes /> : <BadgeNo />;
       },
     },
   },
@@ -48,7 +45,7 @@ export const Table = (props: Props) => {
   const [data, setData] = useState<Category[]>([]);
   useEffect(() => {
     categoryHttp
-      .list<{data: Category[]}>()
+      .list<{ data: Category[] }>()
       .then(({ data }) => setData(data.data));
   }, []);
   return (

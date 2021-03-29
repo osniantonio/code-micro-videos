@@ -5,15 +5,20 @@ import {
   Button,
   ButtonProps,
   Checkbox,
+  FormControlLabel,
   makeStyles,
   TextField,
   Theme,
 } from "@material-ui/core";
-import { useForm } from "react-hook-form";
 import categoryHttp from "../../util/http/category-http";
 import { useHistory, useParams } from "react-router";
 import { Category } from "../../util/models";
-import {useEffect, useState} from "react";
+import { useState } from "react";
+import * as yup from "../../util/vendor/yup";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useEffect } from "react";
+import { useSnackbar } from "notistack";
 
 const useStyles = makeStyles((theme: Theme) => {
   return {
@@ -23,22 +28,66 @@ const useStyles = makeStyles((theme: Theme) => {
   };
 });
 
+const validationSchema = yup.object().shape({
+  name: yup.string().label("Nome").required().max(255),
+});
+
 export const Form = () => {
+  //const snackbar = useSnackbar();
   const history = useHistory();
   const classes = useStyles();
-  const { id } : any = useParams();
+  const { id }: any = useParams();
   const [category, setCategory] = useState<Category | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+  
   const buttonProps: ButtonProps = {
     className: classes.submit,
-    variant: "outlined",
+    color: "secondary",
+    variant: "contained",
+    disabled: loading
   };
-  const { register, handleSubmit, getValues } = useForm({
+
+  const {
+    register,
+    getValues,
+    setValue,
+    handleSubmit,
+    errors,
+    reset,
+    watch,
+  } = useForm({
+    resolver: yupResolver(validationSchema),
     defaultValues: {
       is_active: true,
     },
   });
 
+  useEffect(() => {
+    register({ name: "is_active" });
+  }, [register]);
+
+  useEffect(() => {
+    if (!id) {
+      return;
+    }
+    async function getCategory() {
+      try {
+        const { data } = await categoryHttp.get(id);
+        setCategory(data.data);
+        reset(data.data);
+      } catch (error) {
+        console.log(error);
+        // snackbar.enqueueSnackbar("Nāo foi possível carregar as informações", { variant: "error", });
+      } finally {
+        setLoading(false);
+      }
+    }
+    setLoading(true);
+    getCategory();
+  }, []);
+
   async function onSubmit(formData, event) {
+    setLoading(true);
     const http = !category
       ? categoryHttp.create(formData)
       : categoryHttp.update(category.id, formData);
@@ -52,6 +101,7 @@ export const Form = () => {
           : history.push(`/categories/${data.data.id}/edit`)
         : history.push("/categories");
     });
+    setLoading(false);
   }
 
   return (
@@ -62,6 +112,9 @@ export const Form = () => {
         variant={"outlined"}
         fullWidth
         InputLabelProps={{ shrink: true }}
+        error={errors["name"] !== undefined}
+        helperText={errors["name"] !== undefined && errors["name"].message}
+        disabled={loading}
         inputRef={register}
       />
       <TextField
@@ -73,15 +126,22 @@ export const Form = () => {
         InputLabelProps={{ shrink: true }}
         multiline
         rows="4"
+        disabled={loading}
         inputRef={register}
       />
-      <Checkbox
-        name={"is_active"}
-        color={"primary"}
-        inputRef={register}
-        defaultChecked
+      <FormControlLabel
+        disabled={loading}
+        control={
+          <Checkbox
+            name={"is_active"}
+            color={"primary"}
+            onChange={() => setValue("is_active", !getValues()["is_active"])}
+            checked={watch("is_active")}
+          />
+        }
+        label={"Ativo?"}
+        labelPlacement={"end"}
       />
-      Ativo?
       <Box dir={"rtl"}>
         <Button {...buttonProps} onClick={() => onSubmit(getValues(), null)}>
           Salvar
