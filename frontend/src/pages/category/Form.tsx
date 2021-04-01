@@ -33,18 +33,18 @@ const validationSchema = yup.object().shape({
 });
 
 export const Form = () => {
-  //const snackbar = useSnackbar();
+  const snackbar = useSnackbar();
   const history = useHistory();
   const classes = useStyles();
   const { id }: any = useParams();
   const [category, setCategory] = useState<Category | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  
+
   const buttonProps: ButtonProps = {
     className: classes.submit,
     color: "secondary",
     variant: "contained",
-    disabled: loading
+    disabled: loading,
   };
 
   const {
@@ -77,7 +77,9 @@ export const Form = () => {
         reset(data.data);
       } catch (error) {
         console.log(error);
-        // snackbar.enqueueSnackbar("Nāo foi possível carregar as informações", { variant: "error", });
+        snackbar.enqueueSnackbar("Nāo foi possível carregar as informações", {
+          variant: "error",
+        });
       } finally {
         setLoading(false);
       }
@@ -87,21 +89,32 @@ export const Form = () => {
   }, []);
 
   async function onSubmit(formData, event) {
-    setLoading(true);
-    const http = !category
-      ? categoryHttp.create(formData)
-      : categoryHttp.update(category.id, formData);
+    try {
+      setLoading(true);
+      const http = !category
+        ? categoryHttp.create(formData)
+        : categoryHttp.update(category.id, formData);
 
-    const { data } = await http;
+      const { data } = await http;
 
-    setTimeout(() => {
-      event
-        ? id
-          ? history.replace(`/categories/${data.data.id}/edit`)
-          : history.push(`/categories/${data.data.id}/edit`)
-        : history.push("/categories");
-    });
-    setLoading(false);
+      snackbar.enqueueSnackbar("Categoria salva com sucesso", {
+        variant: "success",
+      });
+
+      setTimeout(() => {
+        event
+          ? id
+            ? history.replace(`/categories/${data.data.id}/edit`)
+            : history.push(`/categories/${data.data.id}/edit`)
+          : history.push("/categories");
+      });
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      snackbar.enqueueSnackbar("Nāo foi possível salvar a categoria", {
+        variant: "error",
+      });
+    }
   }
 
   return (
