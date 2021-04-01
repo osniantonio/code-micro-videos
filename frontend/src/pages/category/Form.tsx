@@ -114,6 +114,8 @@ export const Form = () => {
       snackbar.enqueueSnackbar("Nāo foi possível salvar a categoria", {
         variant: "error",
       });
+    } finally {
+      setLoading(false);
     }
   }
 
