@@ -37,6 +37,19 @@ const validationSchema = yup.object().shape({
 });
 
 export const Form = () => {
+
+  const {
+    register,
+    getValues,
+    handleSubmit,
+    setValue,
+    errors,
+    reset,
+    watch,
+  } = useForm({
+    resolver: yupResolver(validationSchema),
+  });
+
   const snackbar = useSnackbar();
   const history = useHistory();
   const classes = useStyles();
@@ -51,18 +64,6 @@ export const Form = () => {
     disabled: loading,
   };
 
-  const {
-    register,
-    getValues,
-    handleSubmit,
-    setValue,
-    errors,
-    reset,
-    watch,
-  } = useForm({
-    resolver: yupResolver(validationSchema),
-  });
-
   useEffect(() => {
     register({ name: "type" });
   }, [register]);
@@ -73,6 +74,7 @@ export const Form = () => {
     }
     async function getCastMember() {
       try {
+        setLoading(true);
         const { data } = await castMemberHttp.get(id);
         setCastMember(data.data);
         reset(data.data);
@@ -85,7 +87,6 @@ export const Form = () => {
         setLoading(false);
       }
     }
-    setLoading(true);
     getCastMember();
   }, []);
 
