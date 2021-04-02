@@ -3,14 +3,25 @@ import * as React from 'react';
 import {useEffect, useReducer, useRef, useState} from "react";
 import MUIDataTable, { MUIDataTableColumn } from 'mui-datatables';
 import { httpVideo } from '../../util/http';
-import { Chip } from '@material-ui/core';
+import { Chip, IconButton } from '@material-ui/core';
 import parseISO from "date-fns/parseISO";
 import format from "date-fns/format";
-import { CastMemberTypeMap} from "../../util/models";
+import { CastMemberTypeMap, Genre} from "../../util/models";
+import EditIcon from "@material-ui/icons/Edit";
+import { Link } from "react-router-dom";
+import castMemberHttp from '../../util/http/cast-member-http';
 
 const castMemberNames = Object.values(CastMemberTypeMap);
 
 const columnsDefinitions:MUIDataTableColumn[] = [
+    {
+        name: "id",
+        label: "ID",
+        options: {
+          sort: false,
+          filter: false,
+        },
+    },
     {
         name: "name",
         label: "Nome",
@@ -37,21 +48,40 @@ const columnsDefinitions:MUIDataTableColumn[] = [
             }
         }
     },
+    {
+        name: "actions",
+        label: "Ações",
+        options: {
+          sort: false,
+          filter: false,
+          customBodyRender: (value, tableMeta, updateValue) => {
+            return (
+              <IconButton
+                color={"secondary"}
+                component={Link}
+                to={`/cast-members/${tableMeta.rowData[0]}/edit`}
+              >
+                <EditIcon />
+              </IconButton>
+            );
+          },
+        },
+      },
 ];
-const data = [];
+
 type Props = {};
 export const Table = (props: Props) => {
-    const [data, setData] = useState([]);
-    useEffect( () => {
-        httpVideo.get('cast_members').then(
-            response => setData(response.data.data)
-        );
+    const [data, setData] = useState<Genre[]>([]);
+    useEffect(() => {
+      castMemberHttp
+        .list<{ data: Genre[] }>()
+        .then(({ data }) => setData(data.data));
     }, []);
     return (
-        <MUIDataTable 
-            title="Listagem de membros"
-            columns={columnsDefinitions} 
-            data={data}
-        />
+      <MUIDataTable
+        title="Listagem de membros"
+        columns={columnsDefinitions}
+        data={data}
+      />
     );
-};
+  };

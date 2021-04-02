@@ -6,10 +6,22 @@ import { httpVideo } from "../../util/http";
 import { Chip } from "@material-ui/core";
 import parseISO from "date-fns/parseISO";
 import format from "date-fns/format";
-import { Category } from "../../util/models";
+import { Category, Genre } from "../../util/models";
 import { BadgeNo, BadgeYes } from "../../components/Badge";
+import EditIcon from "@material-ui/icons/Edit";
+import { Link } from "react-router-dom";
+import { IconButton } from "@material-ui/core";
+import genreHttp from "../../util/http/genre-http";
 
 const columnsDefinitions: MUIDataTableColumn[] = [
+  {
+    name: "id",
+    label: "ID",
+    options: {
+      sort: false,
+      filter: false,
+    },
+  },
   {
     name: "name",
     label: "Nome",
@@ -18,8 +30,12 @@ const columnsDefinitions: MUIDataTableColumn[] = [
     name: "categories",
     label: "Categorias",
     options: {
+      filterType: "multiselect",
+      filterOptions: {
+        names: [],
+      },
       customBodyRender(value, tableMeta, updateValue) {
-        return value.map((category: Category) => category.name).join(", ");
+        return value.map((valor) => valor.name).join(",");
       },
     },
   },
@@ -45,13 +61,32 @@ const columnsDefinitions: MUIDataTableColumn[] = [
       },
     },
   },
+  {
+    name: "actions",
+    label: "Ações",
+    options: {
+      sort: false,
+      filter: false,
+      customBodyRender: (value, tableMeta, updateValue) => {
+        return (
+          <IconButton
+            color={"secondary"}
+            component={Link}
+            to={`/genres/${tableMeta.rowData[0]}/edit`}
+          >
+            <EditIcon />
+          </IconButton>
+        );
+      },
+    },
+  },
 ];
-const data = [];
+
 type Props = {};
 export const Table = (props: Props) => {
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<Genre[]>([]);
   useEffect(() => {
-    httpVideo.get("genres").then((response) => setData(response.data.data));
+    genreHttp.list<{ data: Genre[] }>().then(({ data }) => setData(data.data));
   }, []);
   return (
     <MUIDataTable

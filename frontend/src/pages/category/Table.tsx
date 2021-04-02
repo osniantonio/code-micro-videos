@@ -1,16 +1,25 @@
 // @flow
 import * as React from "react";
-import { useEffect, useReducer, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import MUIDataTable, { MUIDataTableColumn } from "mui-datatables";
-import { httpVideo } from "../../util/http";
-import { Chip } from "@material-ui/core";
+import { IconButton } from "@material-ui/core";
 import parseISO from "date-fns/parseISO";
 import format from "date-fns/format";
 import categoryHttp from "../../util/http/category-http";
 import { Category } from "../../util/models";
 import { BadgeNo, BadgeYes } from "../../components/Badge";
+import EditIcon from "@material-ui/icons/Edit";
+import { Link } from "react-router-dom";
 
 const columnsDefinitions: MUIDataTableColumn[] = [
+  {
+    name: "id",
+    label: "ID",
+    options: {
+      sort: false,
+      filter: false,
+    },
+  },
   {
     name: "name",
     label: "Nome",
@@ -37,10 +46,28 @@ const columnsDefinitions: MUIDataTableColumn[] = [
       },
     },
   },
+  {
+    name: "actions",
+    label: "Ações",
+    options: {
+      sort: false,
+      filter: false,
+      customBodyRender: (value, tableMeta, updateValue) => {
+        return (
+          <IconButton
+            color={"secondary"}
+            component={Link}
+            to={`/categories/${tableMeta.rowData[0]}/edit`}
+          >
+            <EditIcon />
+          </IconButton>
+        );
+      },
+    },
+  },
 ];
 
 type Props = {};
-
 export const Table = (props: Props) => {
   const [data, setData] = useState<Category[]>([]);
   useEffect(() => {

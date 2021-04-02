@@ -33,19 +33,6 @@ const validationSchema = yup.object().shape({
 });
 
 export const Form = () => {
-  const snackbar = useSnackbar();
-  const history = useHistory();
-  const classes = useStyles();
-  const { id }: any = useParams();
-  const [category, setCategory] = useState<Category | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-
-  const buttonProps: ButtonProps = {
-    className: classes.submit,
-    color: "secondary",
-    variant: "contained",
-    disabled: loading,
-  };
 
   const {
     register,
@@ -61,6 +48,20 @@ export const Form = () => {
       is_active: true,
     },
   });
+  
+  const snackbar = useSnackbar();
+  const history = useHistory();
+  const classes = useStyles();
+  const { id }: any = useParams();
+  const [category, setCategory] = useState<Category | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const buttonProps: ButtonProps = {
+    className: classes.submit,
+    color: "secondary",
+    variant: "contained",
+    disabled: loading,
+  };  
 
   useEffect(() => {
     register({ name: "is_active" });
@@ -72,6 +73,7 @@ export const Form = () => {
     }
     async function getCategory() {
       try {
+        setLoading(true);
         const { data } = await categoryHttp.get(id);
         setCategory(data.data);
         reset(data.data);
@@ -84,7 +86,6 @@ export const Form = () => {
         setLoading(false);
       }
     }
-    setLoading(true);
     getCategory();
   }, []);
 
@@ -114,6 +115,8 @@ export const Form = () => {
       snackbar.enqueueSnackbar("Nāo foi possível salvar a categoria", {
         variant: "error",
       });
+    } finally {
+      setLoading(false);
     }
   }
 
