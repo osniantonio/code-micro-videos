@@ -72,7 +72,7 @@ export const Form = () => {
     if (!id) {
       return;
     }
-    async function getCastMember() {
+    (async function getCastMember() {
       try {
         setLoading(true);
         const { data } = await castMemberHttp.get(id);
@@ -86,8 +86,7 @@ export const Form = () => {
       } finally {
         setLoading(false);
       }
-    }
-    getCastMember();
+    })();
   }, []);
 
   async function onSubmit(formData, event) {

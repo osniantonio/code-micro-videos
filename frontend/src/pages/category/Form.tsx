@@ -70,8 +70,8 @@ export const Form = () => {
   useEffect(() => {
     if (!id) {
       return;
-    }
-    async function getCategory() {
+    }    
+    (async function getCategory() {
       try {
         setLoading(true);
         const { data } = await categoryHttp.get(id);
@@ -85,8 +85,7 @@ export const Form = () => {
       } finally {
         setLoading(false);
       }
-    }
-    getCategory();
+    })();
   }, []);
 
   async function onSubmit(formData, event) {
