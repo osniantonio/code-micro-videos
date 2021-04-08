@@ -20,14 +20,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import categoryHttp from "../../util/http/category-http";
 import { useSnackbar } from "notistack";
-
-const useStyles = makeStyles((theme: Theme) => {
-  return {
-    submit: {
-      margin: theme.spacing(1),
-    },
-  };
-});
+import SubmitActions from "../../components/SubmitActions";
 
 const validationSchema = yup.object().shape({
   name: yup.string().label("Nome").required().max(255),
@@ -43,6 +36,7 @@ export const Form = () => {
     watch,
     errors,
     reset,
+    trigger,
   } = useForm({
     resolver: yupResolver(validationSchema),
     defaultValues: {
@@ -55,23 +49,17 @@ export const Form = () => {
   const history = useHistory();
   const [genre, setGenre] = useState<Genre | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
-  const classes = useStyles();
   const { id }: any = useParams();
   const [loading, setLoading] = useState<boolean>(false);
-  
-  const buttonProps: ButtonProps = {
-    className: classes.submit,
-    color: "secondary",
-    variant: "contained",
-    disabled: loading,
-  };
 
-  const hasErrorById = (error: any, id:string) => {
+  const hasErrorById = (error: any, id: string) => {
     return error[id] !== undefined;
   };
-  
-  const getErroMessageById = (error: any, id:string) => {
-    return error[id] !== undefined && error[id].message  !== undefined ? error[id].message : undefined;
+
+  const getErroMessageById = (error: any, id: string) => {
+    return error[id] !== undefined && error[id].message !== undefined
+      ? error[id].message
+      : undefined;
   };
 
   useEffect(() => {
@@ -132,7 +120,7 @@ export const Form = () => {
   async function onSubmit(formData, event) {
     console.log(errors);
     console.log(errors["categories_id"]);
-    try {     
+    try {
       setLoading(true);
       const http = !genre
         ? genreHttp.create(formData)
@@ -169,8 +157,8 @@ export const Form = () => {
         variant={"outlined"}
         fullWidth
         InputLabelProps={{ shrink: true }}
-        error={hasErrorById(errors, 'name')}
-        helperText={getErroMessageById(errors, 'name')}
+        error={hasErrorById(errors, "name")}
+        helperText={getErroMessageById(errors, "name")}
         disabled={loading}
         inputRef={register}
       />
@@ -190,8 +178,8 @@ export const Form = () => {
           multiple: true,
         }}
         disabled={loading}
-        error={hasErrorById(errors, 'categories_id')}
-        helperText={getErroMessageById(errors, 'categories_id')}
+        error={hasErrorById(errors, "categories_id")}
+        helperText={getErroMessageById(errors, "categories_id")}
         InputLabelProps={{ shrink: true }}
       >
         <MenuItem value="" disabled>
@@ -218,15 +206,14 @@ export const Form = () => {
         label={"Ativo?"}
         labelPlacement={"end"}
       />
-
-      <Box dir={"rtl"}>
-        <Button {...buttonProps} onClick={() => onSubmit(getValues(), null)}>
-          Salvar
-        </Button>
-        <Button {...buttonProps} type="submit">
-          Salvar e continuar editando
-        </Button>
-      </Box>
+      <SubmitActions
+        disabledButtons={loading}
+        handleSave={() =>
+          trigger().then((isValid) => {
+            isValid && onSubmit(getValues(), null);
+          })
+        }
+      />
     </form>
   );
 };
