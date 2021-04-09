@@ -6,7 +6,7 @@ import { IconButton } from "@material-ui/core";
 import parseISO from "date-fns/parseISO";
 import format from "date-fns/format";
 import categoryHttp from "../../util/http/category-http";
-import { Category } from "../../util/models";
+import { Category, ListResponse } from "../../util/models";
 import { BadgeNo, BadgeYes } from "../../components/Badge";
 import EditIcon from "@material-ui/icons/Edit";
 import { Link } from "react-router-dom";
@@ -71,9 +71,17 @@ type Props = {};
 export const Table = (props: Props) => {
   const [data, setData] = useState<Category[]>([]);
   useEffect(() => {
-    categoryHttp
-      .list<{ data: Category[] }>()
-      .then(({ data }) => setData(data.data));
+    let isSubscribed = true;
+    (async () => {
+        const {data} = await categoryHttp.list<ListResponse<Category>>();
+        if (isSubscribed) {
+          setData(data.data);
+        }
+    })();
+
+    return () => {
+      isSubscribed = false;
+    }
   }, []);
   return (
     <MUIDataTable

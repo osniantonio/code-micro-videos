@@ -22,14 +22,8 @@ import castMemberHttp from "../../util/http/cast-member-http";
 import * as yup from "../../util/vendor/yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useSnackbar } from "notistack";
-
-const useStyles = makeStyles((theme: Theme) => {
-  return {
-    submit: {
-      margin: theme.spacing(1),
-    },
-  };
-});
+import SubmitActions from "../../components/SubmitActions";
+import { DefaultForm } from "../../components/DefaultForm";
 
 const validationSchema = yup.object().shape({
   name: yup.string().label("Nome").required().max(255),
@@ -37,7 +31,6 @@ const validationSchema = yup.object().shape({
 });
 
 export const Form = () => {
-
   const {
     register,
     getValues,
@@ -46,23 +39,16 @@ export const Form = () => {
     errors,
     reset,
     watch,
+    trigger,
   } = useForm({
     resolver: yupResolver(validationSchema),
   });
 
   const snackbar = useSnackbar();
   const history = useHistory();
-  const classes = useStyles();
   const { id }: any = useParams();
   const [castMember, setCastMember] = useState<CastMember | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-
-  const buttonProps: ButtonProps = {
-    className: classes.submit,
-    color: "secondary",
-    variant: "contained",
-    disabled: loading,
-  };
 
   useEffect(() => {
     register({ name: "type" });
@@ -72,7 +58,7 @@ export const Form = () => {
     if (!id) {
       return;
     }
-    async function getCastMember() {
+    (async function getCastMember() {
       try {
         setLoading(true);
         const { data } = await castMemberHttp.get(id);
@@ -86,8 +72,7 @@ export const Form = () => {
       } finally {
         setLoading(false);
       }
-    }
-    getCastMember();
+    })();
   }, []);
 
   async function onSubmit(formData, event) {
@@ -122,7 +107,7 @@ export const Form = () => {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <DefaultForm GridItemProps={{xs:12, md:6}} onSubmit={handleSubmit(onSubmit)}>
       <TextField
         name={"name"}
         label={"Nome"}
@@ -164,14 +149,14 @@ export const Form = () => {
           </FormHelperText>
         )}
       </FormControl>
-      <Box dir={"rtl"}>
-        <Button {...buttonProps} onClick={() => onSubmit(getValues(), null)}>
-          Salvar
-        </Button>
-        <Button {...buttonProps} type="submit">
-          Salvar e continuar editando
-        </Button>
-      </Box>
-    </form>
+      <SubmitActions
+        disabledButtons={loading}
+        handleSave={() =>
+          trigger().then((isValid) => {
+            isValid && onSubmit(getValues(), null);
+          })
+        }
+      />
+    </DefaultForm>
   );
 };

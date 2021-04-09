@@ -23,7 +23,6 @@ interface Timestampable {
     readonly updated_at: string;
 }
 
-
 export interface Category extends Timestampable{
     readonly id: string;
     name: string;
@@ -51,7 +50,6 @@ export interface Genre extends Timestampable {
     name: string;
     is_active: boolean;
     categories: Category[];
-
 }
 
 interface GenreVideo extends Omit<Genre, 'categories'> {

@@ -6,7 +6,7 @@ import { httpVideo } from "../../util/http";
 import { Chip } from "@material-ui/core";
 import parseISO from "date-fns/parseISO";
 import format from "date-fns/format";
-import { Category, Genre } from "../../util/models";
+import { Category, Genre, ListResponse } from "../../util/models";
 import { BadgeNo, BadgeYes } from "../../components/Badge";
 import EditIcon from "@material-ui/icons/Edit";
 import { Link } from "react-router-dom";
@@ -86,7 +86,17 @@ type Props = {};
 export const Table = (props: Props) => {
   const [data, setData] = useState<Genre[]>([]);
   useEffect(() => {
-    genreHttp.list<{ data: Genre[] }>().then(({ data }) => setData(data.data));
+    let isSubscribed = true;
+    (async () => {
+      const { data } = await genreHttp.list<ListResponse<Genre>>();
+      if (isSubscribed) {
+        setData(data.data);
+      }
+    })();
+
+    return () => {
+      isSubscribed = false;
+    };
   }, []);
   return (
     <MUIDataTable
