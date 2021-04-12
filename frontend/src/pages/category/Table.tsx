@@ -1,7 +1,7 @@
 // @flow
 import * as React from "react";
 import { useEffect, useState } from "react";
-import MUIDataTable, { MUIDataTableColumn } from "mui-datatables";
+import { MUIDataTableColumn } from "mui-datatables";
 import { IconButton } from "@material-ui/core";
 import parseISO from "date-fns/parseISO";
 import format from "date-fns/format";
@@ -10,6 +10,7 @@ import { Category, ListResponse } from "../../util/models";
 import { BadgeNo, BadgeYes } from "../../components/Badge";
 import EditIcon from "@material-ui/icons/Edit";
 import { Link } from "react-router-dom";
+import DefaultTable, {makeActionsStyles, MuiDataTableRefComponent, TableColumn} from "../../components/Table";
 
 const columnsDefinitions: MUIDataTableColumn[] = [
   {
@@ -84,7 +85,7 @@ export const Table = (props: Props) => {
     }
   }, []);
   return (
-    <MUIDataTable
+    <DefaultTable
       title="Listagem de categorias"
       columns={columnsDefinitions}
       data={data}
