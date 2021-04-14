@@ -10,13 +10,15 @@ import { CastMember, CastMemberTypeMap, ListResponse } from "../../util/models";
 import EditIcon from "@material-ui/icons/Edit";
 import { Link } from "react-router-dom";
 import castMemberHttp from "../../util/http/cast-member-http";
+import DefaultTable, {makeActionsStyles, MuiDataTableRefComponent, TableColumn} from "../../components/Table";
 
 const castMemberNames = Object.values(CastMemberTypeMap);
 
-const columnsDefinitions: MUIDataTableColumn[] = [
+const columnsDefinitions: TableColumn[] = [
   {
     name: "id",
     label: "ID",
+    width: '30%',
     options: {
       sort: false,
       filter: false,
@@ -25,10 +27,12 @@ const columnsDefinitions: MUIDataTableColumn[] = [
   {
     name: "name",
     label: "Nome",
+    width: '43%',
   },
   {
     name: "type",
     label: "Tipo",
+    width: '4%',
     options: {
       customBodyRender(value, tableMeta, updateValue) {
         return CastMemberTypeMap[value];
@@ -41,6 +45,7 @@ const columnsDefinitions: MUIDataTableColumn[] = [
   {
     name: "created_at",
     label: "Criado em",
+    width: '10%',
     options: {
       filter: false,
       customBodyRender(value, tableMeta, updateValue) {
@@ -51,6 +56,7 @@ const columnsDefinitions: MUIDataTableColumn[] = [
   {
     name: "actions",
     label: "Ações",
+    width: '13%',
     options: {
       sort: false,
       filter: false,
@@ -86,7 +92,7 @@ export const Table = (props: Props) => {
     };
   }, []);
   return (
-    <MUIDataTable
+    <DefaultTable
       title="Listagem de membros"
       columns={columnsDefinitions}
       data={data}

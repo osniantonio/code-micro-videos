@@ -12,10 +12,11 @@ import EditIcon from "@material-ui/icons/Edit";
 import { Link } from "react-router-dom";
 import DefaultTable, {makeActionsStyles, MuiDataTableRefComponent, TableColumn} from "../../components/Table";
 
-const columnsDefinitions: MUIDataTableColumn[] = [
+const columnsDefinitions: TableColumn[] = [
   {
     name: "id",
     label: "ID",
+    width: '30%',
     options: {
       sort: false,
       filter: false,
@@ -24,10 +25,12 @@ const columnsDefinitions: MUIDataTableColumn[] = [
   {
     name: "name",
     label: "Nome",
+    width: '43%',
   },
   {
     name: "is_active",
     label: "Ativo?",
+    width: '4%',
     options: {
       filterOptions: {
         names: ["Sim", "Nāo"],
@@ -40,6 +43,7 @@ const columnsDefinitions: MUIDataTableColumn[] = [
   {
     name: "created_at",
     label: "Criado em",
+    width: '10%',
     options: {
       filter: false,
       customBodyRender(value, tableMeta, updateValue) {
@@ -50,6 +54,7 @@ const columnsDefinitions: MUIDataTableColumn[] = [
   {
     name: "actions",
     label: "Ações",
+    width: '13%',
     options: {
       sort: false,
       filter: false,
