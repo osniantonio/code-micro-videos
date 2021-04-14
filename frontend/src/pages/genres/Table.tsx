@@ -12,13 +12,18 @@ import EditIcon from "@material-ui/icons/Edit";
 import { Link } from "react-router-dom";
 import { IconButton } from "@material-ui/core";
 import genreHttp from "../../util/http/genre-http";
-import DefaultTable, {makeActionsStyles, MuiDataTableRefComponent, TableColumn} from "../../components/Table";
+import DefaultTable, {
+  makeActionsStyles,
+  MuiDataTableRefComponent,
+  TableColumn,
+} from "../../components/Table";
+import { useSnackbar } from "notistack";
 
 const columnsDefinitions: TableColumn[] = [
   {
     name: "id",
     label: "ID",
-    width: '30%',
+    width: "30%",
     options: {
       sort: false,
       filter: false,
@@ -27,12 +32,12 @@ const columnsDefinitions: TableColumn[] = [
   {
     name: "name",
     label: "Nome",
-    width: '23%',
+    width: "23%",
   },
   {
     name: "categories",
     label: "Categorias",
-    width: '4%',
+    width: "4%",
     options: {
       filterType: "multiselect",
       filterOptions: {
@@ -46,7 +51,7 @@ const columnsDefinitions: TableColumn[] = [
   {
     name: "is_active",
     label: "Ativo?",
-    width: '20%',
+    width: "20%",
     options: {
       filterOptions: {
         names: ["Sim", "Nāo"],
@@ -59,7 +64,7 @@ const columnsDefinitions: TableColumn[] = [
   {
     name: "created_at",
     label: "Criado em",
-    width: '10%',
+    width: "10%",
     options: {
       filter: false,
       customBodyRender(value, tableMeta, updateValue) {
@@ -70,7 +75,7 @@ const columnsDefinitions: TableColumn[] = [
   {
     name: "actions",
     label: "Ações",
-    width: '13%',
+    width: "13%",
     options: {
       sort: false,
       filter: false,
@@ -91,13 +96,25 @@ const columnsDefinitions: TableColumn[] = [
 
 type Props = {};
 export const Table = (props: Props) => {
+  const snackbar = useSnackbar();
   const [data, setData] = useState<Genre[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
   useEffect(() => {
     let isSubscribed = true;
     (async () => {
-      const { data } = await genreHttp.list<ListResponse<Genre>>();
-      if (isSubscribed) {
-        setData(data.data);
+      setLoading(true);
+      try {
+        const { data } = await genreHttp.list<ListResponse<Genre>>();
+        if (isSubscribed) {
+          setData(data.data);
+        }
+      } catch (error) {
+        console.log(error);
+        snackbar.enqueueSnackbar("Nāo foi possível carregar as informaçoes", {
+          variant: "error",
+        });
+      } finally {
+        setLoading(false);
       }
     })();
 
@@ -110,6 +127,7 @@ export const Table = (props: Props) => {
       title="Listagem de gêneros"
       columns={columnsDefinitions}
       data={data}
+      loading={loading}
     />
   );
 };
