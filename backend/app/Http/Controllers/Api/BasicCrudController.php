@@ -43,7 +43,7 @@ abstract class BasicCrudController extends Controller
     {
         $model = $this->model();
         $keyName = (new $model)->getRouteKeyName();
-        return $this->model()::where($keyName, $id)->firstOrFail();
+        return $this->queryBuilder()->where($keyName, $id)->firstOrFail();
     }
 
     public function show($id)
@@ -55,8 +55,8 @@ abstract class BasicCrudController extends Controller
 
     public function store(Request $request)
     {
-        $validatedData = $this->validate($request, $this->rulesStore());
-        $obj = $this->model()::create($validatedData);
+        $validateData = $this->validate($request, $this->rulesStore());
+        $obj = $this->queryBuilder()->create($validateData);
         $obj->refresh();
         $resource = $this->resource();
         return new $resource($obj);
@@ -78,7 +78,7 @@ abstract class BasicCrudController extends Controller
         return response()->noContent(); // status 204
     }
 
-    protected function queryBuilder():Builder 
+    protected function queryBuilder(): Builder
     {
         return $this->model()::query();
     }
