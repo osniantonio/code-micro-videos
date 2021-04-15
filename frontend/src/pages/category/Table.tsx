@@ -2,7 +2,7 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { MUIDataTableColumn } from "mui-datatables";
-import { IconButton } from "@material-ui/core";
+import { IconButton, MuiThemeProvider } from "@material-ui/core";
 import parseISO from "date-fns/parseISO";
 import format from "date-fns/format";
 import categoryHttp from "../../util/http/category-http";
@@ -107,11 +107,13 @@ export const Table = (props: Props) => {
     };
   }, []);
   return (
-    <DefaultTable
-      title="Listagem de categorias"
-      columns={columnsDefinitions}
-      data={data}
-      loading={loading}
-    />
+    <MuiThemeProvider theme={makeActionsStyles(columnsDefinitions.length -1)}>
+      <DefaultTable
+        title="Listagem de categorias"
+        columns={columnsDefinitions}
+        data={data}
+        loading={loading}
+      />
+    </MuiThemeProvider>
   );
 };

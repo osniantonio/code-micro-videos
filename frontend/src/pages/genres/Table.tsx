@@ -3,7 +3,7 @@ import * as React from "react";
 import { useEffect, useReducer, useRef, useState } from "react";
 import MUIDataTable, { MUIDataTableColumn } from "mui-datatables";
 import { httpVideo } from "../../util/http";
-import { Chip } from "@material-ui/core";
+import { Chip, MuiThemeProvider } from "@material-ui/core";
 import parseISO from "date-fns/parseISO";
 import format from "date-fns/format";
 import { Category, Genre, ListResponse } from "../../util/models";
@@ -123,11 +123,13 @@ export const Table = (props: Props) => {
     };
   }, []);
   return (
-    <DefaultTable
-      title="Listagem de gêneros"
-      columns={columnsDefinitions}
-      data={data}
-      loading={loading}
-    />
+    <MuiThemeProvider theme={makeActionsStyles(columnsDefinitions.length -1)}>
+      <DefaultTable
+        title="Listagem de gêneros"
+        columns={columnsDefinitions}
+        data={data}
+        loading={loading}
+      />
+    </MuiThemeProvider>
   );
 };
