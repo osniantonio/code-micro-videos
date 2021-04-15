@@ -96,11 +96,9 @@ const Table = React.forwardRef<MuiDataTableRefComponent, TableProps>((props, ref
                 :  textLabels.body.noMatch;
     }
 
-    /*
     function applyResponsive() {
-        newProps.options.responsive = isSmOrDown ? 'scrollMaxHeight' : 'stacked';
+        (newProps.options as any).responsive = isSmOrDown ? 'scrollMaxHeight' : 'stacked';
     }
-    */
 
     function getOriginalMuiDataTableProps() {
         return  {
@@ -120,7 +118,7 @@ const Table = React.forwardRef<MuiDataTableRefComponent, TableProps>((props, ref
         {columns: extractMuiDataTableColumns(props.columns)});
 
     applyLoading();
-    // applyResponsive();
+    applyResponsive();
 
     const originalProps = getOriginalMuiDataTableProps();
 
