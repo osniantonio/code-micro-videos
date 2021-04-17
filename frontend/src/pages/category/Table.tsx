@@ -1,21 +1,25 @@
 // @flow
 import * as React from "react";
-import { useEffect, useState } from "react";
-import { MUIDataTableColumn } from "mui-datatables";
-import { IconButton, MuiThemeProvider } from "@material-ui/core";
-import parseISO from "date-fns/parseISO";
+import { useEffect, useReducer, useRef, useState } from "react";
 import format from "date-fns/format";
+import parseISO from "date-fns/parseISO";
 import categoryHttp from "../../util/http/category-http";
-import { Category, ListResponse } from "../../util/models";
 import { BadgeNo, BadgeYes } from "../../components/Badge";
-import EditIcon from "@material-ui/icons/Edit";
-import { Link } from "react-router-dom";
+import { Category, ListResponse } from "../../util/models";
 import DefaultTable, {
   makeActionsStyles,
   MuiDataTableRefComponent,
   TableColumn,
 } from "../../components/Table";
 import { useSnackbar } from "notistack";
+import { IconButton, MuiThemeProvider } from "@material-ui/core";
+import { Link } from "react-router-dom";
+import EditIcon from "@material-ui/icons/Edit";
+import { Creators } from "../../store/filter";
+import useFilter from "../../hooks/useFilter";
+import { useContext } from "react";
+import { FilterResetButton } from "../../components/Table/FilterResetButton";
+import LoadingContext from "../../components/loading/LoadingContext";
 
 const columnsDefinitions: TableColumn[] = [
   {
@@ -31,11 +35,13 @@ const columnsDefinitions: TableColumn[] = [
     name: "name",
     label: "Nome",
     width: "43%",
+    options: {
+      filter: false,
+    },
   },
   {
     name: "is_active",
     label: "Ativo?",
-    width: "4%",
     options: {
       filterOptions: {
         names: ["Sim", "Nāo"],
@@ -44,6 +50,7 @@ const columnsDefinitions: TableColumn[] = [
         return value ? <BadgeYes /> : <BadgeNo />;
       },
     },
+    width: "4%",
   },
   {
     name: "created_at",
@@ -78,42 +85,110 @@ const columnsDefinitions: TableColumn[] = [
   },
 ];
 
-type Props = {};
-export const Table = (props: Props) => {
-  const snackbar = useSnackbar();
-  const [data, setData] = useState<Category[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  useEffect(() => {
-    let isSubscribed = true;
-    (async () => {
-      setLoading(true);
-      try {
-        const { data } = await categoryHttp.list<ListResponse<Category>>();
-        if (isSubscribed) {
-          setData(data.data);
-        }
-      } catch (error) {
-        console.log(error);
-        snackbar.enqueueSnackbar("Nāo foi possível carregar as informaçoes", {
-          variant: "error",
-        });
-      } finally {
-        setLoading(false);
-      }
-    })();
+const debounceTime = 300;
+const debouncedSearchTime = 300;
+const rowsPerPage = 15;
+const rowsPerPageOptions = [15, 25, 50];
 
+const Table = () => {
+  const snackbar = useSnackbar();
+  const subscribed = useRef(true);
+  const [data, setData] = useState<Category[]>([]);
+  const loading = useContext(LoadingContext);
+  const tableRef = useRef() as React.MutableRefObject<MuiDataTableRefComponent>;
+
+  const {
+    columns,
+    filterManager,
+    filterState,
+    debouncedFilterState,
+    dispatch,
+    totalRecords,
+    setTotalRecords,
+  } = useFilter({
+    columns: columnsDefinitions,
+    debounceTime: debounceTime,
+    rowsPerPage,
+    rowsPerPageOptions,
+    tableRef,
+  });
+
+  useEffect(() => {
+    subscribed.current = true;
+    filterManager.pushHistory();
+    getData();
     return () => {
-      isSubscribed = false;
+      subscribed.current = false;
     };
-  }, []);
+  }, [
+    filterManager.cleanSearchText(debouncedFilterState.search),
+    debouncedFilterState.pagination.page,
+    debouncedFilterState.pagination.per_page,
+    debouncedFilterState.order,
+  ]);
+
+  async function getData() {
+    try {
+      const { data } = await categoryHttp.list<ListResponse<Category>>({
+        queryParams: {
+          search: filterManager.cleanSearchText(debouncedFilterState.search),
+          page: debouncedFilterState.pagination.page,
+          per_page: debouncedFilterState.pagination.per_page,
+          sort: debouncedFilterState.order.sort,
+          dir: debouncedFilterState.order.dir,
+        },
+      });
+
+      if (subscribed.current) {
+        setData(data.data);
+        setTotalRecords(data.meta.total);
+      }
+    } catch (error) {
+      console.log(error);
+
+      if (categoryHttp.isCancelledRequest(error)) {
+        return;
+      }
+      snackbar.enqueueSnackbar("Nāo foi possível carregar as informaçoes", {
+        variant: "error",
+      });
+    }
+  }
+
   return (
-    <MuiThemeProvider theme={makeActionsStyles(columnsDefinitions.length -1)}>
+    <MuiThemeProvider theme={makeActionsStyles(columnsDefinitions.length - 1)}>
       <DefaultTable
         title="Listagem de categorias"
-        columns={columnsDefinitions}
+        columns={columns}
         data={data}
         loading={loading}
+        debounceSearchTime={debouncedSearchTime}
+        ref={tableRef}
+        options={{
+          serverSide: true,
+          //responsive: "scrollMaxHeight",
+          searchText: filterState.search as any,
+          page: filterState.pagination.page - 1,
+          rowsPerPage: filterState.pagination.per_page,
+          rowsPerPageOptions,
+          count: totalRecords,
+          customToolbar: () => (
+            <FilterResetButton
+              handleClick={() => {
+                filterManager.resetFilter();
+              }}
+            />
+          ),
+          onSearchChange: (value: any) => filterManager.changeSearch(value),
+          onChangePage: (page: number) => filterManager.changePage(page),
+          onChangeRowsPerPage: (perPage: number) =>
+            filterManager.changeRowsPerPage(perPage),
+          onColumnSortChange: (changedColumn: string, direction: string) =>
+            filterManager.changeColumnSort(changedColumn, direction),
+        }}
       />
     </MuiThemeProvider>
   );
 };
+
+export default Table;
