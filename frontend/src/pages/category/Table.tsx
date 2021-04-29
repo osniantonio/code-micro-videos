@@ -149,11 +149,11 @@ const Table = () => {
       if (categoryHttp.isCancelledRequest(error)) {
         return;
       }
-      snackbar.enqueueSnackbar("Nāo foi possível carregar as informaçoes", {
+      snackbar.enqueueSnackbar("Nāo foi possível carregar as informações", {
         variant: "error",
       });
     }
-  }
+  }  
 
   return (
     <MuiThemeProvider theme={makeActionsStyles(columnsDefinitions.length - 1)}>

@@ -161,7 +161,6 @@ export class FilterManager {
     if (text && text.value !== undefined) {
       newText = text.value;
     }
-
     return newText;
   }
 

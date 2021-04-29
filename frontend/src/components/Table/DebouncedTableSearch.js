@@ -118,7 +118,7 @@ class DebouncedTableSearch extends React.PureComponent {
               "data-test-id": options.textLabels.toolbar.search,
               "aria-label": options.textLabels.toolbar.search,
             }}
-            value={value || ""}
+            value={value || ''}
             onChange={this.handleTextChange}
             fullWidth={true}
             inputRef={(el) => (this.searchField = el)}

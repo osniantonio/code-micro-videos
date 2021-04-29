@@ -19,4 +19,8 @@ class Category extends Model
     {
         return $this->provideFilter(CategoryFilter::class);
     }
+
+    public function genres() {
+        return $this->belongsToMany(Genre::class)->withTrashed();
+    }
 }
