@@ -119,7 +119,6 @@ export class FilterManager {
         dir: direction.includes("desc") ? "desc" : "asc",
       })
     );
-
     this.resetTablePagination();
   }
 

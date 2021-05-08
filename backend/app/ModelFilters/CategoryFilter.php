@@ -2,6 +2,7 @@
 
 namespace App\ModelFilters;
 
+use Log;
 use Illuminate\Database\Eloquent\Builder;
 
 class CategoryFilter extends DefaultModelFilter
@@ -9,7 +10,8 @@ class CategoryFilter extends DefaultModelFilter
     protected $sortable = ['name', 'is_active','created_at'];
 
     public function search($search) {
-        $this->query->where('name', 'LIKE', "%$search%");
+        Log::info('CategoryFilter');
+        $this->where('name', 'LIKE', "%$search%");
     }
 
     public function genres($genres) {

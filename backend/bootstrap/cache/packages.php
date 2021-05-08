@@ -20,6 +20,13 @@
       0 => 'BeyondCode\\DumpServer\\DumpServerServiceProvider',
     ),
   ),
+  'dipenparmar12/laravel-query-log' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Dipenparmar12\\QueryLog\\StoreQueryLogServiceProvider',
+    ),
+  ),
   'facade/ignition' => 
   array (
     'providers' => 

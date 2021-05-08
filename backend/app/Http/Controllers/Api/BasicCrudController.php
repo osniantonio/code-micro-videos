@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use Log;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CategoryResource;
 use App\Models\Category;
@@ -26,6 +27,10 @@ abstract class BasicCrudController extends Controller
 
         if ($hasFilter) {
             $query = $query->filter($request->all());
+        }
+
+        if ($request->has('search')) {
+            $query->where('name', 'like', '%'.$request->input('search').'%');
         }
 
         $data = $request->has('all') || !$this->defaultPerPage
@@ -78,8 +83,7 @@ abstract class BasicCrudController extends Controller
         return response()->noContent(); // status 204
     }
 
-    protected function queryBuilder(): Builder
-    {
+    protected function queryBuilder(): Builder{
         return $this->model()::query();
     }
 }

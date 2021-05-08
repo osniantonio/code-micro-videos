@@ -153,40 +153,38 @@ const Table = () => {
         variant: "error",
       });
     }
-  }  
+  } 
 
   return (
     <MuiThemeProvider theme={makeActionsStyles(columnsDefinitions.length - 1)}>
-      <DefaultTable
-        title="Listagem de categorias"
-        columns={columns}
-        data={data}
-        loading={loading}
-        debounceSearchTime={debouncedSearchTime}
-        ref={tableRef}
-        options={{
-          serverSide: true,
-          //responsive: "scrollMaxHeight",
-          searchText: filterState.search as any,
-          page: filterState.pagination.page - 1,
-          rowsPerPage: filterState.pagination.per_page,
-          rowsPerPageOptions,
-          count: totalRecords,
-          customToolbar: () => (
-            <FilterResetButton
-              handleClick={() => {
-                filterManager.resetFilter();
-              }}
-            />
-          ),
-          onSearchChange: (value: any) => filterManager.changeSearch(value),
-          onChangePage: (page: number) => filterManager.changePage(page),
-          onChangeRowsPerPage: (perPage: number) =>
-            filterManager.changeRowsPerPage(perPage),
-          onColumnSortChange: (changedColumn: string, direction: string) =>
-            filterManager.changeColumnSort(changedColumn, direction),
-        }}
-      />
+        <DefaultTable
+            title="Listagem de categorias"
+            columns={columns}
+            data={data}
+            loading={loading}
+            debounceSearchTime={debouncedSearchTime}
+            ref={tableRef}
+            options={
+                {
+                    serverSide: true,
+                    responsive: "scrollMaxHeight",
+                    searchText: filterState.search as any,
+                    page: filterState.pagination.page - 1,
+                    rowsPerPage: filterState.pagination.per_page,
+                    rowsPerPageOptions,
+                    count: totalRecords,
+                    customToolbar: () => (
+                        <FilterResetButton
+                            handleClick={() => filterManager.resetFilter()}
+                        />
+                    ),
+                    onSearchChange: (value: any) => filterManager.changeSearch(value),
+                    onChangePage: (page: number) => filterManager.changePage(page),
+                    onChangeRowsPerPage: (perPage: number) => filterManager.changeRowsPerPage(perPage),
+                    onColumnSortChange: (changedColumn: string, direction: string) => filterManager.changeColumnSort(changedColumn, direction),
+                }
+            }
+        />
     </MuiThemeProvider>
   );
 };

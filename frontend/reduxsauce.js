@@ -5,5 +5,4 @@ const createdActions = createActions({
   removeParam: ['id'],
 });
 
-console.log(createdActions);
 // dispatch(createdActions.addParams({search}));
