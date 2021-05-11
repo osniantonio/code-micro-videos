@@ -195,7 +195,7 @@ export class FilterManager {
     const search = this.cleanSearchText(this.debouncedState.search);
 
     return {
-      ...(search && search !== "" && { search: search }),
+      ...(search && search !== '' && { search: search }),
       ...(this.debouncedState.pagination.page !== 1 && {
         page: this.debouncedState.pagination.page,
       }),

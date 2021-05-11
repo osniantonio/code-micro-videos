@@ -33,6 +33,10 @@ abstract class BasicCrudController extends Controller
             $query->where('name', 'like', '%'.$request->input('search').'%');
         }
 
+        if ($request->has('sort')) {
+            $query->orderBy($request->input('sort'), $request->input('dir'));
+        }
+
         $data = $request->has('all') || !$this->defaultPerPage
             ? $query->get()
             : $query->paginate($perPage);
