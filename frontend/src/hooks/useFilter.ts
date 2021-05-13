@@ -236,8 +236,8 @@ export class FilterManager {
     this.schema = yup.object().shape({
       search: yup
         .string()
-        .transform((value) => (!value ? undefined : value))
-        .default(""),
+        .transform(value => !value ? undefined : value)
+        .default(''),
       pagination: yup.object().shape({
         page: yup
           .number()
@@ -247,11 +247,8 @@ export class FilterManager {
           .default(1),
         per_page: yup
           .number()
-          .transform((value) =>
-            isNaN(value) || !this.rowsPerPageOptions.includes(parseInt(value))
-              ? undefined
-              : value
-          )
+          .oneOf(this.rowsPerPageOptions)
+          .transform(value => isNaN(value) ? undefined : value)
           .default(this.rowsPerPage),
       }),
       order: yup.object().shape({
@@ -264,7 +261,6 @@ export class FilterManager {
                 (column) => !column.options || column.options.sort !== false
               )
               .map((column) => column.name);
-
             return columnsName.includes(value) ? value : undefined;
           })
           .default(null),

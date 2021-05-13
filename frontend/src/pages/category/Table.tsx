@@ -111,7 +111,7 @@ const Table = () => {
     rowsPerPage,
     rowsPerPageOptions,
     tableRef,
-  });
+  });  
 
   useEffect(() => {
     subscribed.current = true;
