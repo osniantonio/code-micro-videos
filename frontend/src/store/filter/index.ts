@@ -41,11 +41,11 @@ export const INITIAL_STATE: Typings.State = {
   search: null,
   pagination: {
     page: 1,
-    per_page: 10,
+    per_page: 10
   },
   order: {
     sort: null,
-    dir: null,
+    dir: null
   },
 };
 

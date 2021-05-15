@@ -131,13 +131,11 @@ export class FilterManager {
       ...this.schema.cast({}),
       search: { value: null, update: true },
     };
-
     this.dispatch(
       Creators.setReset({
         state: INITIAL_STATE,
       })
     );
-
     this.resetTablePagination();
   }
 
@@ -195,7 +193,7 @@ export class FilterManager {
     const search = this.cleanSearchText(this.debouncedState.search);
 
     return {
-      ...(search && search !== '' && { search: search }),
+      ...(search && search !== "" && { search: search }),
       ...(this.debouncedState.pagination.page !== 1 && {
         page: this.debouncedState.pagination.page,
       }),
@@ -236,8 +234,8 @@ export class FilterManager {
     this.schema = yup.object().shape({
       search: yup
         .string()
-        .transform(value => !value ? undefined : value)
-        .default(''),
+        .transform((value) => (!value ? undefined : value))
+        .default(""),
       pagination: yup.object().shape({
         page: yup
           .number()
@@ -247,8 +245,11 @@ export class FilterManager {
           .default(1),
         per_page: yup
           .number()
-          .oneOf(this.rowsPerPageOptions)
-          .transform(value => isNaN(value) ? undefined : value)
+          .transform((value) =>
+            isNaN(value) || !this.rowsPerPageOptions.includes(parseInt(value))
+              ? undefined
+              : value
+          )
           .default(this.rowsPerPage),
       }),
       order: yup.object().shape({
