@@ -191,9 +191,8 @@ export class FilterManager {
 
   private formatSearchParams() {
     const search = this.cleanSearchText(this.debouncedState.search);
-
     return {
-      ...(search && search !== "" && { search: search }),
+      ...(search && search !== '' && { search: search }),
       ...(this.debouncedState.pagination.page !== 1 && {
         page: this.debouncedState.pagination.page,
       }),
@@ -210,10 +209,7 @@ export class FilterManager {
   }
 
   getStateFromURL() {
-    const queryParams = new URLSearchParams(
-      this.history.location.search.substr(1)
-    );
-
+    const queryParams = new URLSearchParams(this.history.location.search.substr(1));
     return this.schema.cast({
       search: queryParams.get("search"),
       pagination: {

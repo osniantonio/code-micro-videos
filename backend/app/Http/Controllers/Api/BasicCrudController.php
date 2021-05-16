@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use Log;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CategoryResource;
+use App\ModelFilters\GenreFilter;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
@@ -29,13 +30,29 @@ abstract class BasicCrudController extends Controller
             $query = $query->filter($request->all());
         }
 
+        // ini ajustes para filtrar ????
         if ($request->has('search')) {
             $query->where('name', 'like', '%'.$request->input('search').'%');
         }
 
+        if ($request->has('type')) {
+            $query->where('type', $request->input('type'));
+        }
+
+        if ($request->has('categories')) {
+            $idOrNames = explode(",", $request->input('categories'));
+            $query->whereHas('categories', function (Builder $query) use ($idOrNames) {
+                $query
+                    ->whereIn('id', $idOrNames)
+                    ->orWhereIn('name', $idOrNames);
+            });
+        }
+        
         if ($request->has('sort')) {
             $query->orderBy($request->input('sort'), $request->input('dir'));
         }
+        // fim ajustes para filtrar ????
+
 
         $data = $request->has('all') || !$this->defaultPerPage
             ? $query->get()
