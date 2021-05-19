@@ -217,19 +217,19 @@ const Table = () => {
         debounceSearchTime={debouncedSearchTime}
         ref={tableRef}
         options={{
-          //serverSideFilterList,
+          serverSideFilterList,
           serverSide: true,
-          //responsive: "scrollMaxHeight",
+          responsive: "scrollMaxHeight",
           searchText: filterState.search as any,
           page: filterState.pagination.page - 1,
           rowsPerPage: filterState.pagination.per_page,
           rowsPerPageOptions,
           count: totalRecords,
           onFilterChange: (column, filterList, type) => {
-            const columnIndex = columns.findIndex((c) => c.name === column);
-            /*filterManager.changeExtraFilter({
+            const columnIndex = columns.findIndex(c => c.name === column);
+            filterManager.changeExtraFilter({
               [column]: filterList[columnIndex].length ? filterList[columnIndex][0] : null,
-            });*/
+            });
           },
           customToolbar: () => (
             <FilterResetButton
