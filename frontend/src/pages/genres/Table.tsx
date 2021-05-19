@@ -140,7 +140,7 @@ const Table = () => {
             .mixed()
             .nullable()
             .transform((value) => {
-              return !value || value === "" ? undefined : value.split(",");
+              return !value || value === '' ? undefined : value.split(',');
             })
             .default(null),
         });
@@ -149,22 +149,20 @@ const Table = () => {
         return debouncedState.extraFilter
           ? {
               ...(debouncedState.extraFilter.categories && {
-                categories: debouncedState.extraFilter.categories.join(","),
+                categories: debouncedState.extraFilter.categories.join(','),
               }),
             }
           : undefined;
       },
       getStateFromURL: (queryParams) => {
         return {
-          categories: queryParams.get("categories"),
+          categories: queryParams.get('categories'),
         };
       },
     },
   });
 
-  const indexColumnCategories = columns.findIndex(
-    (c) => c.name === "categories"
-  );
+  const indexColumnCategories = columns.findIndex(c => c.name === 'categories');
   const columnCategories = columns[indexColumnCategories];
   const categoriesFilterValue =
     filterState.extraFilter && filterState.extraFilter.categories;

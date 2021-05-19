@@ -110,7 +110,7 @@ const Table = () => {
     debounceTime: debounceTime,
     rowsPerPage,
     rowsPerPageOptions,
-    tableRef,
+    tableRef
   });  
 
   useEffect(() => {
