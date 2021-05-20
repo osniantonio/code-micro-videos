@@ -177,10 +177,9 @@ const Table = () => {
 
   useEffect(() => {
     let isSubscribed = true;
-
     (async () => {
       try {
-        const { data } = await categoryHttp.list({ queryParams: { all: "" } });
+        const { data } = await categoryHttp.list({ queryParams: { all: '' } });
 
         if (isSubscribed) {
           setCategories(data.data);
@@ -190,12 +189,15 @@ const Table = () => {
         }
       } catch (error) {
         console.log(error);
-
         snackbar.enqueueSnackbar("Nāo foi possível carregar as informações", {
           variant: "error",
         });
       }
     })();
+
+    return () => {
+      isSubscribed = false;
+    }
   }, []);
 
   useEffect(() => {
@@ -255,9 +257,9 @@ const Table = () => {
         debounceSearchTime={debouncedSearchTime}
         ref={tableRef}
         options={{
-          //serverSideFilterList,
+          serverSideFilterList,
           serverSide: true,
-          //responsive: "scrollMaxHeight",
+          responsive: "scrollMaxHeight",
           searchText: filterState.search as any,
           page: filterState.pagination.page - 1,
           rowsPerPage: filterState.pagination.per_page,
@@ -265,11 +267,11 @@ const Table = () => {
           count: totalRecords,
           onFilterChange: (column, filterList, type) => {
             const columnIndex = columns.findIndex((c) => c.name === column);
-            /*filterManager.changeExtraFilter({
+            filterManager.changeExtraFilter({
               [column]: filterList[columnIndex].length
                 ? filterList[columnIndex]
                 : null,
-            });*/
+            });
           },
           customToolbar: () => (
             <FilterResetButton
