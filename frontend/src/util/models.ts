@@ -45,6 +45,11 @@ export const CastMemberTypeMap: CastMemberType = {
     2: 'Ator'
 };
 
+export const ActiveMap: any = {
+    'Não': false,
+    'Sim': true
+};
+
 export interface Genre extends Timestampable {
     readonly id: string;
     name: string;

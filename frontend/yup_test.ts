@@ -66,7 +66,7 @@ const schema = yup.object().shape({
   search: yup
     .string()
     .transform((value) => (!value ? undefined : value))
-    .default(""),
+    .default(''),
   pagination: yup.object().shape({
     page: yup
       .number()
@@ -103,3 +103,11 @@ const schema = yup.object().shape({
       .default(null),
   }),
 });
+
+console.log(
+  schema.cast({
+    order: {
+      sort: 'name1'
+    }
+  })
+);

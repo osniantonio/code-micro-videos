@@ -20,6 +20,13 @@
       0 => 'BeyondCode\\DumpServer\\DumpServerServiceProvider',
     ),
   ),
+  'dipenparmar12/laravel-query-log' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'Dipenparmar12\\QueryLog\\StoreQueryLogServiceProvider',
+    ),
+  ),
   'facade/ignition' => 
   array (
     'providers' => 
@@ -71,6 +78,13 @@
     'providers' => 
     array (
       0 => 'Superbalist\\LaravelGoogleCloudStorage\\GoogleCloudStorageServiceProvider',
+    ),
+  ),
+  'tucker-eric/eloquentfilter' => 
+  array (
+    'providers' => 
+    array (
+      0 => 'EloquentFilter\\ServiceProvider',
     ),
   ),
 );
