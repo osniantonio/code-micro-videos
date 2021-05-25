@@ -10,7 +10,6 @@ class CategoryFilter extends DefaultModelFilter
     protected $sortable = ['name', 'is_active','created_at'];
 
     public function search($search) {
-        Log::info('CategoryFilter');
         $this->where('name', 'LIKE', "%$search%");
     }
 

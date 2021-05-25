@@ -60,17 +60,14 @@ const reducer = createReducer<Typings.State, Typings.Actions>(INITIAL_STATE, {
 
 export default reducer;
 
-function setSearch(
-  state = INITIAL_STATE,
-  action: Typings.SetSearchAction
-): Typings.State {
+function setSearch(state = INITIAL_STATE, action: Typings.SetSearchAction): Typings.State {
   return {
-    ...state,
-    search: action.payload.search,
-    pagination: {
-      ...state.pagination,
-      page: 1,
-    },
+      ...state,
+      search: action.payload.search,
+      pagination: {
+          ...state.pagination,
+          page: 1
+      }
   };
 }
 

@@ -4,12 +4,15 @@ namespace App\Http\Controllers\Api;
 
 use Log;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\CategoryResource;
-use App\ModelFilters\GenreFilter;
-use App\Models\Category;
+use EloquentFilter\Filterable;
+use Exception;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Response;
+use Illuminate\Validation\ValidationException;
+use ReflectionException;
 
 abstract class BasicCrudController extends Controller
 {
@@ -22,45 +25,22 @@ abstract class BasicCrudController extends Controller
 
     public function index(Request $request)
     {
-        $perPage = (int) $request->get('per_page', $this->defaultPerPage);
+        $defaultPerPage = (int)$request->get('per_page', $this->defaultPerPage);
         $hasFilter = in_array(Filterable::class, class_uses($this->model()));
+
         $query = $this->queryBuilder();
 
         if ($hasFilter) {
             $query = $query->filter($request->all());
         }
 
-        // ini ajustes para filtrar ????
-        if ($request->has('search')) {
-            $query->where('name', 'like', '%'.$request->input('search').'%');
-        }
-
-        if ($request->has('type')) {
-            $query->where('type', $request->input('type'));
-        }
-
-        if ($request->has('categories')) {
-            $idOrNames = explode(",", $request->input('categories'));
-            $query->whereHas('categories', function (Builder $query) use ($idOrNames) {
-                $query
-                    ->whereIn('id', $idOrNames)
-                    ->orWhereIn('name', $idOrNames);
-            });
-        }
-        
-        if ($request->has('sort')) {
-            $query->orderBy($request->input('sort'), $request->input('dir'));
-        }
-        // fim ajustes para filtrar ????
-
-
         $data = $request->has('all') || !$this->defaultPerPage
             ? $query->get()
-            : $query->paginate($perPage);
-        $resourceCollectionClass = $this->resourceCollection();
-        $refClass = new \ReflectionClass($this->resourceCollection());
+            : $query->paginate($defaultPerPage);
 
-        return $refClass->isSubclassOf(ResourceCollection::class)
+        $resourceCollectionClass = $this->resourceCollection();
+        $reflectionClass = new \ReflectionClass($resourceCollectionClass);
+        return $reflectionClass->isSubclassOf(ResourceCollection::class)
             ? new $resourceCollectionClass($data)
             : $resourceCollectionClass::collection($data);
     }

@@ -15,12 +15,13 @@ class Category extends Model
     protected $casts = ['id' => 'string', 'is_active' => 'boolean'];
     public $incrementing = false;
 
-    public function modelFiler()
+    public function modelFilter()
     {
         return $this->provideFilter(CategoryFilter::class);
     }
 
-    public function genres() {
+    public function genres() 
+    {
         return $this->belongsToMany(Genre::class)->withTrashed();
     }
 }

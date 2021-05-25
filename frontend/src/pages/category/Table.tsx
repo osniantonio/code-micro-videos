@@ -5,7 +5,7 @@ import format from "date-fns/format";
 import parseISO from "date-fns/parseISO";
 import categoryHttp from "../../util/http/category-http";
 import { BadgeNo, BadgeYes } from "../../components/Badge";
-import { Category, ListResponse } from "../../util/models";
+import { ActiveMap, Category, ListResponse } from "../../util/models";
 import DefaultTable, {
   makeActionsStyles,
   MuiDataTableRefComponent,
@@ -20,6 +20,10 @@ import useFilter from "../../hooks/useFilter";
 import { useContext } from "react";
 import { FilterResetButton } from "../../components/Table/FilterResetButton";
 import LoadingContext from "../../components/loading/LoadingContext";
+import * as yup from "../../util/vendor/yup";
+
+const isActiveValues = Object.values(ActiveMap);
+console.log('isActiveValues', isActiveValues);
 
 const columnsDefinitions: TableColumn[] = [
   {
@@ -110,7 +114,36 @@ const Table = () => {
     debounceTime: debounceTime,
     rowsPerPage,
     rowsPerPageOptions,
-    tableRef
+    tableRef,
+    extraFilter: {
+      createValidationSchema: () => {
+        return yup.object().shape({
+          is_active: yup
+            .string()
+            .nullable()
+            .transform((value) => {
+              return !value || !isActiveValues.includes(value)
+                ? undefined
+                : value;
+            })
+            .default(null),
+        });
+      },
+      formatSearchParams: (debouncedState) => {
+        return debouncedState.extraFilter
+          ? {
+              ...(debouncedState.extraFilter.is_active && {
+                is_active: debouncedState.extraFilter.is_active,
+              }),
+            }
+          : undefined;
+      },
+      getStateFromURL: (queryParams) => {
+        return {
+          is_active: queryParams.get("is_active"),
+        };
+      },
+    },
   });  
 
   useEffect(() => {
@@ -126,6 +159,21 @@ const Table = () => {
     debouncedFilterState.pagination.per_page,
     debouncedFilterState.order,
   ]);
+
+  const indexColumnType = columns.findIndex(c => c.name === "is_active");
+  console.log(indexColumnType);
+  const columnType = columns[indexColumnType];
+  console.log(filterState.extraFilter);
+  const typeFilterValue =
+    filterState.extraFilter && (filterState.extraFilter.is_active as never);
+  (columnType.options as any).filterList = typeFilterValue
+    ? [typeFilterValue]
+    : [];
+
+  const serverSideFilterList = columns.map(column => []);
+  if (typeFilterValue) {
+    serverSideFilterList[indexColumnType] = [typeFilterValue];
+  }
 
   async function getData() {
     try {
@@ -166,6 +214,7 @@ const Table = () => {
             ref={tableRef}
             options={
                 {
+                    serverSideFilterList,
                     serverSide: true,
                     responsive: "scrollMaxHeight",
                     searchText: filterState.search as any,

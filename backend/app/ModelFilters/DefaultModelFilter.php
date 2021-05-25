@@ -12,7 +12,6 @@ abstract class DefaultModelFilter extends ModelFilter
 
     public function setup()
     {
-        Log::info('DefaultModelFilter');
         $this->blacklistMethod('isSortable');
         $noSort =  $this->input('sort', '') === '';
         if ($noSort) {
@@ -36,5 +35,3 @@ abstract class DefaultModelFilter extends ModelFilter
         return in_array($column, $this->sortable);
     }
 }
-
-//endereco?sort=created_at&dir=desc

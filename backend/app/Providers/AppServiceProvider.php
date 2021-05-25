@@ -25,8 +25,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        // logs das consultas do backend em laravel
-        /*
+        // logs das consultas do backend em laravel        
         DB::enableQueryLog();
         DB::listen(function($query) {
             Log::info(
@@ -34,7 +33,6 @@ class AppServiceProvider extends ServiceProvider
                 $query->bindings,
                 $query->time
             );
-        });
-        */
+        });        
     }
 }
