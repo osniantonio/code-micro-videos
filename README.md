@@ -1,12 +1,16 @@
-## Terminando CRUDs de cast member e genre
-Nesta fase de projeto, você deverá terminar os CRUDs de category, genre e cast member no front-end.
+## Terminando sistema de filtro e utilizando fowardRef
+Nesta fase, você deverá aplicar a lógica de sistema de filtro, usando reducer, useFilter nas listagens de categorias, gêneros e cast members.
 
-Você deverá fazer:
+Além disto, será necessário criar:
 
-A edição de category, genre e cast member. Isto engloba a validação de dados, carregamento inicial e redirecionamento após o sucesso.
-Observações:
+    Um método dentro da classe FilterManager para controlar a limpeza dos filtros aplicados. O componente Table apenas chamará filterManager.resetFilter() e os filtros serão limpos.
+    Quando acontece a limpeza dos filtros ou a aplicação da ordenação e a paginação atual está na página > 1, a paginação atual retorna a 1, porém isto não se reflete no visual, como vimos nas aulas.
+    
+        Este é um bug no state do componente Table do mui-datatables. 
+        Para resolve-lo, devemos pegar a referência do Table do mui-datatables e chamar o método changePage para forçar a mudança do estado novamente.
+        Para pegar a referência da tabela você deverá usar a técnica ForwardRef do React (consulte a documentação da biblioteca)
+        A referência deverá ser passada para o useFilter e usada no FilterManager como última instrução no resetFilter e no changeColumnSort
+        Ou seja, após estas duas operações forçarem a atualização do estado de paginação do Table do mui-datatables
 
-Em Cast Member, no campo tipo, no atributo value, o uso watch('type') lançará um erro. Tente encontrar a solução.
-Em Genre, provavelmente o campo Categorias não será preenchido corretamente ao carregar os dados da edição, porque a lista de categorias retornada está com paginação, ou seja, temos um universo limitado dos dados e não todas as categorias (não se importa com isto no momento).
-
+Implemente estas solicitações e nos envie o projeot para correção.
 Boa sorte!
