@@ -47,7 +47,6 @@ class DebouncedTableSearch extends React.PureComponent {
   }
   handleTextChange = (event) => {
     const value = event.target.value;
-    console.log(value);
     this.setState(
       {
         text: value,
@@ -107,8 +106,6 @@ class DebouncedTableSearch extends React.PureComponent {
     if (searchText && searchText.value !== undefined) {
       value = searchText.value;
     }
-
-    console.log(value, searchText);
 
     return (
       <Grow appear in={true} timeout={300}>

@@ -23,7 +23,6 @@ import LoadingContext from "../../components/loading/LoadingContext";
 import * as yup from "../../util/vendor/yup";
 
 const isActiveValues = Object.values(ActiveMap);
-console.log('isActiveValues', isActiveValues);
 
 const columnsDefinitions: TableColumn[] = [
   {
@@ -161,9 +160,7 @@ const Table = () => {
   ]);
 
   const indexColumnType = columns.findIndex(c => c.name === "is_active");
-  console.log(indexColumnType);
   const columnType = columns[indexColumnType];
-  console.log(filterState.extraFilter);
   const typeFilterValue =
     filterState.extraFilter && (filterState.extraFilter.is_active as never);
   (columnType.options as any).filterList = typeFilterValue
@@ -192,8 +189,6 @@ const Table = () => {
         setTotalRecords(data.meta.total);
       }
     } catch (error) {
-      console.log(error);
-
       if (categoryHttp.isCancelledRequest(error)) {
         return;
       }

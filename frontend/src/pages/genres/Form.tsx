@@ -104,7 +104,6 @@ export const Form = () => {
           }
         }
       } catch (error) {
-        console.log(error);
         snackbar.enqueueSnackbar("Nāo foi possível carregar as informações", {
           variant: "error",
         });
@@ -119,8 +118,6 @@ export const Form = () => {
   }, []);
 
   async function onSubmit(formData, event) {
-    console.log(errors);
-    console.log(errors["categories_id"]);
     try {
       setLoading(true);
       const http = !genre
@@ -141,7 +138,6 @@ export const Form = () => {
           : history.push("/genres");
       });
     } catch (error) {
-      console.log(error);
       snackbar.enqueueSnackbar("Nāo foi possível salvar o Gênero", {
         variant: "error",
       });
