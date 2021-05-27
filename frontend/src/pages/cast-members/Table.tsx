@@ -196,8 +196,6 @@ const Table = () => {
         setTotalRecords(data.meta.total);
       }
     } catch (error) {
-      console.log(error);
-
       if (castMemberHttp.isCancelledRequest(error)) {
         return;
       }
@@ -228,7 +226,7 @@ const Table = () => {
           onFilterChange: (column, filterList, type) => {
             const columnIndex = columns.findIndex(c => c.name === column);
             filterManager.changeExtraFilter({
-              [column]: filterList[columnIndex].length ? filterList[columnIndex][0] : null,
+              [column]: filterList[columnIndex] && filterList[columnIndex].length ? filterList[columnIndex][0] : null,
             });
           },
           customToolbar: () => (

@@ -65,7 +65,6 @@ export const Form = () => {
         setCastMember(data.data);
         reset(data.data);
       } catch (error) {
-        console.log(error);
         snackbar.enqueueSnackbar("Nāo foi possível carregar as informações", {
           variant: "error",
         });
@@ -97,7 +96,6 @@ export const Form = () => {
       });
       setLoading(false);
     } catch (error) {
-      console.log(error);
       snackbar.enqueueSnackbar("Nāo foi possível salvar o Membro de elenco", {
         variant: "error",
       });

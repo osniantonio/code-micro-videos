@@ -188,7 +188,6 @@ const Table = () => {
           );
         }
       } catch (error) {
-        console.log(error);
         snackbar.enqueueSnackbar("Nāo foi possível carregar as informações", {
           variant: "error",
         });
@@ -236,8 +235,6 @@ const Table = () => {
         setTotalRecords(data.meta.total);
       }
     } catch (error) {
-      console.log(error);
-
       if (genreHttp.isCancelledRequest(error)) {
         return;
       }
@@ -268,9 +265,7 @@ const Table = () => {
           onFilterChange: (column, filterList, type) => {
             const columnIndex = columns.findIndex((c) => c.name === column);
             filterManager.changeExtraFilter({
-              [column]: filterList[columnIndex].length
-                ? filterList[columnIndex]
-                : null,
+              [column]: filterList[columnIndex] && filterList[columnIndex].length ? filterList[columnIndex] : null,
             });
           },
           customToolbar: () => (
