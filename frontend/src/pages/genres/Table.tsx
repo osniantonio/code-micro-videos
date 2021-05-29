@@ -117,6 +117,7 @@ const Table = () => {
   const [data, setData] = useState<Genre[]>([]);
   const loading = useContext(LoadingContext);
   const [categories, setCategories] = useState<Category[]>();
+  const [active, setActive] = useState<boolean>();
   const tableRef = useRef() as React.MutableRefObject<MuiDataTableRefComponent>;
 
   const {
@@ -140,7 +141,14 @@ const Table = () => {
             .mixed()
             .nullable()
             .transform((value) => {
-              return !value || value === '' ? undefined : value.split(',');
+              return !value || value === "" ? undefined : value.split(",");
+            })
+            .default(null),
+            is_active: yup
+            .mixed()
+            .nullable()
+            .transform((value) => {
+              return value === 'Sim' ? 1 : 0;
             })
             .default(null),
         });
@@ -151,12 +159,16 @@ const Table = () => {
               ...(debouncedState.extraFilter.categories && {
                 categories: debouncedState.extraFilter.categories.join(','),
               }),
+              ...(debouncedState.extraFilter.is_active && {
+                is_active: debouncedState.extraFilter.is_active,
+              }),
             }
           : undefined;
       },
       getStateFromURL: (queryParams) => {
         return {
           categories: queryParams.get('categories'),
+          is_active: queryParams.get('is_active')
         };
       },
     },
@@ -180,7 +192,6 @@ const Table = () => {
     (async () => {
       try {
         const { data } = await categoryHttp.list({ queryParams: { all: '' } });
-
         if (isSubscribed) {
           setCategories(data.data);
           (columnCategories.options as any).filterOptions.names = data.data.map(
@@ -227,6 +238,10 @@ const Table = () => {
             debouncedFilterState.extraFilter.categories && {
               categories: debouncedFilterState.extraFilter.categories.join(","),
             }),
+            ...(debouncedFilterState.extraFilter &&
+              debouncedFilterState.extraFilter.is_active && {
+                is_active: debouncedFilterState.extraFilter.is_active,
+              })
         },
       });
 

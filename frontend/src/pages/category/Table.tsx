@@ -157,6 +157,7 @@ const Table = () => {
     debouncedFilterState.pagination.page,
     debouncedFilterState.pagination.per_page,
     debouncedFilterState.order,
+    JSON.stringify(debouncedFilterState.extraFilter),
   ]);
 
   const indexColumnType = columns.findIndex(c => c.name === "is_active");
@@ -174,6 +175,7 @@ const Table = () => {
 
   async function getData() {
     try {
+      console.log(debouncedFilterState.extraFilter);
       const { data } = await categoryHttp.list<ListResponse<Category>>({
         queryParams: {
           search: filterManager.cleanSearchText(debouncedFilterState.search),
@@ -181,6 +183,10 @@ const Table = () => {
           per_page: debouncedFilterState.pagination.per_page,
           sort: debouncedFilterState.order.sort,
           dir: debouncedFilterState.order.dir,
+          ...(debouncedFilterState.extraFilter &&
+            debouncedFilterState.extraFilter.is_active && {
+              is_active: debouncedFilterState.extraFilter.is_active,
+            })
         },
       });
 

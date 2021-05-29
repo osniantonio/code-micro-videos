@@ -13,6 +13,11 @@ class GenreFilter extends DefaultModelFilter
         $this->query->where('name', 'LIKE', "%$search%");
     }
 
+    public function is_active($is_active)
+    {
+        $this->query->where('is_active', $is_active);
+    }
+
     public function categories($categories)
     {
         $idOrNames = explode(",", $categories);

@@ -31,9 +31,7 @@ class DebouncedTableSearch extends React.PureComponent {
   constructor(props) {
     super(props);
     const { searchText } = this.props;
-
     let value = searchText;
-
     if (searchText && searchText.value !== undefined) {
       value = searchText.value;
     }
@@ -45,6 +43,7 @@ class DebouncedTableSearch extends React.PureComponent {
       this.props.debouceTime
     );
   }
+
   handleTextChange = (event) => {
     const value = event.target.value;
     this.setState(
@@ -118,7 +117,7 @@ class DebouncedTableSearch extends React.PureComponent {
               "data-test-id": options.textLabels.toolbar.search,
               "aria-label": options.textLabels.toolbar.search,
             }}
-            value={value || ''}
+            value={value || ""}
             onChange={this.handleTextChange}
             fullWidth={true}
             inputRef={(el) => (this.searchField = el)}
