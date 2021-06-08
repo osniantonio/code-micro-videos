@@ -102,10 +102,8 @@ const AsyncAutoComplete = React.forwardRef<
     }
 
     let isSubscribed = true;
-
     (async () => {
       setLoading(true);
-
       try {
         const data = await props.fetchOptions(debouncedSearchText);
         if (isSubscribed) {
