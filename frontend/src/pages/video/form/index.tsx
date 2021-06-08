@@ -37,6 +37,9 @@ import { omit, zipObject } from "lodash";
 import InputFile, { InputFileComponent } from "../../../components/InputFile";
 import { RatingField } from "./RatingField";
 import { UploadField } from "./UploadField";
+import CastMemberField, { CastMemberFieldComponent } from "./CastMemberField";
+import GenreField, { GenreFieldComponent } from "./GenreField";
+import CategoryField, { CategoryFieldComponent } from "./CategoryField";
 
 const useStyles = makeStyles((theme: Theme) => ({
   cardUpload: {
@@ -92,6 +95,9 @@ export const Form = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const theme = useTheme();
   const isGreaterMd = useMediaQuery(theme.breakpoints.up("md"));
+  const castMemberRef = useRef() as MutableRefObject<CastMemberFieldComponent>;
+    const genreRef = useRef() as MutableRefObject<GenreFieldComponent>;
+    const categoryRef = useRef() as MutableRefObject<CategoryFieldComponent>;
 
   const uploadRef = useRef(
     zipObject(
@@ -166,7 +172,9 @@ export const Form = () => {
   return (
     <DefaultForm GridItemProps={{ xs: 12 }} onSubmit={handleSubmit(onSubmit)}>
       <Grid container spacing={5}>
+
         <Grid item xs={12} md={6}>
+
           <TextField
             name={"title"}
             label={"Título"}
@@ -197,6 +205,7 @@ export const Form = () => {
               errors["description"].message
             }
           />
+
           <Grid container spacing={1}>
             <Grid item xs={6}>
               <TextField
@@ -235,9 +244,46 @@ export const Form = () => {
               />
             </Grid>
           </Grid>
-          Elenco
-          <br />
-          Gêneros e categorias
+
+          <CastMemberField
+              ref={castMemberRef}
+              castMembers={watch('cast_members')}
+              setCastMembers={(value) => setValue('cast_members', value)}
+              error={errors.cast_members}
+              disabled={loading}
+          />
+          <Grid container spacing={2}>
+              <Grid item xs={6} md={6}>
+                  <GenreField
+                      ref={genreRef}
+                        genres={watch('genres')}
+                        setGenres={(value) => setValue('genres', value)}
+                        categories={watch('categories')}
+                        setCategories={(value) => setValue('categories', value)}
+                        error={errors.genres}
+                        disabled={loading}
+                  />
+              </Grid>
+              <Grid item xs={6} md={6}>
+                  <CategoryField
+                      ref={categoryRef}
+                      categories={watch('categories')}
+                      setCategories={(value) => setValue('categories', value)}
+                      genres={watch('genres')}
+                      error={errors.categories}
+                      disabled={loading}
+                  />
+              </Grid>
+          </Grid>
+          <Grid item xs={12} >
+              <FormHelperText>
+                  Escolha os gêneros dos videos
+              </FormHelperText>
+              <FormHelperText>
+                  Escolha pelo menos uma categoria de cada gênero
+              </FormHelperText>
+          </Grid>
+
         </Grid>
 
         <Grid item xs={12} md={6}>
