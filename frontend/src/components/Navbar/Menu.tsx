@@ -8,7 +8,8 @@ const listRoutes = [
     'dashboard',
     'categories.list',
     'cast_members.list',
-    'genres.list'
+    'genres.list',
+    'videos.list'
 ];
 
 export const Menu : React.FC = () => {

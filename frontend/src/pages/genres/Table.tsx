@@ -69,7 +69,7 @@ const columnsDefinitions: TableColumn[] = [
         names: [],
       },
       customBodyRender(value, tableMeta, updateValue) {
-        return value.map((valor) => valor.name).join(",");
+        return value ? value.map((valor) => valor.name).join(",") : '';
       },
     },
   },

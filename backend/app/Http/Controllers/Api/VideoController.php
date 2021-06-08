@@ -16,7 +16,7 @@ class VideoController extends BasicCrudController
         $this->rules = [
             'title' => 'required|max:255',
             'description' => 'required',
-            'year_launched' => 'required|date_format:Y',
+            'year_launched' => 'required|date_format:Y|min:1',
             'opened' => 'boolean',
             'rating' => 'required|in:' . implode(',', Video::RATING_LIST),
             'duration' => 'required|integer',
@@ -25,6 +25,11 @@ class VideoController extends BasicCrudController
                 'required',
                 'array',
                 'exists:genres,id,deleted_at,NULL',
+            ],
+            'cast_members_id' => [
+                'required',
+                 'array',
+                 'exists:cast_members,id,deleted_at,NULL',
             ],
             'thumb_file' => 'image|max:' . Video::THUMB_FILE_MAX_SIZE, //max é kilobytes
             'banner_file' => 'image|max:' . Video::BANNER_FILE_MAX_SIZE, //max é kilobytes
