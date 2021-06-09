@@ -252,6 +252,7 @@ export const Form = () => {
               error={errors.cast_members}
               disabled={loading}
           />
+
           <Grid container spacing={2}>
               <Grid item xs={6} md={6}>
                   <GenreField
@@ -275,6 +276,7 @@ export const Form = () => {
                   />
               </Grid>
           </Grid>
+          
           <Grid item xs={12} >
               <FormHelperText>
                   Escolha os gêneros dos videos
