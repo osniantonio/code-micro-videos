@@ -14,10 +14,10 @@ class CategoryFilter extends DefaultModelFilter
     }
 
     public function genres($genres) {
-        $id = explode(",", $genres);
-        $this->whereHas('genres', function (Builder $query) use($id) {
+        $ids = explode(",", $genres);
+        $this->whereHas('genres', function (Builder $query) use($ids) {
             $query
-                ->whereIn('id', $id);
+                ->whereIn('id', $ids);
         });
     }
 }
