@@ -61,6 +61,21 @@ const validationSchema = yup.object().shape({
   description: yup.string().label("Sinopse").required(),
   year_launched: yup.number().label("Ano de lançamento").required().min(1),
   duration: yup.number().label("Duraçāo").required().min(1),
+  cast_members: yup.array().label('Elenco').required(),
+  genres: yup.array()
+      .label('Gêneros')
+      .required()
+      .test( {
+          message: 'Cada gênero precisa ter pelo menos uma categoria selecionada',
+          test(value: any) {
+              return value.every(
+                  v => v.categories.filter(
+                      cat => this.parent.categories.map(c=> c.id).includes(cat.id)
+                  ).length !== 0
+              );
+          }
+      }),
+  categories: yup.array().label('Categorias').required(),
   rating: yup.string().label("Cassificaçāo").required(),
 });
 
@@ -79,12 +94,12 @@ export const Form = () => {
   } = useForm({
     resolver: yupResolver(validationSchema),
     defaultValues: {
-      rating: null,
+      rating:null,
       cast_members: [],
       genres: [],
       categories: [],
-      opened: false,
-    },
+      opened:false
+    }
   });
 
   const classes = useStyles();
@@ -96,8 +111,8 @@ export const Form = () => {
   const theme = useTheme();
   const isGreaterMd = useMediaQuery(theme.breakpoints.up("md"));
   const castMemberRef = useRef() as MutableRefObject<CastMemberFieldComponent>;
-    const genreRef = useRef() as MutableRefObject<GenreFieldComponent>;
-    const categoryRef = useRef() as MutableRefObject<CategoryFieldComponent>;
+  const genreRef = useRef() as MutableRefObject<GenreFieldComponent>;
+  const categoryRef = useRef() as MutableRefObject<CategoryFieldComponent>;
 
   const uploadRef = useRef(
     zipObject(
@@ -123,12 +138,16 @@ export const Form = () => {
     if (!id) {
       return;
     }
-    (async function getVideo() {
+
+    let isSubscribed = true;
+    (async () => {
       try {
         setLoading(true);
         const { data } = await videoHttp.get(id);
-        setVideo(data.data);
-        reset(data.data);
+        if (isSubscribed) {
+          setVideo(data.data);
+          reset(data.data);
+        }
       } catch (error) {
         snackbar.enqueueSnackbar("Nāo foi possível carregar as informações", {
           variant: "error",
@@ -137,9 +156,22 @@ export const Form = () => {
         setLoading(false);
       }
     })();
+    return () => {
+      isSubscribed = false;
+    };
   }, []);
 
   async function onSubmit(formData, event) {
+
+    const sendData = omit(formData, ["cast_members", "genres", "categories"]);
+    sendData["cast_members_id"] = formData["cast_members"].map(
+      (cast_member) => cast_member.id
+    );
+    sendData["categories_id"] = formData["categories"].map(
+      (category) => category.id
+    );
+    sendData["genres_id"] = formData["genres"].map((genre) => genre.id);
+
     try {
       setLoading(true);
       const http = !video
@@ -248,7 +280,7 @@ export const Form = () => {
           <CastMemberField
               ref={castMemberRef}
               castMembers={watch('cast_members')}
-              setCastMembers={(value) => setValue('cast_members', value)}
+              setCastMembers={(value) => setValue('cast_members', value, { shouldDirty: true, shouldValidate: true})}
               error={errors.cast_members}
               disabled={loading}
           />
@@ -258,7 +290,7 @@ export const Form = () => {
                   <GenreField
                       ref={genreRef}
                         genres={watch('genres')}
-                        setGenres={(value) => setValue('genres', value)}
+                        setGenres={(value) => setValue('genres', value, { shouldDirty: true, shouldValidate: true})}
                         categories={watch('categories')}
                         setCategories={(value) => setValue('categories', value)}
                         error={errors.genres}
@@ -269,7 +301,7 @@ export const Form = () => {
                   <CategoryField
                       ref={categoryRef}
                       categories={watch('categories')}
-                      setCategories={(value) => setValue('categories', value)}
+                      setCategories={(value) => setValue('categories', value, { shouldDirty: true, shouldValidate: true})}
                       genres={watch('genres')}
                       error={errors.categories}
                       disabled={loading}

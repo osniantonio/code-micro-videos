@@ -1,7 +1,7 @@
-import * as React from "react";
+import * as React from 'react';
 import AsyncAutoComplete, {
   AsyncAutoCompleteComponent,
-} from "../../../components/AsyncAutoComplete";
+} from '../../../components/AsyncAutoComplete';
 import {
   FormControl,
   FormHelperText,
@@ -9,26 +9,26 @@ import {
   FormControlProps,
   Typography,
   Theme,
-} from "@material-ui/core";
-import GridSelected from "../../../components/GridSelected";
-import GridSelectedItem from "../../../components/GridSelectedItem";
-import useHttpHandled from "../../../hooks/useHttpHandle";
-import useCollectionManager from "../../../hooks/useCollectionManager";
-import { Genre } from "../../../util/models";
-import categoryHttp from "../../../util/http/category-http";
-import { getGenresFromCategory } from "../../../util/models-filters";
-import { makeStyles } from "@material-ui/core/styles";
-import { grey } from "@material-ui/core/colors";
-import { RefAttributes } from "react";
-import { CastMemberFieldComponent } from "./CastMemberField";
-import { useRef } from "react";
-import { MutableRefObject } from "react";
-import { useImperativeHandle } from "react";
+} from '@material-ui/core';
+import GridSelected from '../../../components/GridSelected';
+import GridSelectedItem from '../../../components/GridSelectedItem';
+import useHttpHandled from '../../../hooks/useHttpHandle';
+import useCollectionManager from '../../../hooks/useCollectionManager';
+import { Genre } from '../../../util/models';
+import categoryHttp from '../../../util/http/category-http';
+import { getGenresFromCategory } from '../../../util/models-filters';
+import { makeStyles } from '@material-ui/core/styles';
+import { grey } from '@material-ui/core/colors';
+import { RefAttributes } from 'react';
+import { CastMemberFieldComponent } from './CastMemberField';
+import { useRef } from 'react';
+import { MutableRefObject } from 'react';
+import { useImperativeHandle } from 'react';
 
 const useStyles = makeStyles((theme: Theme) => ({
   genresSubtitle: {
-    color: grey["800"],
-    fontSize: "0,8rem",
+    color: grey['800'],
+    fontSize: '0,8rem',
   },
 }));
 
@@ -64,8 +64,8 @@ const CategoryField = React.forwardRef<
     return autocompleteHttp(
       categoryHttp.list({
         queryParams: {
-          genres: genres.map((genre) => genre.id).join(","),
-          all: "",
+          genres: genres.map((genre) => genre.id).join(','),
+          all: '',
         },
       })
     ).then((data) => data.data);
@@ -81,7 +81,7 @@ const CategoryField = React.forwardRef<
         ref={autocompleteRef}
         fetchOptions={fetchOptions}
         AutocompleteProps={{
-          //autoSelect:true,
+          //autoSelect:true - se usar o getOptionSelected,
           clearOnEscape: true,
           getOptionLabel: (option) => option.name,
           getOptionSelected: (option, value) => option.id === value.id,
@@ -89,29 +89,27 @@ const CategoryField = React.forwardRef<
           disabled: disabled === true || !genres.length,
         }}
         TextFieldProps={{
-          label: "Categorias",
+          label: 'Categorias',
           error: error !== undefined,
         }}
       />
 
       <FormControl
-        margin={"normal"}
+        margin={'normal'}
         fullWidth
-        error={error != undefined}
+        error={error !== undefined}
         disabled={disabled === true}
         {...props.FormControlProps}
       >
         <GridSelected>
           {categories.map((category, key) => {
-            let genresFromCategory = "";
-
-            if (genres != undefined && genres.length > 0) {
+            let genresFromCategory = '';
+            if (genres !== undefined && genres.length > 0) {
               let genreses = getGenresFromCategory(genres, category);
-
-              if (genreses != undefined && genreses.length > 0) {
+              if (genreses !== undefined && genreses.length > 0) {
                 genresFromCategory = genreses
                   .map((genre) => genre.name)
-                  .join(",");
+                  .join(',');
               }
             }
 
@@ -122,7 +120,6 @@ const CategoryField = React.forwardRef<
                 xs={12}
               >
                 <Typography noWrap={true}>{category.name}</Typography>
-
                 <Typography noWrap={true} className={classes.genresSubtitle}>
                   Gêneros: {genresFromCategory}
                 </Typography>
