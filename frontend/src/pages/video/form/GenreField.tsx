@@ -1,28 +1,28 @@
 // @flow
-import * as React from 'react';
+import * as React from "react";
 import AsyncAutoComplete, {
   AsyncAutoCompleteComponent,
-} from '../../../components/AsyncAutoComplete';
+} from "../../../components/AsyncAutoComplete";
 import {
   FormControl,
   FormControlProps,
   FormHelperText,
   Grid,
   Typography,
-} from '@material-ui/core';
-import genreHttp from '../../../util/http/genre-http';
-import CategoryField from './CategoryField';
-import { RefAttributes } from 'react';
-import { CastMemberFieldComponent } from './CastMemberField';
-import { useRef } from 'react';
-import { MutableRefObject } from 'react';
-import { useImperativeHandle } from 'react';
-import { getGenresFromCategory } from '../../../util/models-filters';
+} from "@material-ui/core";
+import genreHttp from "../../../util/http/genre-http";
+import CategoryField from "./CategoryField";
+import { RefAttributes } from "react";
+import { CastMemberFieldComponent } from "./CastMemberField";
+import { useRef } from "react";
+import { MutableRefObject } from "react";
+import { useImperativeHandle } from "react";
+import { getGenresFromCategory } from "../../../util/models-filters";
 
-import useHttpHandled from '../../../hooks/useHttpHandle';
-import useCollectionManager from '../../../hooks/useCollectionManager';
-import GridSelected from '../../../components/GridSelected';
-import GridSelectedItem from '../../../components/GridSelectedItem';
+import useHttpHandled from "../../../hooks/useHttpHandle";
+import useCollectionManager from "../../../hooks/useCollectionManager";
+import GridSelected from "../../../components/GridSelected";
+import GridSelectedItem from "../../../components/GridSelectedItem";
 
 interface GenreFieldProps extends RefAttributes<GenreFieldComponent> {
   genres: any[];
@@ -56,7 +56,7 @@ const GenreField = React.forwardRef<GenreFieldComponent, GenreFieldProps>(
         genreHttp.list({
           queryParams: {
             search: searchText,
-            all: '',
+            all: "",
           },
         })
       ).then((data) => data.data);
@@ -81,12 +81,12 @@ const GenreField = React.forwardRef<GenreFieldComponent, GenreFieldProps>(
             disabled,
           }}
           TextFieldProps={{
-            label: 'Gêneros',
+            label: "Gêneros",
             error: error !== undefined,
           }}
         />
         <FormControl
-          margin={'normal'}
+          margin={"normal"}
           fullWidth
           error={error !== undefined}
           disabled={disabled === true}
@@ -111,7 +111,7 @@ const GenreField = React.forwardRef<GenreFieldComponent, GenreFieldProps>(
                         ) {
                           return (
                             genresFromCategory.length === 1 &&
-                            genres[0].id == genre.id
+                            genres[0].id === genre.id
                           );
                         }
                       }
@@ -119,7 +119,7 @@ const GenreField = React.forwardRef<GenreFieldComponent, GenreFieldProps>(
                   );
 
                   if (
-                    categoriesWithOneGenre != undefined &&
+                    categoriesWithOneGenre !== undefined &&
                     categoriesWithOneGenre.length > 0
                   ) {
                     categoriesWithOneGenre.forEach((cat) =>

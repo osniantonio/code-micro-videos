@@ -50,7 +50,6 @@ const CategoryField = React.forwardRef<
   CategoryFieldProps
 >((props, ref) => {
   const classes = useStyles();
-
   const autocompleteHttp = useHttpHandled();
   const { categories, setCategories, genres, error, disabled } = props;
   const { addItem, removeItem } = useCollectionManager(
@@ -112,7 +111,6 @@ const CategoryField = React.forwardRef<
                   .join(',');
               }
             }
-
             return (
               <GridSelectedItem
                 key={key}
