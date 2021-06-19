@@ -30,7 +30,7 @@ const columnsDefinitions: TableColumn[] = [
   },
   {
     name: "title",
-    label: "Titulo",
+    label: "Título",
     width: "20%",
     options: {
       sort: false,
@@ -73,6 +73,7 @@ const columnsDefinitions: TableColumn[] = [
       },
     },
   },
+  
   {
     name: "actions",
     label: "Ações",
