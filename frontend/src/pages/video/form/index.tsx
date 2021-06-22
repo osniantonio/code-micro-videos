@@ -179,6 +179,8 @@ export const Form = () => {
   }, []);
 
   async function onSubmit(formData, event) {
+    console.log('onSubmit--');
+    console.log(formData);
     const sendData = omit(formData, ['cast_members', 'genres', 'categories']);
     sendData['cast_members_id'] = formData['cast_members'].map(cast_member => cast_member.id);
     sendData['categories_id'] = formData['categories'].map(category => category.id);

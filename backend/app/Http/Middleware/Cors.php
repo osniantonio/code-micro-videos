@@ -18,7 +18,7 @@ class Cors
         $origins = env('CORS_ORIGINS', []);
         return $next($request)
             ->header('Access-Control-Allow-Origin', is_string($origins) ? explode(",", $origins) : $origins)
-            ->header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS')
-            ->header('Access-Control-Allow-Headers', 'Accept, Content-Type, Authorization');
+            ->header('Access-Control-Allow-Methods', '*')
+            ->header('Access-Control-Allow-Headers', '*');
     }
 }

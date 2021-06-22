@@ -2,7 +2,6 @@
 
 namespace App\Http;
 
-use Fruitcake\Cors\HandleCors;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel
@@ -41,7 +40,7 @@ class Kernel extends HttpKernel
         ],
 
         'api' => [
-            HandleCors::class,
+            \Fruitcake\Cors\HandleCors::class,
             'throttle:60,1',
             'bindings',
         ],
@@ -55,7 +54,7 @@ class Kernel extends HttpKernel
      * @var array
      */
     protected $routeMiddleware = [
-        'cors' => \App\Http\Middleware\Cors::class,
+        //'cors' => \App\Http\Middleware\Cors::class,
         'auth' => \App\Http\Middleware\Authenticate::class,
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
         'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,
