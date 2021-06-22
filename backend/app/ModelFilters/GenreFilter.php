@@ -20,11 +20,11 @@ class GenreFilter extends DefaultModelFilter
 
     public function categories($categories)
     {
-        $idOrNames = explode(",", $categories);
-        $this->whereHas('categories', function (Builder $query) use ($idOrNames) {
+        $ids = explode(",", $categories);
+        $this->whereHas('categories', function (Builder $query) use ($ids) {
             $query
-                ->whereIn('id', $idOrNames)
-                ->orWhereIn('name', $idOrNames);
+                ->whereIn('id', $ids)
+                ->orWhereIn('name', $ids);
         });
     }
 }

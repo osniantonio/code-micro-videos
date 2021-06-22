@@ -72,7 +72,7 @@ const GenreField = React.forwardRef<GenreFieldComponent, GenreFieldProps>(
           ref={autocompleteRef}
           fetchOptions={fetchOptions}
           AutocompleteProps={{
-            //autoSelect:true,
+            //autoSelect:true - se usar o getOptionSelected,
             clearOnEscape: true,
             freeSolo: true,
             getOptionLabel: (option) => option.name,
@@ -88,7 +88,7 @@ const GenreField = React.forwardRef<GenreFieldComponent, GenreFieldProps>(
         <FormControl
           margin={"normal"}
           fullWidth
-          error={error != undefined}
+          error={error !== undefined}
           disabled={disabled === true}
           {...props.FormControlProps}
         >
@@ -99,19 +99,19 @@ const GenreField = React.forwardRef<GenreFieldComponent, GenreFieldProps>(
                 onDelete={() => {
                   const categoriesWithOneGenre = categories.filter(
                     (category) => {
-                      if (genres != undefined && genres.length > 0) {
+                      if (genres !== undefined && genres.length > 0) {
                         const genresFromCategory = getGenresFromCategory(
                           genres,
                           category
                         );
 
                         if (
-                          genresFromCategory != undefined &&
+                          genresFromCategory !== undefined &&
                           genres.length > 0
                         ) {
                           return (
                             genresFromCategory.length === 1 &&
-                            genres[0].id == genre.id
+                            genres[0].id === genre.id
                           );
                         }
                       }
@@ -119,7 +119,7 @@ const GenreField = React.forwardRef<GenreFieldComponent, GenreFieldProps>(
                   );
 
                   if (
-                    categoriesWithOneGenre != undefined &&
+                    categoriesWithOneGenre !== undefined &&
                     categoriesWithOneGenre.length > 0
                   ) {
                     categoriesWithOneGenre.forEach((cat) =>

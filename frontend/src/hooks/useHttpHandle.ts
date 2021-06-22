@@ -1,5 +1,5 @@
-import { useSnackbar } from "notistack";
-import axios from "axios";
+import { useSnackbar } from 'notistack';
+import axios from 'axios';
 
 const useHttpHandled = () => {
   const snackbar = useSnackbar();
@@ -10,8 +10,8 @@ const useHttpHandled = () => {
     } catch (error) {
       console.log(error);
       if (!axios.isCancel(error)) {
-        snackbar.enqueueSnackbar("Nāo foi possível carregar as informações", {
-          variant: "error",
+        snackbar.enqueueSnackbar('Nāo foi possível carregar as informações', {
+          variant: 'error',
         });
         throw error;
       }

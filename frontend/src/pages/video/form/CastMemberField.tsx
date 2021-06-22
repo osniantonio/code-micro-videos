@@ -23,15 +23,16 @@ import GridSelectedItem from "../../../components/GridSelectedItem";
 
 interface CastMemberFieldProps extends RefAttributes<CastMemberFieldComponent> {
   castMembers: any[];
-  setCastMembers: (castMembers) => void;
+  setCastMembers: (cast_members) => void;
   error: any;
   disabled?: boolean;
-  FormControlProps?: FormControlProps;
+  FormControlProps?: FormControlProps
 }
 
 export interface CastMemberFieldComponent {
   clear: () => void;
 }
+
 const CastMemberField = React.forwardRef<
   CastMemberFieldComponent,
   CastMemberFieldProps
@@ -84,7 +85,7 @@ const CastMemberField = React.forwardRef<
       <FormControl
         margin={"normal"}
         fullWidth
-        error={error != undefined}
+        error={error !== undefined}
         disabled={disabled === true}
         {...props.FormControlProps}
       >
