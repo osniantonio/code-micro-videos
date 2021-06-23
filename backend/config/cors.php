@@ -3,8 +3,9 @@
 $origins = env('CORS_ORIGINS', []);
 
 return [
+    'paths' => [],
     'supportsCredentials' => false,
-    'allowedOrigins' => is_string($origins) ? explode(",", $origins) : $origins,
+    'allowedOrigins' => '*',
     'allowedOriginsPatterns' => [],
     'allowedHeaders' => ['*'],
     'allowedMethods' => ['*'],

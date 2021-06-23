@@ -37,10 +37,8 @@ export function addGlobalResponseInterceptor(
   const ids: number[] = [];
   for (let i of instances) {
     const id = i.interceptors.response.use(onFulfilled, onRejected);
-
     ids.push(id);
   }
-
   return ids;
 }
 
