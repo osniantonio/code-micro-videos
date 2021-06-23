@@ -9,7 +9,8 @@ const listRoutes = [
     'categories.list',
     'cast_members.list',
     'genres.list',
-    'videos.list'
+    'videos.list',
+    'uploads'
 ];
 
 export const Menu : React.FC = () => {

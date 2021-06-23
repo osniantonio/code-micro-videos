@@ -15,7 +15,7 @@ export default class HttpResource {
 
   list<T = any>(options?: { queryParams? }): Promise<AxiosResponse<T>> {
     if (this.cancelList) {
-      this.cancelList.cancel("list cancelled");
+      this.cancelList.cancel("List request cancelled");
     }
     this.cancelList = axios.CancelToken.source();
     const config: AxiosRequestConfig = {

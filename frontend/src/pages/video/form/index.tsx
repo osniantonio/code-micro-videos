@@ -133,7 +133,7 @@ export const Form = () => {
     const obj: any = {
       video: {
         id: "1",
-        title: " vento levou",
+        title: "teste mp4",
       },
       files: [{ file: new File([""], "teste.mp4") }],
     };
@@ -187,7 +187,12 @@ export const Form = () => {
     sendData['genres_id'] = formData['genres'].map(genre => genre.id);
 
     try {
-      setLoading(true);     
+      setLoading(true);
+      
+      /** 
+       * Spoofing que possibilitará não criar esta rota nova, pesquise sobre isto na documentação e 
+       * implemente a edição dos vídeos enviando os arquivos utlizando o verbo POST (_method: 'PUT')
+       * */
       const http = !video
               ? videoHttp.create(sendData)
               : videoHttp.update(video.id, {...sendData, _method: 'PUT'}, {http:{usePost:true}});
