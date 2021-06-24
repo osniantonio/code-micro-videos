@@ -3,7 +3,7 @@
 $origins = env('CORS_ORIGINS', []);
 
 return [
-    'paths' => [],
+    'paths' => ['*'],
     'supportsCredentials' => false,
     'allowedOrigins' => '*',
     'allowedOriginsPatterns' => [],
