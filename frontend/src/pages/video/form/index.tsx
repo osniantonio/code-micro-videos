@@ -44,6 +44,7 @@ import CategoryField, { CategoryFieldComponent } from "./CategoryField";
 import {useDispatch, useSelector} from "react-redux";
 import {State as UploadState, Upload} from "../../../store/upload/types";
 import {Creators} from "../../../store/upload";
+import useSnackbarFormError from "../../../hooks/useSnackbarFormError";
 
 const useStyles = makeStyles((theme: Theme) => ({
   cardUpload: {
@@ -61,26 +62,44 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 const validationSchema = yup.object().shape({
-  title: yup.string().label("Título").required().max(255),
-  description: yup.string().label("Sinopse").required(),
-  year_launched: yup.number().label("Ano de lançamento").required().min(1),
-  duration: yup.number().label("Duraçāo").required().min(1),  
-  genres: yup.array()
-      .label('Gêneros')
+  title: yup.string()
+      .label("Título")
       .required()
-      .test( {
+      .max(255),
+  description: yup.string()
+      .label("Sinopse")
+      .required(),
+  year_launched: yup.number()
+      .label('Ano de lançamento')
+      .required()
+      .min(1),
+  duration: yup.number()
+      .label("Duração")
+      .required()
+      .min(1),
+  rating: yup.string()
+      .label("Classificação")
+      .required(),
+  genres: yup.array()
+      .label("Gêneros")
+      .required()
+      .test({
           message: "Cada gênero escolhido precisa ter pelo menos uma categoria selecionada",
           test(value: any) {
               return value.every(
                   v => v.categories.filter(
-                      cat => this.parent.categories.map(c=> c.id).includes(cat.id)
+                      cat => this.parent.categories.map(c => c.id).includes(cat.id)
                   ).length !== 0
               );
           }
       }),
-  cast_members: yup.array().label('Elenco').required(),
-  categories: yup.array().label('Categorias').required(),
-  rating: yup.string().label("Cassificaçāo").required(),
+  categories: yup.array()
+      .label("Categorias")
+      .required(),
+  cast_members: yup.array()
+      .label("Membros de elenco")
+      .required(),
+
 });
 
 const fileFields = Object.keys(VideoFileFieldsMap);
@@ -95,6 +114,7 @@ export const Form = () => {
     reset,
     watch,
     trigger,
+    formState,
   } = useForm({
     resolver: yupResolver(validationSchema),
     defaultValues: {
@@ -106,6 +126,7 @@ export const Form = () => {
     }
   });
 
+  useSnackbarFormError(formState.submitCount, errors);
   const classes = useStyles();
   const snackbar = useSnackbar();
   const history = useHistory();
