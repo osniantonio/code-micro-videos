@@ -13,6 +13,7 @@ services:
             - CHOKIDAR_USEPOLLING=true
         volumes:
             - .:/var/www
+            - ./.docker/php/custom.ini:/usr/local/etc/php/conf.d/custom.ini
         networks:
             - app-network
         depends_on:
@@ -43,7 +44,7 @@ services:
             - "33006:3306"
         volumes:
             - ./.docker/dbdata:/var/lib/mysql
-            - ./.docker/mysql:/docker-entrypoint-initdb.d
+            - ./.docker/mysql:/docker-entrypoint-initdb.d            
         environment:
             - MYSQL_ROOT_PASSWORD=root
             - MYSQL_USER=root
