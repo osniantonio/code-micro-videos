@@ -107,7 +107,7 @@ const Table = () => {
     debouncedFilterState,
     dispatch,
     totalRecords,
-    setTotalRecords,
+    setTotalRecords,    
   } = useFilter({
     columns: columnsDefinitions,
     debounceTime: debounceTime,
@@ -143,7 +143,7 @@ const Table = () => {
         };
       },
     },
-  });  
+  }); 
 
   useEffect(() => {
     subscribed.current = true;

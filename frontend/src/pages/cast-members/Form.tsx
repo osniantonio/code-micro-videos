@@ -24,6 +24,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useSnackbar } from "notistack";
 import SubmitActions from "../../components/SubmitActions";
 import { DefaultForm } from "../../components/DefaultForm";
+import useSnackbarFormError from "../../hooks/useSnackbarFormError";
 
 const validationSchema = yup.object().shape({
   name: yup.string().label("Nome").required().max(255),
@@ -40,10 +41,12 @@ export const Form = () => {
     reset,
     watch,
     trigger,
+    formState
   } = useForm({
     resolver: yupResolver(validationSchema),
   });
 
+  useSnackbarFormError(formState.submitCount, errors);
   const snackbar = useSnackbar();
   const history = useHistory();
   const { id }: any = useParams();
