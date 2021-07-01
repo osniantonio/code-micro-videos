@@ -27,6 +27,8 @@ import { BadgeNo, BadgeYes } from "../../components/Badge";
 import categoryHttp from "../../util/http/category-http";
 import { useContext } from "react";
 import LoadingContext from "../../components/loading/LoadingContext";
+import {DeleteDialog} from "../../components/DeleteDialog";
+import useDeleteCollection from "../../hooks/useDeleteCollection";
 
 const columnsDefinitions: TableColumn[] = [
   {
@@ -119,6 +121,7 @@ const Table = () => {
   const [categories, setCategories] = useState<Category[]>();
   const [active, setActive] = useState<boolean>();
   const tableRef = useRef() as React.MutableRefObject<MuiDataTableRefComponent>;
+  const {openDeleteDialog, setOpenDeleteDialog, rowsToDelete, setRowsToDelete} = useDeleteCollection();
 
   const {
     columns,
@@ -248,6 +251,9 @@ const Table = () => {
       if (subscribed.current) {
         setData(data.data);
         setTotalRecords(data.meta.total);
+        if (openDeleteDialog) {
+          setOpenDeleteDialog(false);
+        }
       }
     } catch (error) {
       if (genreHttp.isCancelledRequest(error)) {
@@ -259,8 +265,45 @@ const Table = () => {
     }
   }
 
+  async function deleteRows(confirmed: boolean) {
+    if (!confirmed) {
+      setOpenDeleteDialog(false);
+      return;
+    }
+
+    try {
+      const ids = rowsToDelete.data
+        .map((value) => data[value.index].id)
+        .join(",");
+
+      await genreHttp.deleteCollection({ ids });
+
+      if (
+        rowsToDelete.data.length === debouncedFilterState.pagination.per_page &&
+        debouncedFilterState.pagination.page > 1
+      ) {
+        const page = debouncedFilterState.pagination.page - 2;
+        filterManager.changePage(page);
+      } else {
+        await getData();
+      }
+
+      setOpenDeleteDialog(false);
+
+      snackbar.enqueueSnackbar("Registros excluidos com sucesso!", {
+        variant: "success",
+      });
+    } catch (e) {
+      console.log(e);
+      snackbar.enqueueSnackbar("Não foi possível excluir os registros", {
+        variant: "error",
+      });
+    }
+  }
+
   return (
     <MuiThemeProvider theme={makeActionsStyles(columnsDefinitions.length - 1)}>
+      <DeleteDialog open={openDeleteDialog} handleClose={deleteRows}/>
       <DefaultTable
         title="Listagem de generos"
         columns={columns}
@@ -296,6 +339,10 @@ const Table = () => {
             filterManager.changeRowsPerPage(perPage),
           onColumnSortChange: (changedColumn: string, direction: string) =>
             filterManager.changeColumnSort(changedColumn, direction),
+          onRowsDelete: (rowsDeleted) => {
+            setRowsToDelete(rowsDeleted as any);
+            return false;
+          }
         }}
       />
     </MuiThemeProvider>
