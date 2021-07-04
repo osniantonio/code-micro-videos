@@ -25,7 +25,7 @@ export const LoadingProvider = (props) => {
     let isSubscribed = true;
 
     const requestsIds = addGlobalRequestInterceptor((config) => {
-      if (isSubscribed && !config.headers.hasOwnProperty("x-ignore-loading")) {
+      if (isSubscribed && (config.headers && !config.headers.hasOwnProperty("x-ignore-loading"))) {
         setLoading(true);
         setCountRequest((prevState) => prevState + 1);
       }
@@ -37,7 +37,7 @@ export const LoadingProvider = (props) => {
       (response) => {
         if (
           isSubscribed &&
-          !response.config.headers.hasOwnProperty("x-ignore-loading")
+          (response.config && !response.config.headers.hasOwnProperty("x-ignore-loading"))
         ) {
           decrementCountRequest();
         }
@@ -46,7 +46,7 @@ export const LoadingProvider = (props) => {
       (error) => {
         if (
           isSubscribed &&
-          !error.config.headers.hasOwnProperty("x-ignore-loading")
+          (!error.config || !error.config.headers.hasOwnProperty("x-ignore-loading"))
         ) {
           decrementCountRequest();
         }

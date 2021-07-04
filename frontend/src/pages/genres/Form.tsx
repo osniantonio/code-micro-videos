@@ -25,8 +25,9 @@ import { DefaultForm } from "../../components/DefaultForm";
 import useSnackbarFormError from "../../hooks/useSnackbarFormError";
 
 const validationSchema = yup.object().shape({
-  name: yup.string().label("Nome").required().max(255),
-  categories_id: yup.array().label("Categorias").required().min(1),
+  name: yup.string().label('Nome').required().max(255),
+  categories_id: yup.array().label('Categorias').min(1),
+  is_active: yup.boolean().label('Ativo?').required(),
 });
 
 export const Form = () => {
@@ -40,12 +41,12 @@ export const Form = () => {
     reset,
     trigger,
     formState
-  } = useForm({
+  } = useForm<{name, categories_id, is_active}>({
     resolver: yupResolver(validationSchema),
     defaultValues: {
       categories_id: [],
-      is_active: true,
-    },
+      is_active: true
+    }
   });
 
   useSnackbarFormError(formState.submitCount, errors);
