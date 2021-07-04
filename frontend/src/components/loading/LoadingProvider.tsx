@@ -1,7 +1,5 @@
-// @flow
 import * as React from "react";
-import { useState, useEffect, useMemo } from "react";
-import axios from "axios";
+import { useEffect, useMemo, useState } from "react";
 import LoadingContext from "./LoadingContext";
 import {
   addGlobalRequestInterceptor,
@@ -9,18 +7,27 @@ import {
   removeGlobalRequestInterceptor,
   removeGlobalResponseInterceptor,
 } from "../../util/http";
+import { omit } from "lodash";
 
 export const LoadingProvider = (props) => {
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState(false);
   const [countRequest, setCountRequest] = useState(0);
 
+  /** Evitar registro duplicado de interceptors */
+  /**
+   * IMPORTANTE
+   * Deve-se usar o useMemo, pois o mesmo não tem relação com ciclo de vida, sendo executado primeiro
+   * já o useEffect pode ser executado muito depois, ou seja, algumas requests iniciais não teriam ainda
+   * os interceptors
+   *
+   * */
   useMemo(() => {
     let isSubscribed = true;
 
-    const requestIds = addGlobalRequestInterceptor((config) => {
-      if (isSubscribed) {
+    const requestsIds = addGlobalRequestInterceptor((config) => {
+      if (isSubscribed && (config.headers && !config.headers.hasOwnProperty("x-ignore-loading"))) {
         setLoading(true);
-        setCountRequest((prevCountRequest) => prevCountRequest + 1);
+        setCountRequest((prevState) => prevState + 1);
       }
 
       return config;
@@ -28,14 +35,19 @@ export const LoadingProvider = (props) => {
 
     const responseIds = addGlobalResponseInterceptor(
       (response) => {
-        if (isSubscribed) {
+        if (
+          isSubscribed &&
+          (response.config && !response.config.headers.hasOwnProperty("x-ignore-loading"))
+        ) {
           decrementCountRequest();
         }
-
         return response;
       },
       (error) => {
-        if (isSubscribed) {
+        if (
+          isSubscribed &&
+          (!error.config || !error.config.headers.hasOwnProperty("x-ignore-loading"))
+        ) {
           decrementCountRequest();
         }
         return Promise.reject(error);
@@ -44,11 +56,14 @@ export const LoadingProvider = (props) => {
 
     return () => {
       isSubscribed = false;
-      removeGlobalRequestInterceptor(requestIds);
+      removeGlobalRequestInterceptor(requestsIds);
       removeGlobalResponseInterceptor(responseIds);
     };
-  }, [true]);
+  }, []);
 
+  /**
+   * Existe para garantir que requisições subsequentes não anulem o loading uma das outras
+   * */
   useEffect(() => {
     if (!countRequest) {
       setLoading(false);
@@ -56,7 +71,7 @@ export const LoadingProvider = (props) => {
   }, [countRequest]);
 
   function decrementCountRequest() {
-    setCountRequest((prevCountRequest) => prevCountRequest - 1);
+    setCountRequest((prevState) => prevState - 1);
   }
 
   return (

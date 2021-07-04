@@ -1,31 +1,36 @@
 //import logo from './logo.svg';
 //import './App.css';
-import React from 'react';
-import { Navbar } from './components/Navbar';
-import { Box, CssBaseline, MuiThemeProvider } from '@material-ui/core';
-import AppRouter from './routes/AppRouter';
-import { BrowserRouter } from 'react-router-dom';
-import Breadcrumbs from './components/Breadcrumbs';
-import theme from './theme';
-import {SnackbarProvider} from "./components/SnackbarProvider";
+import React from "react";
+import { Navbar } from "./components/Navbar";
+import { Box, CssBaseline, MuiThemeProvider } from "@material-ui/core";
+import AppRouter from "./routes/AppRouter";
+import { BrowserRouter } from "react-router-dom";
+import Breadcrumbs from "./components/Breadcrumbs";
+import theme from "./theme";
+import { SnackbarProvider } from "./components/SnackbarProvider";
+import Spinner from "./components/Spinner";
+import { LoadingProvider } from "./components/loading/LoadingProvider";
 
 const App: React.FC = () => {
   return (
     <React.Fragment>
-     <MuiThemeProvider theme={theme}>
-      <SnackbarProvider>
-          <CssBaseline />
-          <BrowserRouter>
-              <Navbar/>
-              <Box paddingTop={'70px'}>
-                  <Breadcrumbs/>
-                  <AppRouter/>
+      <LoadingProvider>
+        <MuiThemeProvider theme={theme}>
+          <SnackbarProvider>
+            <CssBaseline />
+            <BrowserRouter>
+              <Spinner />
+              <Navbar />
+              <Box paddingTop={"70px"}>
+                <Breadcrumbs />
+                <AppRouter />
               </Box>
-          </BrowserRouter>
-      </SnackbarProvider>
-      </MuiThemeProvider>
-      </React.Fragment>
+            </BrowserRouter>
+          </SnackbarProvider>
+        </MuiThemeProvider>
+      </LoadingProvider>
+    </React.Fragment>
   );
-}
+};
 
 export default App;
