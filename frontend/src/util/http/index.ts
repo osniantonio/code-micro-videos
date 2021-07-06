@@ -15,10 +15,8 @@ export function addGlobalRequestInterceptor(
   const ids: number[] = [];
   for (let i of instances) {
     const id = i.interceptors.request.use(onFulfilled, onRejected);
-
     ids.push(id);
   }
-
   return ids;
 }
 

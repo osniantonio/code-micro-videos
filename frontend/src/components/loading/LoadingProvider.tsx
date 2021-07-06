@@ -18,18 +18,21 @@ export const LoadingProvider = (props) => {
    * IMPORTANTE
    * Deve-se usar o useMemo, pois o mesmo não tem relação com ciclo de vida, sendo executado primeiro
    * já o useEffect pode ser executado muito depois, ou seja, algumas requests iniciais não teriam ainda
-   * os interceptors
+   * os interceptors.
    *
    * */
   useMemo(() => {
     let isSubscribed = true;
 
     const requestsIds = addGlobalRequestInterceptor((config) => {
-      if (isSubscribed && (config.headers && !config.headers.hasOwnProperty("x-ignore-loading"))) {
+      if (
+        isSubscribed &&
+        config.headers &&
+        !config.headers.hasOwnProperty("x-ignore-loading")
+      ) {
         setLoading(true);
         setCountRequest((prevState) => prevState + 1);
       }
-
       return config;
     });
 
@@ -37,7 +40,8 @@ export const LoadingProvider = (props) => {
       (response) => {
         if (
           isSubscribed &&
-          (response.config && !response.config.headers.hasOwnProperty("x-ignore-loading"))
+          response.config &&
+          !response.config.headers.hasOwnProperty("x-ignore-loading")
         ) {
           decrementCountRequest();
         }
@@ -46,7 +50,8 @@ export const LoadingProvider = (props) => {
       (error) => {
         if (
           isSubscribed &&
-          (!error.config || !error.config.headers.hasOwnProperty("x-ignore-loading"))
+          (!error.config ||
+            !error.config.headers.hasOwnProperty("x-ignore-loading"))
         ) {
           decrementCountRequest();
         }

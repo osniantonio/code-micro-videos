@@ -19,7 +19,6 @@ interface SpinnerProps {}
 
 const Spinner: React.FC<SpinnerProps> = (props) => {
   const loading = useContext(LoadingContext);
-
   return (
     <MuiThemeProvider theme={makeLocalTheme}>
       <Fade in={loading} timeout={{ exit: 300 }}>
