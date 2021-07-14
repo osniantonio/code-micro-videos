@@ -17,6 +17,7 @@ import classNames from "classnames";
 import { useSelector } from "react-redux";
 import { Upload } from "../../store/upload/types";
 import { countInProgress } from "../../store/upload/getters";
+import { UploadItem } from "./UploadItem";
 
 const useStyles = makeStyles((theme: Theme) => ({
   card: {
@@ -86,7 +87,8 @@ const SnackbarUpload = React.forwardRef<any, SnackbarUploadProps>(
           </div>
         </CardActions>
         <Collapse in={expanded}>
-          <List className={classes.list}>Items</List>
+          <UploadItem />
+          <UploadItem />
         </Collapse>
       </Card>
     );
