@@ -11,6 +11,9 @@ import {
 } from "@material-ui/core";
 import MovieIcon from "@material-ui/icons/Movie";
 import UploadProgress from "../UploadProgress";
+import UploadAction from "./UploadAction";
+import { Upload } from "../../store/upload/types";
+import { hasError } from "../../store/upload/getters";
 
 const useStyles = makeStyles((theme: Theme) => ({
   listItem: {
@@ -29,16 +32,22 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
 }));
 
-interface UploadItemProps {}
+interface UploadItemProps {
+  upload: Upload;
+}
 
 export const UploadItem: React.FC<UploadItemProps> = (props) => {
+  const { upload } = props;
   const classes = useStyles();
+  const error = hasError(upload);
   const [itemHover, setItemHover] = useState(false);
 
   return (
     <>
       <Tooltip
-        title={"Não foi possível fazer upload, clique pra mais detalhes"}
+        title={
+          error ? "Não foi possível fazer upload, clique pra mais detalhes" : ""
+        }
         placement={"left"}
         disableFocusListener={true}
         disableTouchListener={true}
@@ -56,11 +65,14 @@ export const UploadItem: React.FC<UploadItemProps> = (props) => {
             className={classes.listItemText}
             primary={
               <Typography noWrap={true} variant={"subtitle2"} color={"inherit"}>
-                E o vento levou!!!!
+                {upload && upload.video
+                  ? upload.video.title
+                  : "E o vento levou!!!!"}
               </Typography>
             }
           />
           <UploadProgress size={30} />
+          <UploadAction upload={upload} hover={itemHover} />
         </ListItem>
       </Tooltip>
       <Divider component={"li"} />

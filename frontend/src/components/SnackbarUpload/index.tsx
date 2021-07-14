@@ -57,13 +57,17 @@ interface SnackbarUploadProps {
   id: string | number;
 }
 
+interface UploadItemProps {
+  upload: Upload;
+}
+
 const SnackbarUpload = React.forwardRef<any, SnackbarUploadProps>(
   (props, ref) => {
     const { id } = props;
     const classes = useStyles();
     const { closeSnackbar } = useSnackbar();
     const [expanded, setExpanded] = useState<boolean>(true);
-
+    const upload: any = {};
     return (
       <Card ref={ref} className={classes.card}>
         <CardActions classes={{ root: classes.cardActionRoot }}>
@@ -87,8 +91,8 @@ const SnackbarUpload = React.forwardRef<any, SnackbarUploadProps>(
           </div>
         </CardActions>
         <Collapse in={expanded}>
-          <UploadItem />
-          <UploadItem />
+          <UploadItem upload={upload} />
+          <UploadItem upload={upload} />
         </Collapse>
       </Card>
     );
