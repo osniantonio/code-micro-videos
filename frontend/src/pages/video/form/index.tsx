@@ -45,6 +45,7 @@ import {useDispatch, useSelector} from "react-redux";
 import {State as UploadState, Upload} from "../../../store/upload/types";
 import {Creators} from "../../../store/upload";
 import useSnackbarFormError from "../../../hooks/useSnackbarFormError";
+import SnackbarUpload from "../../../components/SnackbarUpload";
 
 const useStyles = makeStyles((theme: Theme) => ({
   cardUpload: {
@@ -173,10 +174,20 @@ export const Form = () => {
   }, [register]);
 
   useEffect(() => {
+    snackbar.enqueueSnackbar('', {
+      persist: true,
+      anchorOrigin: {
+        vertical: 'bottom',
+        horizontal: 'right'
+      },
+      content: (key, message) => {
+        const idKey = key as any;
+        return <SnackbarUpload id={idKey}/>
+      }
+    });
     if (!id) {
       return;
     }
-
     let isSubscribed = true;
     (async () => {
       try {
