@@ -26,6 +26,7 @@ const useStyles = makeStyles((theme: Theme) => {
 });
 
 interface UploadActionProps {}
+
 const UploadAction: React.FC<UploadActionProps> = (props) => {
   const classes = useStyles();
   return (
