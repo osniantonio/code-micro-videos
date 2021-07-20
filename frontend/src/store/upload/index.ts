@@ -5,23 +5,44 @@ import update from "immutability-helper";
 export const { Types, Creators } = createActions<
   {
     ADD_UPLOAD: string;
+    REMOVE_UPLOAD: string;
+    UPDATE_PROGRESS: string;
+    SET_UPLOAD_ERROR: string;
   },
   {
     addUpload(
       payload: Typings.AddUploadAction["payload"]
     ): Typings.AddUploadAction;
+    removeUpload(
+      payload: Typings.RemoveUploadAction["payload"]
+    ): Typings.RemoveUploadAction;
+    updateProgress(
+      payload: Typings.UpdateProgressAction["payload"]
+    ): Typings.UpdateProgressAction;
+    setUploadError(
+      payload: Typings.SetUploadErrorAction["payload"]
+    ): Typings.SetUploadErrorAction;
   }
 >({
   addUpload: ["payload"],
+  removeUpload: ["payload"],
+  updateProgress: ["payload"],
+  setUploadError: ["payload"],
 });
 
-export const INITIAL_STATE: Typings.State = {
+export const INITIAL_STATE: Typings.UploadState = {
   uploads: [],
 };
 
-const reducer = createReducer<Typings.State, Typings.Actions>(INITIAL_STATE, {
-  [Types.ADD_UPLOAD]: addUpload as any,
-});
+const reducer = createReducer<Typings.UploadState, Typings.Actions>(
+  INITIAL_STATE,
+  {
+    [Types.ADD_UPLOAD]: addUpload as any,
+    [Types.REMOVE_UPLOAD]: removeUpload as any,
+    //[Types.UPDATE_PROGRESS]: updateProgress as any,
+    //[Types.SET_UPLOAD_ERROR]: setUploadError as any,
+  }
+);
 
 export default reducer;
 
@@ -59,6 +80,21 @@ function addUpload(
         })),
       },
     ],
+  };
+}
+
+function removeUpload(
+  state: Typings.UploadState = INITIAL_STATE,
+  action: Typings.RemoveUploadAction
+): Typings.UploadState {
+  const uploads = state.uploads.filter(
+    (upload) => upload.video.id !== action.payload.id
+  );
+  if (uploads.length === state.uploads.length) {
+    return state;
+  }
+  return {
+    uploads,
   };
 }
 

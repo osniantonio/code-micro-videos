@@ -41,9 +41,9 @@ import { UploadField } from "./UploadField";
 import CastMemberField, { CastMemberFieldComponent } from "./CastMemberField";
 import GenreField, { GenreFieldComponent } from "./GenreField";
 import CategoryField, { CategoryFieldComponent } from "./CategoryField";
-import {useDispatch, useSelector} from "react-redux";
-import {State as UploadState, Upload} from "../../../store/upload/types";
-import {Creators} from "../../../store/upload";
+import { useDispatch, useSelector } from "react-redux";
+import { State as UploadState, Upload } from "../../../store/upload/types";
+import { Creators } from "../../../store/upload";
 import useSnackbarFormError from "../../../hooks/useSnackbarFormError";
 import SnackbarUpload from "../../../components/SnackbarUpload";
 
@@ -63,44 +63,29 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 const validationSchema = yup.object().shape({
-  title: yup.string()
-      .label("Título")
-      .required()
-      .max(255),
-  description: yup.string()
-      .label("Sinopse")
-      .required(),
-  year_launched: yup.number()
-      .label('Ano de lançamento')
-      .required()
-      .min(1),
-  duration: yup.number()
-      .label("Duração")
-      .required()
-      .min(1),
-  rating: yup.string()
-      .label("Classificação")
-      .required(),
-  genres: yup.array()
-      .label("Gêneros")
-      .required()
-      .test({
-          message: "Cada gênero escolhido precisa ter pelo menos uma categoria selecionada",
-          test(value: any) {
-              return value.every(
-                  v => v.categories.filter(
-                      cat => this.parent.categories.map(c => c.id).includes(cat.id)
-                  ).length !== 0
-              );
-          }
-      }),
-  categories: yup.array()
-      .label("Categorias")
-      .required(),
-  cast_members: yup.array()
-      .label("Membros de elenco")
-      .required(),
-
+  title: yup.string().label("Título").required().max(255),
+  description: yup.string().label("Sinopse").required(),
+  year_launched: yup.number().label("Ano de lançamento").required().min(1),
+  duration: yup.number().label("Duração").required().min(1),
+  rating: yup.string().label("Classificação").required(),
+  genres: yup
+    .array()
+    .label("Gêneros")
+    .required()
+    .test({
+      message:
+        "Cada gênero escolhido precisa ter pelo menos uma categoria selecionada",
+      test(value: any) {
+        return value.every(
+          (v) =>
+            v.categories.filter((cat) =>
+              this.parent.categories.map((c) => c.id).includes(cat.id)
+            ).length !== 0
+        );
+      },
+    }),
+  categories: yup.array().label("Categorias").required(),
+  cast_members: yup.array().label("Membros de elenco").required(),
 });
 
 const fileFields = Object.keys(VideoFileFieldsMap);
@@ -119,12 +104,12 @@ export const Form = () => {
   } = useForm({
     resolver: yupResolver(validationSchema),
     defaultValues: {
-      rating:null,
+      rating: null,
       cast_members: [],
       genres: [],
       categories: [],
-      opened:false
-    }
+      opened: false,
+    },
   });
 
   useSnackbarFormError(formState.submitCount, errors);
@@ -150,6 +135,8 @@ export const Form = () => {
   }>;
 
   const uploads = useSelector<UploadState, Upload[]>((state) => state.uploads);
+  console.log(uploads);
+
   const dispatch = useDispatch();
   setTimeout(() => {
     const obj: any = {
@@ -174,16 +161,16 @@ export const Form = () => {
   }, [register]);
 
   useEffect(() => {
-    snackbar.enqueueSnackbar('', {
+    snackbar.enqueueSnackbar("", {
       persist: true,
       anchorOrigin: {
-        vertical: 'bottom',
-        horizontal: 'right'
+        vertical: "bottom",
+        horizontal: "right",
       },
       content: (key, message) => {
         const idKey = key as any;
-        return <SnackbarUpload id={idKey}/>
-      }
+        return <SnackbarUpload id={idKey} />;
+      },
     });
     if (!id) {
       return;
@@ -211,23 +198,31 @@ export const Form = () => {
   }, []);
 
   async function onSubmit(formData, event) {
-    console.log('onSubmit--');
+    console.log("onSubmit--");
     console.log(formData);
-    const sendData = omit(formData, ['cast_members', 'genres', 'categories']);
-    sendData['cast_members_id'] = formData['cast_members'].map(cast_member => cast_member.id);
-    sendData['categories_id'] = formData['categories'].map(category => category.id);
-    sendData['genres_id'] = formData['genres'].map(genre => genre.id);
+    const sendData = omit(formData, ["cast_members", "genres", "categories"]);
+    sendData["cast_members_id"] = formData["cast_members"].map(
+      (cast_member) => cast_member.id
+    );
+    sendData["categories_id"] = formData["categories"].map(
+      (category) => category.id
+    );
+    sendData["genres_id"] = formData["genres"].map((genre) => genre.id);
 
     try {
       setLoading(true);
-      
-      /** 
-       * Spoofing que possibilitará não criar esta rota nova, pesquise sobre isto na documentação e 
+
+      /**
+       * Spoofing que possibilitará não criar esta rota nova, pesquise sobre isto na documentação e
        * implemente a edição dos vídeos enviando os arquivos utlizando o verbo POST (_method: 'PUT')
        * */
       const http = !video
-              ? videoHttp.create(sendData)
-              : videoHttp.update(video.id, {...sendData, _method: 'PUT'}, {http:{usePost:true}});
+        ? videoHttp.create(sendData)
+        : videoHttp.update(
+            video.id,
+            { ...sendData, _method: "PUT" },
+            { http: { usePost: true } }
+          );
 
       const { data } = await http;
 
@@ -276,9 +271,7 @@ export const Form = () => {
   return (
     <DefaultForm GridItemProps={{ xs: 12 }} onSubmit={handleSubmit(onSubmit)}>
       <Grid container spacing={5}>
-
         <Grid item xs={12} md={6}>
-
           <TextField
             name={"title"}
             label={"Título"}
@@ -350,46 +343,49 @@ export const Form = () => {
           </Grid>
 
           <CastMemberField
-              ref={castMemberRef}
-              castMembers={watch('cast_members') as any[]}
-              setCastMembers={(value) => setValue('cast_members', value, { shouldValidate: true })}
-              error={errors.cast_members}
-              disabled={loading}
+            ref={castMemberRef}
+            castMembers={watch("cast_members") as any[]}
+            setCastMembers={(value) =>
+              setValue("cast_members", value, { shouldValidate: true })
+            }
+            error={errors.cast_members}
+            disabled={loading}
           />
 
           <Grid container spacing={2}>
-              <Grid item xs={6} md={6}>
-                  <GenreField
-                      ref={genreRef}
-                        genres={watch('genres') as any[]}
-                        setGenres={(value) => setValue('genres', value, { shouldValidate: true })}
-                        categories={watch('categories') as any[]}
-                        setCategories={(value) => setValue('categories', value)}
-                        error={errors["genres"]}
-                        disabled={loading}
-                  />
-              </Grid>
-              <Grid item xs={6} md={6}>
-                  <CategoryField
-                      ref={categoryRef}
-                      categories={watch('categories') as any[]}
-                      setCategories={(value) => setValue('categories', value, { shouldValidate: true })}
-                      genres={watch('genres') as any[]}
-                      error={errors["categories"]}
-                      disabled={loading}
-                  />
-              </Grid>
-          </Grid>
-          
-          <Grid item xs={12} >
-              <FormHelperText>
-                  Escolha os gêneros dos videos
-              </FormHelperText>
-              <FormHelperText>
-                  Escolha pelo menos uma categoria de cada gênero
-              </FormHelperText>
+            <Grid item xs={6} md={6}>
+              <GenreField
+                ref={genreRef}
+                genres={watch("genres") as any[]}
+                setGenres={(value) =>
+                  setValue("genres", value, { shouldValidate: true })
+                }
+                categories={watch("categories") as any[]}
+                setCategories={(value) => setValue("categories", value)}
+                error={errors["genres"]}
+                disabled={loading}
+              />
+            </Grid>
+            <Grid item xs={6} md={6}>
+              <CategoryField
+                ref={categoryRef}
+                categories={watch("categories") as any[]}
+                setCategories={(value) =>
+                  setValue("categories", value, { shouldValidate: true })
+                }
+                genres={watch("genres") as any[]}
+                error={errors["categories"]}
+                disabled={loading}
+              />
+            </Grid>
           </Grid>
 
+          <Grid item xs={12}>
+            <FormHelperText>Escolha os gêneros dos videos</FormHelperText>
+            <FormHelperText>
+              Escolha pelo menos uma categoria de cada gênero
+            </FormHelperText>
+          </Grid>
         </Grid>
 
         <Grid item xs={12} md={6}>
@@ -412,13 +408,17 @@ export const Form = () => {
                 ref={uploadRef.current["thumb_file"]}
                 accept={"image/*"}
                 label={"Thumb"}
-                setValue={(value) => setValue("thumb_file", value, { shouldValidate: true })}
+                setValue={(value) =>
+                  setValue("thumb_file", value, { shouldValidate: true })
+                }
               />
               <UploadField
                 ref={uploadRef.current["banner_file"]}
                 accept={"image/*"}
                 label={"Banner"}
-                setValue={(value) => setValue("banner_file", value, { shouldValidate: true })}
+                setValue={(value) =>
+                  setValue("banner_file", value, { shouldValidate: true })
+                }
               />
             </CardContent>
           </Card>
@@ -431,13 +431,17 @@ export const Form = () => {
                 ref={uploadRef.current["trailer_file"]}
                 accept={"video/mp4"}
                 label={"Trailer"}
-                setValue={(value) => setValue("trailer_file", value, { shouldValidate: true })}
+                setValue={(value) =>
+                  setValue("trailer_file", value, { shouldValidate: true })
+                }
               />
               <UploadField
                 ref={uploadRef.current["video_file"]}
                 accept={"video/mp4"}
                 label={"Principal"}
-                setValue={(value) => setValue("video_file", value, { shouldValidate: true })}
+                setValue={(value) =>
+                  setValue("video_file", value, { shouldValidate: true })
+                }
               />
             </CardContent>
           </Card>
