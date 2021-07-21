@@ -3,7 +3,7 @@ import { AxiosError } from "axios";
 import { AnyAction } from "redux";
 
 export interface FileUpload {
-  fieldField: string;
+  fileField: string;
   filename: string;
   progress: number;
   error?: AxiosError;
