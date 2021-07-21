@@ -9,7 +9,8 @@ function reducer(state, action) {
 }
 
 function* helloWorld() {
-  console.log("hello");
+  console.log("Hello World");
+  // fica parado até que capture essa ação
   const action = yield take("acaoY");
   yield put({
     type: "acaoX",
