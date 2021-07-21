@@ -41,41 +41,47 @@ const reducer = createReducer<UploadState, Actions>(INITIAL_STATE, {
   [Types.ADD_UPLOAD]: addUpload as any,
   [Types.REMOVE_UPLOAD]: removeUpload as any,
   [Types.UPDATE_PROGRESS]: updateProgress as any,
-  //[Types.SET_UPLOAD_ERROR]: setUploadError as any,
+  [Types.SET_UPLOAD_ERROR]: setUploadError as any,
 });
 
 export default reducer;
 
-function addUpload(state = INITIAL_STATE, action: AddUploadAction): UploadState {
+function addUpload(
+  state = INITIAL_STATE,
+  action: AddUploadAction
+): UploadState {
   if (action.payload.files.length === 0) {
-      return state;
+    return state;
   }
   const index = findIndexUpload(state, action.payload.video.id);
 
   /** upload ainda em progresso */
   if (index !== -1 && state.uploads[index].progress < 1) {
-      return state;
+    return state;
   }
 
   /** remove o video caso ele já exista como concluido */
-  const uploads = index === -1 ? state.uploads : update(state.uploads, {
-      $splice: [[index, 1]]
-  });
+  const uploads =
+    index === -1
+      ? state.uploads
+      : update(state.uploads, {
+          $splice: [[index, 1]],
+        });
 
   return {
-      uploads: [
-          ...uploads,
-          {
-              video: action.payload.video,
-              progress: 0,
-              files: action.payload.files.map(file => ({
-                  fileField: file.fileField,
-                  filename: file.file.name,
-                  progress: 0
-              }))
-          }
-      ]
-  }
+    uploads: [
+      ...uploads,
+      {
+        video: action.payload.video,
+        progress: 0,
+        files: action.payload.files.map((file) => ({
+          fileField: file.fileField,
+          filename: file.file.name,
+          progress: 0,
+        })),
+      },
+    ],
+  };
 }
 
 function removeUpload(
@@ -98,7 +104,7 @@ function findIndexUpload(state: UploadState, id: string) {
 }
 
 function findIndexFile(files: Array<{ fileField }>, fileField: string) {
-  return files.findIndex(file => file.fileField === fileField);
+  return files.findIndex((file) => file.fileField === fileField);
 }
 
 function findIndexUploadAndFile(
@@ -143,9 +149,7 @@ function updateProgress(
   const upload = state.uploads[indexUpload];
   const file = upload.files[indexFile];
 
-  /** evita atualizar o progress de um video que já foi dado como concluido
-   *  seja com sucesso, ou erro
-   * */
+  // não precisa atualizar
   if (file.progress === action.payload.progress) {
     return state;
   }
@@ -160,6 +164,38 @@ function updateProgress(
         });
         const progress = calculateGlobalProgress(files);
         return { ...upload, progress, files };
+      },
+    },
+  });
+
+  return { uploads };
+}
+
+function setUploadError(
+  state = INITIAL_STATE,
+  action: SetUploadErrorAction
+): UploadState {
+  const videoId = action.payload.video.id;
+  const fileField = action.payload.fileField;
+  const { indexUpload, indexFile } = findIndexUploadAndFile(
+    state,
+    videoId,
+    fileField
+  );
+
+  if (typeof indexUpload === "undefined") {
+    return state;
+  }
+
+  const upload = state.uploads[indexUpload];
+  const file = upload.files[indexFile];
+
+  const uploads = update(state.uploads, {
+    [indexUpload]: {
+      files: {
+        [indexFile]: {
+          $set: { ...file, error: action.payload.error, progress: 1 },
+        },
       },
     },
   });
