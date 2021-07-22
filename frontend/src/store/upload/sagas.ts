@@ -7,8 +7,6 @@ import videoHttp from "../../util/http/video-http";
 import { Unsubscribe } from "redux";
 
 /**
- * FLUXO
- *
  * upload(recebe action)
  *      -> para cada arquivo(chama uploadFile)
  *          -> uploadFile
@@ -31,13 +29,6 @@ export function* uploadWatcherSaga() {
   }
 }
 
-// criando um novo video
-//1-post e criar
-//2-put com upload
-
-//editar um novo video
-//1-put e editar
-//2-put com upload
 function* uploadFile({
   video,
   fileInfo,
