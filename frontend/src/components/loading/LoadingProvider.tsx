@@ -33,6 +33,7 @@ export const LoadingProvider = (props) => {
         setLoading(true);
         setCountRequest((prevState) => prevState + 1);
       }
+      config.headers = omit(config.headers, 'x-ignore-loading');
       return config;
     });
 
