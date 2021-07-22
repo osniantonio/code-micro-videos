@@ -22,6 +22,7 @@ export function* uploadWatcherSaga() {
           video: payload.video,
           fileInfo,
         });
+        console.log(response);
       } catch (e) {
         console.log(e);
       }
