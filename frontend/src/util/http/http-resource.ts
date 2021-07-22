@@ -37,22 +37,6 @@ export default class HttpResource {
     return this.http.post<T>(this.resource, sendData);
   }
 
-  update<T = any>(
-    id,
-    data,
-    options?: { http?: { usePost: boolean } }
-  ): Promise<AxiosResponse<T>> {
-    let sendData = data;
-    if (this.containsFile(data)) {
-      sendData = this.getFormData(data);
-    }
-
-    const { http } = (options || {}) as any;
-    return !options || !http || !http.usePost
-      ? this.http.put<T>(`${this.resource}/${id}`, sendData)
-      : this.http.post<T>(`${this.resource}/${id}`, sendData);
-  }
-
   partialUpdate<T = any>(
     id: any,
     data,
@@ -65,6 +49,21 @@ export default class HttpResource {
     const { http, config } = (options || {}) as any;
     return !options || !http || !http.usePost
       ? this.http.patch<T>(`${this.resource}/${id}`, sendData, config)
+      : this.http.post<T>(`${this.resource}/${id}`, sendData, config);
+  }
+
+  update<T = any>(
+    id: any,
+    data,
+    options?: { http?: { usePost: boolean }; config?: AxiosRequestConfig }
+  ): Promise<AxiosResponse<T>> {
+    let sendData = data;
+    if (this.containsFile(data)) {
+      sendData = this.getFormData(data);
+    }
+    const { http, config } = (options || {}) as any;
+    return !options || !http || !http.usePost
+      ? this.http.put<T>(`${this.resource}/${id}`, sendData, config)
       : this.http.post<T>(`${this.resource}/${id}`, sendData, config);
   }
 
