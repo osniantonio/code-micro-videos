@@ -43,7 +43,7 @@ import CastMemberField, { CastMemberFieldComponent } from "./CastMemberField";
 import GenreField, { GenreFieldComponent } from "./GenreField";
 import CategoryField, { CategoryFieldComponent } from "./CategoryField";
 import { useDispatch, useSelector } from "react-redux";
-import { State as UploadState, Upload } from "../../../store/upload/types";
+import { State as UploadState, Upload, UploadModule } from "../../../store/upload/types";
 import { Creators } from "../../../store/upload";
 import useSnackbarFormError from "../../../hooks/useSnackbarFormError";
 import SnackbarUpload from "../../../components/SnackbarUpload";
@@ -135,7 +135,7 @@ export const Form = () => {
     [key: string]: MutableRefObject<InputFileComponent>;
   }>;
 
-  const uploads = useSelector<UploadState, Upload[]>((state) => state.uploads);
+  const uploads = useSelector<UploadModule, Upload[]>(state => state.upload.uploads);
   console.log(uploads);
 
   const dispatch = useDispatch();
