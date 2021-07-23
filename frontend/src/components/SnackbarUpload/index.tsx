@@ -14,10 +14,10 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { useSnackbar } from "notistack";
 import { makeStyles } from "@material-ui/core/styles";
 import classNames from "classnames";
-import { useSelector } from "react-redux";
-import { Upload } from "../../store/upload/types";
-import { countInProgress } from "../../store/upload/getters";
 import { UploadItem } from "./UploadItem";
+import { useSelector } from "react-redux";
+import { Upload, UploadModule } from "../../store/upload/types";
+import { countInProgress } from "../../store/upload/getters";
 
 const useStyles = makeStyles((theme: Theme) => ({
   card: {
@@ -57,22 +57,24 @@ interface SnackbarUploadProps {
   id: string | number;
 }
 
-interface UploadItemProps {
-  upload: Upload;
-}
-
 const SnackbarUpload = React.forwardRef<any, SnackbarUploadProps>(
   (props, ref) => {
     const { id } = props;
     const classes = useStyles();
     const { closeSnackbar } = useSnackbar();
     const [expanded, setExpanded] = useState<boolean>(true);
-    const upload: any = {};
+
+    const uploads = useSelector<UploadModule, Upload[]>(
+      (state) => state.upload.uploads
+    );
+
+    const totalInProgress = countInProgress(uploads);
+
     return (
       <Card ref={ref} className={classes.card}>
         <CardActions classes={{ root: classes.cardActionRoot }}>
           <Typography variant={"subtitle2"} className={classes.title}>
-            Fazendo o upload de - totalInProgress - vídeo(s)
+            Fazendo o upload de {totalInProgress} vídeo(s)
           </Typography>
           <div className={classes.icons}>
             <IconButton
@@ -91,8 +93,11 @@ const SnackbarUpload = React.forwardRef<any, SnackbarUploadProps>(
           </div>
         </CardActions>
         <Collapse in={expanded}>
-          <UploadItem upload={upload} />
-          <UploadItem upload={upload} />
+          <List className={classes.list}>
+            {uploads.map((upload: Upload, key) => (
+              <UploadItem key={key} upload={upload} />
+            ))}
+          </List>
         </Collapse>
       </Card>
     );
