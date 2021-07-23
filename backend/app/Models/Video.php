@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Traits\SerializeDateToIso8601;
 use App\Models\Traits\UploadFiles;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Video extends Model
 {
-    use SoftDeletes, Traits\Uuid, UploadFiles;
+    use SoftDeletes, Traits\Uuid, UploadFiles, SerializeDateToIso8601;
 
     const RATING_LIST = ['L', '10', '12', '14', '16', '18'];
 
@@ -33,6 +34,8 @@ class Video extends Model
         'duration' => 'integer'
     ];
     public $incrementing = false;
+    protected $keyType = 'string';
+    protected $hidden = ['video_file', 'thumb_file', 'trailer_file', 'banner_file'];
 
     public static $fileFields = [
         'video_file',

@@ -1,30 +1,29 @@
 import * as React from "react";
-import { useContext, useEffect, useState } from "react";
-import format from "date-fns/format";
-import parseISO from "date-fns/parseISO";
-import { ListResponse, Video } from "../../util/models";
+import { useContext, useEffect, useRef, useState } from "react";
 import DefaultTable, {
-  makeActionsStyles,
   MuiDataTableRefComponent,
   TableColumn,
 } from "../../components/Table";
 import { useSnackbar } from "notistack";
-import { useRef } from "react";
+import { Category, listResponse, Video } from "../../util/models";
 import useFilter from "../../hooks/useFilter";
-import { IconButton, MuiThemeProvider } from "@material-ui/core";
-import { FilterResetButton } from "../../components/Table/FilterResetButton";
+import videoHttp from "../../util/http/video-http";
+import categoryHttp from "../../util/http/category-http";
+import FilterResetButton from "../../components/Table/FilterResetButton";
+import { format, parseISO } from "date-fns";
+import * as yup from "../../util/vendor/yup";
+import IconButton from "@material-ui/core/IconButton/IconButton";
 import { Link } from "react-router-dom";
 import EditIcon from "@material-ui/icons/Edit";
-import videoHttp from "../../util/http/video-http";
-import LoadingContext from "../../components/loading/LoadingContext";
-import {DeleteDialog} from "../../components/DeleteDialog";
+import { DeleteDialog } from "../../components/DeleteDialog";
 import useDeleteCollection from "../../hooks/useDeleteCollection";
+import LoadingContext from "../../components/loading/LoadingContext";
 
 const columnsDefinitions: TableColumn[] = [
   {
     name: "id",
     label: "ID",
-    width: "32%",
+    width: "30%",
     options: {
       sort: false,
       filter: false,
@@ -32,38 +31,47 @@ const columnsDefinitions: TableColumn[] = [
   },
   {
     name: "title",
-    label: "Título",
+    label: "Titulo",
     width: "20%",
     options: {
-      sort: false,
       filter: false,
     },
   },
   {
     name: "genres",
-    label: "Gêneros",
+    label: "Gẽneros",
     width: "13%",
     options: {
-      sort: false,
       filter: false,
-      customBodyRender: (value, tableMeta, updateValue) => {
-        return value.map((valor) => valor.name).join(", ");
+      customBodyRender(value, tableMeta, updateValue) {
+        return (
+          <span>
+            {" "}
+            {value.map((value: { name: any }) => value.name).join(", ")}{" "}
+          </span>
+        );
       },
     },
   },
   {
     name: "categories",
     label: "Categorias",
-    width: "13%",
+    width: "12%",
     options: {
-      sort: false,
-      filter: false,
-      customBodyRender: (value, tableMeta, updateValue) => {
-        return value.map((valor) => valor.name).join(", ");
+      filterType: "multiselect",
+      filterOptions: {
+        names: [],
+      },
+      customBodyRender(value, tableMeta, updateValue) {
+        return (
+          <span>
+            {" "}
+            {value.map((value: { name: any }) => value.name).join(", ")}{" "}
+          </span>
+        );
       },
     },
   },
-
   {
     name: "created_at",
     label: "Criado em",
@@ -75,7 +83,6 @@ const columnsDefinitions: TableColumn[] = [
       },
     },
   },
-  
   {
     name: "actions",
     label: "Ações",
@@ -104,68 +111,153 @@ const rowsPerPage = 15;
 const rowsPerPageOptions = [15, 25, 50];
 
 const Table = () => {
-  const snackbar = useSnackbar();
-  const subscribed = useRef(true);
+  const { enqueueSnackbar } = useSnackbar();
   const [data, setData] = useState<Video[]>([]);
-  const loading = useContext(LoadingContext);
+  const subscribed = useRef(true);
   const tableRef = useRef() as React.MutableRefObject<MuiDataTableRefComponent>;
-  const {openDeleteDialog, setOpenDeleteDialog, rowsToDelete, setRowsToDelete} = useDeleteCollection();
+  const [categories, setCategories] = useState<Category[]>();
+  const {
+    openDeleteDialog,
+    setOpenDeleteDialog,
+    rowsToDelete,
+    setRowsToDelete,
+  } = useDeleteCollection();
+
+  const loading = useContext(LoadingContext);
 
   const {
     columns,
     filterManager,
     filterState,
     debouncedFilterState,
-    dispatch,
     totalRecords,
     setTotalRecords,
   } = useFilter({
     columns: columnsDefinitions,
+    rowsPerPage: rowsPerPage,
+    rowsPerPageOptions: rowsPerPageOptions,
     debounceTime: debounceTime,
-    rowsPerPage,
-    rowsPerPageOptions,
-    tableRef,
+    tableRef: tableRef,
+    extraFilter: {
+      createValidationSchema: () => {
+        return yup.object().shape({
+          categories: yup
+            .mixed()
+            .nullable()
+            .transform((value) => {
+              return !value || value === "" ? undefined : value.split(",");
+            })
+            .default(null),
+        });
+      },
+      formatSearchParams: (debouncedState) => {
+        return debouncedState.extraFilter
+          ? {
+              ...(debouncedState.extraFilter.categories && {
+                categories: debouncedState.extraFilter.categories.join(","),
+              }),
+            }
+          : undefined;
+      },
+      getStateFromURL: (queryParams) => {
+        return {
+          categories: queryParams.get("categories"),
+        };
+      },
+    },
   });
+
+  const indexColumnCategories = columns.findIndex(
+    (c) => c.name === "categories"
+  );
+  const columnCategories = columns[indexColumnCategories];
+  const categoriesFilterValue =
+    debouncedFilterState.extraFilter &&
+    debouncedFilterState.extraFilter.categories;
+  (columnCategories.options as any).filterList = categoriesFilterValue
+    ? categoriesFilterValue
+    : [];
+
+  const serverSideFilterList = columns.map((column) => []);
+  if (categoriesFilterValue) {
+    serverSideFilterList[indexColumnCategories] = categoriesFilterValue;
+  }
 
   useEffect(() => {
     subscribed.current = true;
-    filterManager.pushHistory();
+
+    (async () => {
+      try {
+        const { data } = await categoryHttp.list({ queryParams: { all: "" } });
+
+        if (subscribed.current) {
+          setCategories(data.data);
+          (columnCategories.options as any).filterOptions.names = data.data.map(
+            (category) => category.name
+          );
+        }
+      } catch (e) {
+        console.log(e);
+        if (categoryHttp.isCancelledRequest(e)) {
+          return;
+        }
+        enqueueSnackbar("Não foi possível carregar as informações", {
+          variant: "error",
+        });
+      }
+    })();
+
+    return () => {
+      subscribed.current = false;
+    };
+  }, [enqueueSnackbar]);
+
+  const filteredSearch = filterManager.clearSearchText(
+    debouncedFilterState.search
+  );
+
+  useEffect(() => {
+    subscribed.current = true;
     getData();
+    filterManager.pushHistory();
+
     return () => {
       subscribed.current = false;
     };
   }, [
-    filterManager.cleanSearchText(debouncedFilterState.search),
+    filteredSearch,
     debouncedFilterState.pagination.page,
     debouncedFilterState.pagination.per_page,
     debouncedFilterState.order,
+    JSON.stringify(debouncedFilterState.extraFilter),
   ]);
 
   async function getData() {
     try {
-      const { data } = await videoHttp.list<ListResponse<Video>>({
+      const { data } = await videoHttp.list<listResponse<Video>>({
         queryParams: {
-          search: filterManager.cleanSearchText(filterState.search),
-          page: filterState.pagination.page,
-          per_page: filterState.pagination.per_page,
-          sort: filterState.order.sort,
-          dir: filterState.order.dir,
+          search: filterManager.clearSearchText(debouncedFilterState.search),
+          page: debouncedFilterState.pagination.page,
+          per_page: debouncedFilterState.pagination.per_page,
+          sort: debouncedFilterState.order.sort,
+          dir: debouncedFilterState.order.dir,
+          ...(debouncedFilterState.extraFilter &&
+            debouncedFilterState.extraFilter.categories && {
+              categories: debouncedFilterState.extraFilter.categories.join(","),
+            }),
         },
       });
 
       if (subscribed.current) {
         setData(data.data);
         setTotalRecords(data.meta.total);
-        if (openDeleteDialog) {
-          setOpenDeleteDialog(false);
-        }
       }
-    } catch (error) {
-      console.log(error);
-      if (videoHttp.isCancelledRequest(error)) {
+    } catch (e) {
+      console.log(e);
+      if (videoHttp.isCancelledRequest(e)) {
         return;
       }
-      snackbar.enqueueSnackbar("Nāo foi possível carregar as informações", {
+      enqueueSnackbar("Não foi possível carregar as informações", {
         variant: "error",
       });
     }
@@ -196,55 +288,67 @@ const Table = () => {
 
       setOpenDeleteDialog(false);
 
-      snackbar.enqueueSnackbar("Registros excluidos com sucesso!", {
+      enqueueSnackbar("Registros excluidos com sucesso!", {
         variant: "success",
       });
     } catch (e) {
       console.log(e);
-      snackbar.enqueueSnackbar("Não foi possível excluir os registros", {
+      enqueueSnackbar("Não foi possível excluir os registros", {
         variant: "error",
       });
     }
   }
 
   return (
-    <MuiThemeProvider theme={makeActionsStyles(columnsDefinitions.length - 1)}>
-      <DeleteDialog open={openDeleteDialog} handleClose={deleteRows}/>
+    <React.Fragment>
+      <DeleteDialog open={openDeleteDialog} handleClose={deleteRows} />
       <DefaultTable
-        title="Listagem de videos"
-        columns={columns}
+        title={"Videos"}
         data={data}
-        loading={loading}
+        columns={columns}
         debounceSearchTime={debouncedSearchTime}
+        loading={loading}
         ref={tableRef}
         options={{
           serverSide: true,
-          responsive: "scrollMaxHeight",
           searchText: filterState.search as any,
           page: filterState.pagination.page - 1,
-          rowsPerPage: filterState.pagination.per_page,
-          rowsPerPageOptions,
+          rowsPerPage: rowsPerPage,
+          rowsPerPageOptions: rowsPerPageOptions,
           count: totalRecords,
-          customToolbar: () => (
-            <FilterResetButton
-              handleClick={() => {
-                filterManager.resetFilter();
-              }}
-            />
-          ),
-          onSearchChange: (value: string) => filterManager.changeSearch(value),
-          onChangePage: (page: number) => filterManager.changePage(page),
-          onChangeRowsPerPage: (perPage: number) =>
-            filterManager.changeRowsPerPage(perPage),
+          customToolbar: () => {
+            return (
+              <FilterResetButton
+                handleClick={() => filterManager.resetFilter()}
+              />
+            );
+          },
+          onFilterChange: (column, filterList, type) => {
+            const columnIndex = columns.findIndex((c) => c.name === column);
+
+            if (columnIndex && filterList[columnIndex]) {
+              filterManager.changeExtraFilter({
+                [column]: filterList[columnIndex].length
+                  ? filterList[columnIndex]
+                  : null,
+              });
+            } else {
+              filterManager.clearExtraFilter();
+            }
+          },
+          onSearchChange: (value) => filterManager.changeSearch(value),
+          onChangePage: (page) => filterManager.changePage(page),
+          onChangeRowsPerPage: (per_page) =>
+            filterManager.changeRowsPerPage(per_page),
           onColumnSortChange: (changedColumn: string, direction: string) =>
-            filterManager.changeColumnSort(changedColumn, direction),
+            filterManager.changeSort(changedColumn, direction),
           onRowsDelete: (rowsDeleted) => {
             setRowsToDelete(rowsDeleted as any);
             return false;
-          }
+          },
         }}
       />
-    </MuiThemeProvider>
+    </React.Fragment>
   );
 };
 

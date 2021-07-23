@@ -42,16 +42,19 @@ export interface SetOrderAction extends AnyAction {
   };
 }
 
+export interface SetResetAction extends AnyAction {
+  payload: {
+    state: State;
+  };
+}
+
 export interface UpdateExtraFilterAction extends AnyAction {
   payload: {
     [key: string]: any;
   };
 }
-
-export interface SetResetAction extends AnyAction {
-  payload: {
-    state: State;
-  };
+export interface ClearExtraFilter extends AnyAction {
+  payload: {};
 }
 
 export type Actions =
@@ -60,4 +63,5 @@ export type Actions =
   | SetPerPageAction
   | SetOrderAction
   | SetResetAction
-  | UpdateExtraFilterAction;
+  | UpdateExtraFilterAction
+  | ClearExtraFilter;

@@ -1,5 +1,15 @@
-import * as Typings from "./types";
 import { createActions, createReducer } from "reduxsauce";
+import {
+  SetSearchAction,
+  SetPageAction,
+  SetPerPageAction,
+  SetOrderAction,
+  State,
+  Actions,
+  SetResetAction,
+  UpdateExtraFilterAction,
+  ClearExtraFilter,
+} from "./types";
 
 export const { Types, Creators } = createActions<
   {
@@ -9,24 +19,18 @@ export const { Types, Creators } = createActions<
     SET_ORDER: string;
     SET_RESET: string;
     UPDATE_EXTRA_FILTER: string;
+    CLEAR_EXTRA_FILTER: string;
   },
   {
-    setSearch(
-      payload: Typings.SetSearchAction["payload"]
-    ): Typings.SetSearchAction;
-    setPage(payload: Typings.SetPageAction["payload"]): Typings.SetPageAction;
-    setPerPage(
-      payload: Typings.SetPerPageAction["payload"]
-    ): Typings.SetPerPageAction;
-    setOrder(
-      payload: Typings.SetOrderAction["payload"]
-    ): Typings.SetOrderAction;
-    setReset(
-      payload: Typings.SetResetAction["payload"]
-    ): Typings.SetResetAction;
+    setSearch(payload: SetSearchAction["payload"]): SetSearchAction;
+    setPage(payload: SetPageAction["payload"]): SetPageAction;
+    setPerPage(payload: SetPerPageAction["payload"]): SetPerPageAction;
+    setOrder(payload: SetOrderAction["payload"]): SetOrderAction;
+    setReset(payload: SetResetAction["payload"]): SetResetAction;
     updateExtraFilter(
-      payload: Typings.UpdateExtraFilterAction["payload"]
-    ): Typings.UpdateExtraFilterAction;
+      payload: UpdateExtraFilterAction["payload"]
+    ): UpdateExtraFilterAction;
+    clearExtraFilter(payload: ClearExtraFilter["payload"]): ClearExtraFilter;
   }
 >({
   setSearch: ["payload"],
@@ -35,46 +39,45 @@ export const { Types, Creators } = createActions<
   setOrder: ["payload"],
   setReset: ["payload"],
   updateExtraFilter: ["payload"],
+  clearExtraFilter: ["payload"],
 });
 
-export const INITIAL_STATE: Typings.State = {
+export const INITIAL_STATE: State = {
   search: null,
   pagination: {
     page: 1,
-    per_page: 10
+    per_page: 15,
   },
   order: {
     sort: null,
-    dir: null
+    dir: null,
   },
 };
 
-const reducer = createReducer<Typings.State, Typings.Actions>(INITIAL_STATE, {
+const reducer = createReducer<State, Actions>(INITIAL_STATE, {
   [Types.SET_SEARCH]: setSearch as any,
   [Types.SET_PAGE]: setPage as any,
   [Types.SET_PER_PAGE]: setPerPage as any,
   [Types.SET_ORDER]: setOrder as any,
   [Types.SET_RESET]: setReset as any,
   [Types.UPDATE_EXTRA_FILTER]: updateExtraFilter as any,
+  [Types.CLEAR_EXTRA_FILTER]: clearExtraFilter as any,
 });
 
 export default reducer;
 
-function setSearch(state = INITIAL_STATE, action: Typings.SetSearchAction): Typings.State {
+function setSearch(state = INITIAL_STATE, action: SetSearchAction): State {
   return {
-      ...state,
-      search: action.payload.search,
-      pagination: {
-          ...state.pagination,
-          page: 1
-      }
+    ...state,
+    search: action.payload.search,
+    pagination: {
+      ...state.pagination,
+      page: 1,
+    },
   };
 }
 
-function setPage(
-  state = INITIAL_STATE,
-  action: Typings.SetPageAction
-): Typings.State {
+function setPage(state = INITIAL_STATE, action: SetPageAction): State {
   return {
     ...state,
     pagination: {
@@ -84,10 +87,7 @@ function setPage(
   };
 }
 
-function setPerPage(
-  state = INITIAL_STATE,
-  action: Typings.SetPerPageAction
-): Typings.State {
+function setPerPage(state = INITIAL_STATE, action: SetPerPageAction): State {
   return {
     ...state,
     pagination: {
@@ -97,10 +97,7 @@ function setPerPage(
   };
 }
 
-function setOrder(
-  state = INITIAL_STATE,
-  action: Typings.SetOrderAction
-): Typings.State {
+function setOrder(state = INITIAL_STATE, action: SetOrderAction): State {
   return {
     ...state,
     pagination: {
@@ -114,9 +111,13 @@ function setOrder(
   };
 }
 
+function setReset(state = INITIAL_STATE, action: SetResetAction): State {
+  return action.payload.state;
+}
+
 function updateExtraFilter(
   state = INITIAL_STATE,
-  action: Typings.UpdateExtraFilterAction
+  action: UpdateExtraFilterAction
 ) {
   return {
     ...state,
@@ -127,6 +128,12 @@ function updateExtraFilter(
   };
 }
 
-function setReset(state = INITIAL_STATE, action: Typings.SetResetAction) {
-  return action.payload.state;
+function clearExtraFilter(
+  state = INITIAL_STATE,
+  action: UpdateExtraFilterAction
+) {
+  return {
+    ...state,
+    extraFilter: action.payload,
+  };
 }

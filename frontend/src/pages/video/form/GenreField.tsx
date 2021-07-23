@@ -1,33 +1,30 @@
-// @flow
 import * as React from "react";
-import AsyncAutoComplete, {
+import {
+  AsyncAutoComplete,
   AsyncAutoCompleteComponent,
 } from "../../../components/AsyncAutoComplete";
+import GridSelected from "../../../components/GridSelected";
 import {
+  Typography,
   FormControl,
   FormControlProps,
-  FormHelperText,
-  Grid,
-  Typography,
+  useTheme,
 } from "@material-ui/core";
-import genreHttp from "../../../util/http/genre-http";
-import CategoryField from "./CategoryField";
-import { RefAttributes } from "react";
-import { CastMemberFieldComponent } from "./CastMemberField";
+import GridSelectedItem from "../../../components/GridSelectedItem";
+import useCollectionManager from "../../../hooks/useCollectionManager";
+import FormHelperText from "@material-ui/core/FormHelperText";
+import { RefAttributes, useCallback } from "react";
+import { useImperativeHandle } from "react";
 import { useRef } from "react";
 import { MutableRefObject } from "react";
-import { useImperativeHandle } from "react";
-import { getGenresFromCategory } from "../../../util/models-filters";
-
 import useHttpHandled from "../../../hooks/useHttpHandle";
-import useCollectionManager from "../../../hooks/useCollectionManager";
-import GridSelected from "../../../components/GridSelected";
-import GridSelectedItem from "../../../components/GridSelectedItem";
+import { getGenresFromCategory } from "../../../util/models-filters";
+import genreHttp from "../../../util/http/genre-http";
 
 interface GenreFieldProps extends RefAttributes<GenreFieldComponent> {
   genres: any[];
-  setGenres: (genres) => void;
   categories: any[];
+  setGenres: (genres) => void;
   setCategories: (categories) => void;
   error: any;
   disabled?: boolean;
@@ -37,60 +34,64 @@ interface GenreFieldProps extends RefAttributes<GenreFieldComponent> {
 export interface GenreFieldComponent {
   clear: () => void;
 }
+
 const GenreField = React.forwardRef<GenreFieldComponent, GenreFieldProps>(
   (props, ref) => {
-    const { genres, setGenres, categories, setCategories, error, disabled } =
+    const { genres, categories, setGenres, setCategories, error, disabled } =
       props;
-    const autocompleteHttp = useHttpHandled();
+    const autoCompleteHttp = useHttpHandled();
     const { addItem, removeItem } = useCollectionManager(genres, setGenres);
     const { removeItem: removeCategory } = useCollectionManager(
       categories,
       setCategories
     );
 
-    const autocompleteRef =
+    const autoCompleteRef =
       useRef() as MutableRefObject<AsyncAutoCompleteComponent>;
+    const theme = useTheme();
 
-    function fetchOptions(searchText) {
-      return autocompleteHttp(
-        genreHttp.list({
-          queryParams: {
-            search: searchText,
-            all: "",
-          },
-        })
-      ).then((data) => data.data);
-    }
+    const fetchOptions = useCallback(
+      (searchText) => {
+        return autoCompleteHttp(
+          genreHttp.list({ queryParams: { search: searchText, all: "" } })
+        )
+          .then((data) => data.data)
+          .catch((error) => console.log(error));
+      },
+      [autoCompleteHttp]
+    );
 
     useImperativeHandle(ref, () => ({
-      clear: () => autocompleteRef.current.clear(),
+      clear: () => autoCompleteRef.current.clear(),
     }));
 
     return (
-      <>
+      <React.Fragment>
         <AsyncAutoComplete
-          ref={autocompleteRef}
+          ref={autoCompleteRef}
           fetchOptions={fetchOptions}
-          AutocompleteProps={{
-            //autoSelect:true - se usar o getOptionSelected,
-            clearOnEscape: true,
-            freeSolo: true,
-            getOptionLabel: (option) => option.name,
-            getOptionSelected: (option, value) => option.id === value.id,
-            onChange: (event, value) => addItem(value),
-            disabled,
-          }}
           TextFieldProps={{
             label: "Gêneros",
             error: error !== undefined,
           }}
+          AutocompleteProps={{
+            clearOnEscape: true,
+            freeSolo: true,
+            getOptionSelected: (option, value) => option.id === value.id,
+            getOptionLabel: (option) => option.name,
+            onChange: (event, value) => addItem(value),
+            disabled: disabled,
+          }}
         />
+        <FormHelperText style={{ height: theme.spacing(3) }}>
+          Escolha os gêneros do vídeo
+        </FormHelperText>
         <FormControl
-          margin={"normal"}
-          fullWidth
           error={error !== undefined}
           disabled={disabled === true}
           {...props.FormControlProps}
+          fullWidth
+          margin={"normal"}
         >
           <GridSelected>
             {genres.map((genre, key) => (
@@ -99,44 +100,30 @@ const GenreField = React.forwardRef<GenreFieldComponent, GenreFieldProps>(
                 onDelete={() => {
                   const categoriesWithOneGenre = categories.filter(
                     (category) => {
-                      if (genres !== undefined && genres.length > 0) {
-                        const genresFromCategory = getGenresFromCategory(
-                          genres,
-                          category
-                        );
-
-                        if (
-                          genresFromCategory !== undefined &&
-                          genres.length > 0
-                        ) {
-                          return (
-                            genresFromCategory.length === 1 &&
-                            genres[0].id === genre.id
-                          );
-                        }
-                      }
+                      const genresFromCategory = getGenresFromCategory(
+                        genres,
+                        category
+                      );
+                      return (
+                        genresFromCategory.length === 1 &&
+                        genresFromCategory.findIndex(
+                          (g) => g.id === genre.id
+                        ) !== -1
+                      );
                     }
                   );
-
-                  if (
-                    categoriesWithOneGenre !== undefined &&
-                    categoriesWithOneGenre.length > 0
-                  ) {
-                    categoriesWithOneGenre.forEach((cat) =>
-                      removeCategory(cat)
-                    );
-                  }
+                  categoriesWithOneGenre.forEach((cat) => removeCategory(cat));
                   removeItem(genre);
                 }}
                 xs={12}
               >
-                <Typography noWrap={true}>{genre.name}</Typography>
+                <Typography>{genre.name}</Typography>
               </GridSelectedItem>
             ))}
           </GridSelected>
           {error && <FormHelperText>{error.message}</FormHelperText>}
         </FormControl>
-      </>
+      </React.Fragment>
     );
   }
 );

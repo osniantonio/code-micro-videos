@@ -1,23 +1,26 @@
-// @flow
 import * as React from "react";
-import { IconButton, makeStyles, Tooltip } from "@material-ui/core";
+import { Tooltip } from "@material-ui/core";
+import IconButton from "@material-ui/core/IconButton";
 import ClearAllIcon from "@material-ui/icons/ClearAll";
+import { makeStyles } from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => ({
-  iconButton: (theme as any).overrides.MUIDataTableToolbar.icon,
+  IconButton: (theme.overrides as any).MUIDataTableToolbar.icon,
 }));
 
-type FilterResetButtonProps = {
+interface FilterResetButtonProps {
   handleClick: () => void;
-};
-export const FilterResetButton: React.FC<FilterResetButtonProps> = (props) => {
-  // @ts-ignore
+}
+
+const FilterResetButton: React.FC<FilterResetButtonProps> = (props) => {
   const classes = useStyles();
   return (
     <Tooltip title={"Limpar busca"}>
-      <IconButton className={classes.iconButton} onClick={props.handleClick}>
-        <ClearAllIcon />
+      <IconButton onClick={props.handleClick}>
+        <ClearAllIcon className={classes.IconButton} />
       </IconButton>
     </Tooltip>
   );
 };
+
+export default FilterResetButton;

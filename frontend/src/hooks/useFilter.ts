@@ -1,12 +1,20 @@
-import { Dispatch, Reducer, useEffect, useReducer, useState } from "react";
-import reducer, { Creators, INITIAL_STATE } from "../store/filter";
+import {
+  Dispatch,
+  Reducer,
+  useReducer,
+  useState,
+  useEffect,
+  MutableRefObject,
+} from "react";
+import reducer, { Creators } from "../store/filter";
 import {
   Actions as FilterActions,
+  State,
   State as FilterState,
 } from "../store/filter/types";
 import { MUIDataTableColumn } from "mui-datatables";
 import { useDebounce } from "use-debounce";
-import { useHistory } from "react-router";
+import { useHistory } from "react-router-dom";
 import { History } from "history";
 import { isEqual } from "lodash";
 import * as yup from "../util/vendor/yup";
@@ -18,13 +26,13 @@ interface FilterManagerOptions {
   rowsPerPageOptions: number[];
   debounceTime: number;
   history: History;
-  tableRef: React.MutableRefObject<MuiDataTableRefComponent>;
+  tableRef: MutableRefObject<MuiDataTableRefComponent>;
   extraFilter?: ExtraFilter;
 }
 
 interface ExtraFilter {
   getStateFromURL: (queryParams: URLSearchParams) => any;
-  formatSearchParams: (debouncedState: FilterState) => any;
+  formatSearchParams: (debouncedState: State) => any;
   createValidationSchema: () => any;
 }
 
@@ -37,15 +45,24 @@ export default function useFilter(options: UseFilterOptions) {
   const [filterState, dispatch] = useReducer<
     Reducer<FilterState, FilterActions>
   >(reducer, INITIAL_STATE);
+
   const [debouncedFilterState] = useDebounce(filterState, options.debounceTime);
+
   const [totalRecords, setTotalRecords] = useState<number>(0);
 
   filterManager.state = filterState;
   filterManager.debouncedState = debouncedFilterState;
   filterManager.dispatch = dispatch;
 
-  filterManager.applyOrderColumns();
+  filterManager.applyOrdersInColumns();
 
+  /**
+   * Dá replace do objeto history assim que carrega o componente.
+   * Fluxo -> carrega -> pega dados da url -> coloca no estado inicial -> da replace do objeto history
+   *       -> da push history(porém o objeto é igual a primeira vez e ignora).
+   *       -> Futuras alterações fazem só o push do history
+   *
+   */
   useEffect(() => {
     filterManager.replaceHistory();
   }, []);
@@ -64,14 +81,13 @@ export default function useFilter(options: UseFilterOptions) {
 export class FilterManager {
   schema;
   state: FilterState = null as any;
-  debouncedState: FilterState = null as any;
   dispatch: Dispatch<FilterActions> = null as any;
   columns: MUIDataTableColumn[];
   rowsPerPage: number;
   rowsPerPageOptions: number[];
-  debounceTime: number;
   history: History;
-  tableRef: React.MutableRefObject<MuiDataTableRefComponent>;
+  debouncedState: FilterState = null as any;
+  tableRef: MutableRefObject<MuiDataTableRefComponent>;
   extraFilter?: ExtraFilter;
 
   constructor(options: FilterManagerOptions) {
@@ -79,16 +95,13 @@ export class FilterManager {
       columns,
       rowsPerPage,
       rowsPerPageOptions,
-      debounceTime,
       history,
       tableRef,
       extraFilter,
     } = options;
-
     this.columns = columns;
     this.rowsPerPage = rowsPerPage;
     this.rowsPerPageOptions = rowsPerPageOptions;
-    this.debounceTime = debounceTime;
     this.history = history;
     this.tableRef = tableRef;
     this.extraFilter = extraFilter;
@@ -100,6 +113,15 @@ export class FilterManager {
     this.tableRef.current.changePage(0);
   }
 
+  changeExtraFilter(value) {
+    this.dispatch(Creators.updateExtraFilter(value));
+  }
+
+  clearExtraFilter() {
+    this.dispatch(Creators.clearExtraFilter({}));
+    this.resetTablePagination();
+  }
+
   changeSearch(value: string) {
     this.dispatch(Creators.setSearch({ search: value }));
   }
@@ -108,11 +130,11 @@ export class FilterManager {
     this.dispatch(Creators.setPage({ page: page + 1 }));
   }
 
-  changeRowsPerPage(perPage: number) {
-    this.dispatch(Creators.setPerPage({ per_page: perPage }));
+  changeRowsPerPage(per_page: number) {
+    this.dispatch(Creators.setPerPage({ per_page: per_page }));
   }
 
-  changeColumnSort(changedColumn: string, direction: string) {
+  changeSort(changedColumn: string, direction: string) {
     this.dispatch(
       Creators.setOrder({
         sort: changedColumn,
@@ -122,24 +144,22 @@ export class FilterManager {
     this.resetTablePagination();
   }
 
-  changeExtraFilter(data) {
-    this.dispatch(Creators.updateExtraFilter(data));
-  }
-
   resetFilter() {
     const INITIAL_STATE = {
       ...this.schema.cast({}),
-      search: { value: null, update: true },
+      search: { value: null },
     };
+
     this.dispatch(
       Creators.setReset({
         state: INITIAL_STATE,
       })
     );
+
     this.resetTablePagination();
   }
 
-  applyOrderColumns() {
+  applyOrdersInColumns() {
     this.columns = this.columns.map((column) => {
       return column.name === this.state.order.sort
         ? {
@@ -153,11 +173,12 @@ export class FilterManager {
     });
   }
 
-  cleanSearchText(text) {
+  clearSearchText(text) {
     let newText = text;
     if (text && text.value !== undefined) {
       newText = text.value;
     }
+
     return newText;
   }
 
@@ -175,7 +196,7 @@ export class FilterManager {
       search: "?" + new URLSearchParams(this.formatSearchParams() as any),
       state: {
         ...this.debouncedState,
-        search: this.cleanSearchText(this.debouncedState.search),
+        search: this.clearSearchText(this.debouncedState.search),
       },
     };
 
@@ -190,7 +211,8 @@ export class FilterManager {
   }
 
   private formatSearchParams() {
-    const search = this.cleanSearchText(this.debouncedState.search);
+    const search = this.clearSearchText(this.debouncedState.search);
+
     return {
       ...(search && search !== "" && { search: search }),
       ...(this.debouncedState.pagination.page !== 1 && {
@@ -212,6 +234,7 @@ export class FilterManager {
     const queryParams = new URLSearchParams(
       this.history.location.search.substr(1)
     );
+
     return this.schema.cast({
       search: queryParams.get("search"),
       pagination: {
@@ -260,17 +283,18 @@ export class FilterManager {
                 (column) => !column.options || column.options.sort !== false
               )
               .map((column) => column.name);
+
             return columnsName.includes(value) ? value : undefined;
           })
           .default(null),
         dir: yup
           .string()
           .nullable()
-          .transform((value) =>
-            !value || !["asc", "desc"].includes(value.toLowerCase())
+          .transform((value) => {
+            return !value || !["asc", "desc"].includes(value.toLowerCase())
               ? undefined
-              : value
-          )
+              : value;
+          })
           .default(null),
       }),
       ...(this.extraFilter && {
