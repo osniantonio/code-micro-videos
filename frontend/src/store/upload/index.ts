@@ -1,3 +1,4 @@
+import { createActions, createReducer } from "reduxsauce";
 import {
   Actions,
   AddUploadAction,
@@ -6,7 +7,6 @@ import {
   UpdateProgressAction,
   UploadState,
 } from "./types";
-import { createActions, createReducer } from "reduxsauce";
 import update from "immutability-helper";
 
 export const { Types, Creators } = createActions<
@@ -32,7 +32,6 @@ export const { Types, Creators } = createActions<
   updateProgress: ["payload"],
   setUploadError: ["payload"],
 });
-
 export const INITIAL_STATE: UploadState = {
   uploads: [],
 };
@@ -46,6 +45,43 @@ const reducer = createReducer<UploadState, Actions>(INITIAL_STATE, {
 
 export default reducer;
 
+function findIndexUpload(state: UploadState, id: string) {
+  return state.uploads.findIndex((upload) => upload.video.id === id);
+}
+
+function findIndexFile(files: Array<{ fileField }>, fileField: string) {
+  return files.findIndex((file) => file.fileField === fileField);
+}
+
+function findIndexUploadAndFile(
+  state: UploadState,
+  videoId: string,
+  fileField: string
+): { indexUpload?; indexFile? } {
+  const indexUpload = findIndexUpload(state, videoId);
+
+  if (indexUpload === -1) {
+    return {};
+  }
+
+  const upload = state.uploads[indexUpload];
+  const indexFile = findIndexFile(upload.files, fileField);
+
+  return indexFile === -1 ? {} : { indexUpload, indexFile };
+}
+
+function calculateGlobalProgress(files: Array<{ progress }>) {
+  const countFiles = files.length;
+
+  if (!countFiles) {
+    return 0;
+  }
+
+  const sumProgress = files.reduce((sum, file) => sum + file.progress, 0);
+
+  return sumProgress / countFiles;
+}
+
 function addUpload(
   state = INITIAL_STATE,
   action: AddUploadAction
@@ -55,12 +91,10 @@ function addUpload(
   }
   const index = findIndexUpload(state, action.payload.video.id);
 
-  /** upload ainda em progresso */
   if (index !== -1 && state.uploads[index].progress < 1) {
     return state;
   }
 
-  /** remove o video caso ele já exista como concluido */
   const uploads =
     index === -1
       ? state.uploads
@@ -85,9 +119,12 @@ function addUpload(
 }
 
 function removeUpload(
-  state: UploadState = INITIAL_STATE,
+  state = INITIAL_STATE,
   action: RemoveUploadAction
 ): UploadState {
+  console.log('removeUpload');
+  console.log(state);
+  console.log(state);
   const uploads = state.uploads.filter(
     (upload) => upload.video.id !== action.payload.id
   );
@@ -95,39 +132,8 @@ function removeUpload(
     return state;
   }
   return {
-    uploads,
+    uploads: uploads,
   };
-}
-
-function findIndexUpload(state: UploadState, id: string) {
-  return state.uploads.findIndex((upload) => upload.video.id === id);
-}
-
-function findIndexFile(files: Array<{ fileField }>, fileField: string) {
-  return files.findIndex((file) => file.fileField === fileField);
-}
-
-function findIndexUploadAndFile(
-  state: UploadState,
-  videoId: string,
-  fileField: string
-): { indexUpload?; indexFile? } {
-  const indexUpload = findIndexUpload(state, videoId);
-  if (indexUpload === -1) {
-    return {};
-  }
-  const upload = state.uploads[indexUpload];
-  const indexFile = findIndexFile(upload.files, fileField);
-  return indexFile === -1 ? {} : { indexUpload, indexFile };
-}
-
-function calculateGlobalProgress(files: Array<{ progress }>) {
-  const countFiles = files.length;
-  if (!countFiles) {
-    return 0;
-  }
-  const sumProgress = files.reduce((sum, file) => sum + file.progress, 0);
-  return sumProgress / countFiles;
 }
 
 function updateProgress(
@@ -149,7 +155,6 @@ function updateProgress(
   const upload = state.uploads[indexUpload];
   const file = upload.files[indexFile];
 
-  // não precisa atualizar
   if (file.progress === action.payload.progress) {
     return state;
   }
@@ -177,6 +182,7 @@ function setUploadError(
 ): UploadState {
   const videoId = action.payload.video.id;
   const fileField = action.payload.fileField;
+
   const { indexUpload, indexFile } = findIndexUploadAndFile(
     state,
     videoId,

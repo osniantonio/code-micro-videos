@@ -71,7 +71,7 @@ export const UploadItem: React.FC<UploadItemProps> = (props) => {
               </Typography>
             }
           />
-          <UploadProgress size={30} />
+          <UploadProgress size={30} uploadOrFile={upload} />
           <UploadAction upload={upload} hover={itemHover} />
         </ListItem>
       </Tooltip>

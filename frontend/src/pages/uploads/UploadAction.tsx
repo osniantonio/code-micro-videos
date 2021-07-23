@@ -1,11 +1,17 @@
 import * as React from "react";
+import { useEffect, useState } from "react";
+import makeStyles from "@material-ui/core/styles/makeStyles";
 import { Divider, Fade, IconButton, Theme } from "@material-ui/core";
 import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 import ErrorIcon from "@material-ui/icons/Error";
 import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
-import { makeStyles } from "@material-ui/core/styles";
 import { Link } from "react-router-dom";
+import { FileUpload, Upload } from "../../store/upload/types";
+import { useDispatch } from "react-redux";
+import { Creators } from "../../store/upload/";
+import { hasError, isFinished, isUploadType } from "../../store/upload/getters";
+import { useDebounce } from "use-debounce";
 
 const useStyles = makeStyles((theme: Theme) => {
   return {
@@ -25,27 +31,51 @@ const useStyles = makeStyles((theme: Theme) => {
   };
 });
 
-interface UploadActionProps {}
+interface UploadActionProps {
+  uploadOrFile: Upload | FileUpload;
+}
 
 const UploadAction: React.FC<UploadActionProps> = (props) => {
+  const { uploadOrFile } = props;
   const classes = useStyles();
-  return (
+  const dispatch = useDispatch();
+  const error = hasError(uploadOrFile);
+  const [show, setShow] = useState(false);
+  const [debouncedShow] = useDebounce(show, 2500);
+  const videoId = (uploadOrFile as any).video
+    ? (uploadOrFile as any).video.id
+    : "";
+  const activeActions = isUploadType(uploadOrFile);
+
+  useEffect(() => {
+    setShow(isFinished(uploadOrFile));
+  }, [uploadOrFile]);
+
+  return debouncedShow ? (
     <Fade in={true} timeout={{ enter: 1000 }}>
       <>
-        <CheckCircleIcon className={classes.successIcon} />
-        <ErrorIcon className={classes.errorIcon} />
-        <>
-          <Divider className={classes.divider} orientation={"vertical"} />
-          <IconButton>
-            <DeleteIcon color={"primary"} />
-          </IconButton>
-          <IconButton component={Link} to={`/videos/uuid/edit`}>
-            <EditIcon color={"primary"} />
-          </IconButton>
-        </>
+        {uploadOrFile.progress === 1 && !error && (
+          <CheckCircleIcon className={classes.successIcon} />
+        )}
+        {error && <ErrorIcon className={classes.errorIcon} />}
+
+        {activeActions && (
+          <>
+            <Divider className={classes.divider} orientation={"vertical"} />
+            <IconButton
+              onClick={() => dispatch(Creators.removeUpload({ id: videoId }))}
+            >
+              <DeleteIcon color={"primary"} />
+            </IconButton>
+
+            <IconButton component={Link} to={`/videos/${videoId}/edit`}>
+              <EditIcon color={"primary"} />
+            </IconButton>
+          </>
+        )}
       </>
     </Fade>
-  );
+  ) : null;
 };
 
 export default UploadAction;
