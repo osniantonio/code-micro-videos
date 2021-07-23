@@ -65,9 +65,7 @@ export const UploadItem: React.FC<UploadItemProps> = (props) => {
             className={classes.listItemText}
             primary={
               <Typography noWrap={true} variant={"subtitle2"} color={"inherit"}>
-                {upload && upload.video
-                  ? upload.video.title
-                  : "E o vento levou!!!!"}
+                {upload.video.title}
               </Typography>
             }
           />
