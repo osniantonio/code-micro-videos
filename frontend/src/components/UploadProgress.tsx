@@ -26,7 +26,6 @@ interface UploadProgressProps {
 const UploadProgress: React.FC<UploadProgressProps> = (props) => {
   const classes = useStyles();
   const { size, uploadOrFile } = props;
-
   const error = hasError(uploadOrFile);
   return (
     <Fade in={uploadOrFile.progress < 1} timeout={{ enter: 100, exit: 2000 }}>
@@ -37,7 +36,6 @@ const UploadProgress: React.FC<UploadProgressProps> = (props) => {
           className={classes.progressBackground}
           size={size} 
         />
-
         <CircularProgress
           className={classes.progress}
           variant={"static"}
