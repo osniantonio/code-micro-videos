@@ -1,15 +1,10 @@
 // @flow
 import * as React from "react";
 import {
-  Box,
-  Button,
-  ButtonProps,
   Checkbox,
   FormControlLabel,
-  makeStyles,
   MenuItem,
   TextField,
-  Theme,
 } from "@material-ui/core";
 import { useHistory, useParams } from "react-router";
 import { useEffect, useState } from "react";
@@ -25,9 +20,9 @@ import { DefaultForm } from "../../components/DefaultForm";
 import useSnackbarFormError from "../../hooks/useSnackbarFormError";
 
 const validationSchema = yup.object().shape({
-  name: yup.string().label('Nome').required().max(255),
-  categories_id: yup.array().label('Categorias').min(1),
-  is_active: yup.boolean().label('Ativo?').required(),
+  name: yup.string().label("Nome").required().max(255),
+  categories_id: yup.array().label("Categorias").min(1),
+  is_active: yup.boolean().label("Ativo?").required(),
 });
 
 export const Form = () => {
@@ -40,17 +35,17 @@ export const Form = () => {
     errors,
     reset,
     trigger,
-    formState
-  } = useForm<{name, categories_id, is_active}>({
+    formState,
+  } = useForm<{ name; categories_id; is_active }>({
     resolver: yupResolver(validationSchema),
     defaultValues: {
       categories_id: [],
-      is_active: true
-    }
+      is_active: true,
+    },
   });
 
   useSnackbarFormError(formState.submitCount, errors);
-  const snackbar = useSnackbar();
+  const { enqueueSnackbar } = useSnackbar();
   const history = useHistory();
   const [genre, setGenre] = useState<Genre | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -84,7 +79,7 @@ export const Form = () => {
 
     (async () => {
       setLoading(true);
-      const promises = [ categoryHttp.list({queryParams: {all: ''}})];
+      const promises = [categoryHttp.list({ queryParams: { all: "" } })];
 
       if (id) {
         promises.push(genreHttp.get(id));
@@ -108,7 +103,7 @@ export const Form = () => {
           }
         }
       } catch (error) {
-        snackbar.enqueueSnackbar("Nāo foi possível carregar as informações", {
+        enqueueSnackbar("Nāo foi possível carregar as informações", {
           variant: "error",
         });
       } finally {
@@ -119,7 +114,7 @@ export const Form = () => {
     return () => {
       isSubscribed = false;
     };
-  }, []);
+  }, [id, reset, enqueueSnackbar]);
 
   async function onSubmit(formData, event) {
     try {
@@ -130,7 +125,7 @@ export const Form = () => {
 
       const { data } = await http;
 
-      snackbar.enqueueSnackbar("Gênero salvo com sucesso", {
+      enqueueSnackbar("Gênero salvo com sucesso", {
         variant: "success",
       });
 
@@ -142,7 +137,7 @@ export const Form = () => {
           : history.push("/genres");
       });
     } catch (error) {
-      snackbar.enqueueSnackbar("Nāo foi possível salvar o Gênero", {
+      enqueueSnackbar("Nāo foi possível salvar o Gênero", {
         variant: "error",
       });
     } finally {
@@ -151,7 +146,10 @@ export const Form = () => {
   }
 
   return (
-    <DefaultForm GridItemProps={{xs:12, md:6}} onSubmit={handleSubmit(onSubmit)}>
+    <DefaultForm
+      GridItemProps={{ xs: 12, md: 6 }}
+      onSubmit={handleSubmit(onSubmit)}
+    >
       <TextField
         name={"name"}
         label={"Nome"}

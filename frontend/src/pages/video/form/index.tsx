@@ -5,7 +5,6 @@ import {
   useCallback,
   useContext,
   useEffect,
-  useMemo,
   useRef,
   useState,
 } from "react";
@@ -35,14 +34,13 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import GenreField, { GenreFieldComponent } from "./GenreField";
 import CategoryField, { CategoryFieldComponent } from "./CategoryField";
-import FormHelperText from "@material-ui/core/FormHelperText";
 import { CastMemberField, CastMemberFieldComponent } from "./CastMemberField";
 import { omit, zipObject } from "lodash";
 import { InputFileComponent } from "../../../components/InputFile";
 import useSnackbarFormError from "../../../hooks/useSnackbarFormError";
 import SnackbarUpload from "../../../components/SnackbarUpload";
-import { useDispatch, useSelector } from "react-redux";
-import { FileInfo, Upload, UploadModule } from "../../../store/upload/types";
+import { useDispatch } from "react-redux";
+import { FileInfo } from "../../../store/upload/types";
 import { Creators } from "../../../store/upload";
 import LoadingContext from "../../../components/loading/LoadingContext";
 
@@ -140,9 +138,6 @@ const Index = () => {
   ) as MutableRefObject<{
     [key: string]: MutableRefObject<InputFileComponent>;
   }>;
-  //fileFields = ['banner_file','thumb_file']
-  //createRef = [{current: undefined}, {current: undefined}]
-  //zipObject = [bannerfile: ref1, thumbfile: ref2]
 
   const dispatch = useDispatch();
 
@@ -151,14 +146,13 @@ const Index = () => {
       Object.keys(uploadRef.current).forEach((field) =>
         uploadRef.current[field].current.clear()
       );
-
       castMemberRef.current.clear();
       categoriesRef.current.clear();
       genresRef.current.clear();
-      reset(data); //opcional
+      reset(data);
     },
-    [castMemberRef, categoriesRef, genresRef, uploadRef]
-  ); //refs -> muda o conteudo, mas o que importa é a instancia
+    [castMemberRef, categoriesRef, genresRef, uploadRef, reset]
+  );
 
   useEffect(() => {
     [

@@ -1,14 +1,9 @@
 // @flow
 import * as React from "react";
 import {
-  Box,
-  Button,
-  ButtonProps,
   Checkbox,
   FormControlLabel,
-  makeStyles,
   TextField,
-  Theme,
 } from "@material-ui/core";
 import categoryHttp from "../../util/http/category-http";
 import { useHistory, useParams } from "react-router";
@@ -46,7 +41,7 @@ export const Form = () => {
   });
 
   useSnackbarFormError(formState.submitCount, errors);
-  const snackbar = useSnackbar();
+  const {enqueueSnackbar} = useSnackbar();
   const history = useHistory();
   const { id }: any = useParams();
   const [category, setCategory] = useState<Category | null>(null);
@@ -67,14 +62,14 @@ export const Form = () => {
         setCategory(data.data);
         reset(data.data);
       } catch (error) {
-        snackbar.enqueueSnackbar("Nāo foi possível carregar as informações", {
+        enqueueSnackbar("Nāo foi possível carregar as informações", {
           variant: "error",
         });
       } finally {
         setLoading(false);
       }
     })();
-  }, []);
+  }, [id, reset, enqueueSnackbar]);
 
   async function onSubmit(formData, event) {
     try {
@@ -85,7 +80,7 @@ export const Form = () => {
 
       const { data } = await http;
 
-      snackbar.enqueueSnackbar("Categoria salva com sucesso", {
+      enqueueSnackbar("Categoria salva com sucesso", {
         variant: "success",
       });
 
@@ -98,7 +93,7 @@ export const Form = () => {
       });
       setLoading(false);
     } catch (error) {
-      snackbar.enqueueSnackbar("Nāo foi possível salvar a categoria", {
+      enqueueSnackbar("Nāo foi possível salvar a categoria", {
         variant: "error",
       });
     } finally {

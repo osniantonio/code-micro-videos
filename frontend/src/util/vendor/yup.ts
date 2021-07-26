@@ -1,22 +1,23 @@
-import { setLocale } from "yup";
+/* eslint-disable no-template-curly-in-string */
+import { setLocale } from 'yup';
 
 setLocale({
   mixed: {
-    required: "${path} é requerido",
-    notType: "${path} é inválido",
+    required: '${path} é requerido',
+    notType: '${path} é inválido',
   },
   string: {
-    max: "${path} precisa ter no máximo ${max} caracteres",
-    min: "${path} precisa ter no mínimo ${min} caracteres",
+    max: '${path} precisa ter no máximo ${max} caracteres',
+    min: '${path} precisa ter no mínimo ${min} caracteres',
   },
   number: {
-    max: "${path} precisa ter no máximo ${max}",
-    min: "${path} precisa ter no mínimo ${min}",
+    max: '${path} precisa ter no máximo ${max}',
+    min: '${path} precisa ter no mínimo ${min}',
   },
   array: {
-    max: "${path} precisa ter no máximo ${max} item(ns)",
-    min: "${path} precisa ter no mínimo ${min} item(ns)",
+    max: '${path} precisa ter no máximo ${max} item(ns)',
+    min: '${path} precisa ter no mínimo ${min} item(ns)',
 },
 });
 
-export * from "yup";
+export * from 'yup';

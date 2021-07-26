@@ -1,6 +1,6 @@
 // @flow
 import * as React from "react";
-import { Grid, GridProps, IconButton, Theme } from "@material-ui/core";
+import { Grid, GridProps, IconButton } from "@material-ui/core";
 import DeleteIcon from "@material-ui/icons/Delete";
 
 interface GridSelectedItemProps extends GridProps {

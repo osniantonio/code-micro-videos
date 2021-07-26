@@ -12,7 +12,7 @@ const useSnackbarFormError = (submitCount, errors) => {
         { variant: "error" }
       );
     }
-  }, [submitCount]);
+  }, [submitCount, errors, enqueueSnackbar]);
 };
 
 export default useSnackbarFormError;

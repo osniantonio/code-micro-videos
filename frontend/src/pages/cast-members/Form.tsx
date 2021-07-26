@@ -1,18 +1,13 @@
 // @flow
 import * as React from "react";
 import {
-  Box,
-  Button,
-  ButtonProps,
   FormControl,
   FormControlLabel,
   FormHelperText,
   FormLabel,
-  makeStyles,
   Radio,
   RadioGroup,
   TextField,
-  Theme,
 } from "@material-ui/core";
 import { useForm } from "react-hook-form";
 import { useHistory, useParams } from "react-router";
@@ -47,7 +42,7 @@ export const Form = () => {
   });
 
   useSnackbarFormError(formState.submitCount, errors);
-  const snackbar = useSnackbar();
+  const {enqueueSnackbar} = useSnackbar();
   const history = useHistory();
   const { id }: any = useParams();
   const [castMember, setCastMember] = useState<CastMember | null>(null);
@@ -68,14 +63,14 @@ export const Form = () => {
         setCastMember(data.data);
         reset(data.data);
       } catch (error) {
-        snackbar.enqueueSnackbar("Nāo foi possível carregar as informações", {
+        enqueueSnackbar("Nāo foi possível carregar as informações", {
           variant: "error",
         });
       } finally {
         setLoading(false);
       }
     })();
-  }, []);
+  }, [id, reset, enqueueSnackbar]);
 
   async function onSubmit(formData, event) {
     try {
@@ -86,7 +81,7 @@ export const Form = () => {
 
       const { data } = await http;
 
-      snackbar.enqueueSnackbar("Membro de elenco salvo com sucesso", {
+      enqueueSnackbar("Membro de elenco salvo com sucesso", {
         variant: "success",
       });
 
@@ -99,7 +94,7 @@ export const Form = () => {
       });
       setLoading(false);
     } catch (error) {
-      snackbar.enqueueSnackbar("Nāo foi possível salvar o Membro de elenco", {
+      enqueueSnackbar("Nāo foi possível salvar o Membro de elenco", {
         variant: "error",
       });
     } finally {

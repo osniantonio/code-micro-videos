@@ -8,7 +8,6 @@ const useHttpHandled = () => {
     async (request: Promise<any>) => {
       try {
         const { data } = await request;
-
         return data;
       } catch (e) {
         if (!Axios.isCancel(e)) {

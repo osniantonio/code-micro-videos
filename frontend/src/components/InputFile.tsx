@@ -1,6 +1,6 @@
 // @flow
 import * as React from "react";
-import { Button, InputAdornment, TextField } from "@material-ui/core";
+import { InputAdornment, TextField } from "@material-ui/core";
 
 import {
   MutableRefObject,
