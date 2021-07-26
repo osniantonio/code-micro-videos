@@ -16,6 +16,8 @@ import IconButton from "@material-ui/core/IconButton/IconButton";
 import { Link } from "react-router-dom";
 import EditIcon from "@material-ui/icons/Edit";
 import LoadingContext from "../../components/loading/LoadingContext";
+import { DeleteDialog } from "../../components/DeleteDialog";
+import useDeleteCollection from "../../hooks/useDeleteCollection";
 
 const columnsDefinitions: TableColumn[] = [
   {
@@ -96,6 +98,13 @@ const Table = () => {
   const loading = useContext(LoadingContext);
 
   const {
+    openDeleteDialog,
+    setOpenDeleteDialog,
+    rowsToDelete,
+    setRowsToDelete,
+  } = useDeleteCollection();
+
+  const {
     filterManager,
     filterState,
     totalRecords,
@@ -155,37 +164,80 @@ const Table = () => {
     }
   }
 
+  async function deleteRows(confirmed: boolean) {
+    if (!confirmed) {
+      setOpenDeleteDialog(false);
+      return;
+    }
+
+    try {
+      const ids = rowsToDelete.data
+        .map((value) => data[value.index].id)
+        .join(",");
+
+      await categoryHttp.deleteCollection({ ids });
+
+      if (
+        rowsToDelete.data.length === debouncedFilterState.pagination.per_page &&
+        debouncedFilterState.pagination.page > 1
+      ) {
+        const page = debouncedFilterState.pagination.page - 2;
+        filterManager.changePage(page);
+      } else {
+        await getData();
+      }
+
+      setOpenDeleteDialog(false);
+
+      enqueueSnackbar("Registros excluidos com sucesso!", {
+        variant: "success",
+      });
+    } catch (e) {
+      console.log(e);
+      enqueueSnackbar("Não foi possível excluir os registros", {
+        variant: "error",
+      });
+    }
+  }
+
   return (
-    <DefaultTable
-      title="Categorias"
-      columns={filterManager.columns}
-      data={data}
-      loading={loading}
-      debounceSearchTime={debouncedSearchTime}
-      ref={tableRef}
-      options={{
-        serverSide: true,
-        searchText: filterState.search as any,
-        page: filterState.pagination.page - 1,
-        rowsPerPage: filterState.pagination.per_page,
-        rowsPerPageOptions: rowsPerPageOptions,
-        count: totalRecords,
-        filter: false,
-        customToolbar: () => {
-          return (
-            <FilterResetButton
-              handleClick={() => filterManager.resetFilter()}
-            />
-          );
-        },
-        onSearchChange: (value) => filterManager.changeSearch(value),
-        onChangePage: (page) => filterManager.changePage(page),
-        onChangeRowsPerPage: (per_page) =>
-          filterManager.changeRowsPerPage(per_page),
-        onColumnSortChange: (changedColumn: string, direction: string) =>
-          filterManager.changeSort(changedColumn, direction),
-      }}
-    />
+    <React.Fragment>
+      <DeleteDialog open={openDeleteDialog} handleClose={deleteRows} />
+      <DefaultTable
+        title="Categorias"
+        columns={filterManager.columns}
+        data={data}
+        loading={loading}
+        debounceSearchTime={debouncedSearchTime}
+        ref={tableRef}
+        options={{
+          serverSide: true,
+          searchText: filterState.search as any,
+          page: filterState.pagination.page - 1,
+          rowsPerPage: filterState.pagination.per_page,
+          rowsPerPageOptions: rowsPerPageOptions,
+          count: totalRecords,
+          filter: false,
+          customToolbar: () => {
+            return (
+              <FilterResetButton
+                handleClick={() => filterManager.resetFilter()}
+              />
+            );
+          },
+          onSearchChange: (value) => filterManager.changeSearch(value),
+          onChangePage: (page) => filterManager.changePage(page),
+          onChangeRowsPerPage: (per_page) =>
+            filterManager.changeRowsPerPage(per_page),
+          onColumnSortChange: (changedColumn: string, direction: string) =>
+            filterManager.changeSort(changedColumn, direction),
+          onRowsDelete: (rowsDeleted) => {
+            setRowsToDelete(rowsDeleted as any);
+            return false;
+          },
+        }}
+      />
+    </React.Fragment>
   );
 };
 

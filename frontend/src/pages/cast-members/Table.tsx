@@ -17,6 +17,8 @@ import IconButton from "@material-ui/core/IconButton/IconButton";
 import { Link } from "react-router-dom";
 import EditIcon from "@material-ui/icons/Edit";
 import LoadingContext from "../../components/loading/LoadingContext";
+import { DeleteDialog } from "../../components/DeleteDialog";
+import useDeleteCollection from "../../hooks/useDeleteCollection";
 
 const castMemberNames = Object.values(CastMemberTypeMap);
 
@@ -93,6 +95,13 @@ const Table = () => {
   const tableRef = useRef() as React.MutableRefObject<MuiDataTableRefComponent>;
 
   const loading = useContext(LoadingContext);
+
+  const {
+    openDeleteDialog,
+    setOpenDeleteDialog,
+    rowsToDelete,
+    setRowsToDelete,
+  } = useDeleteCollection();
 
   const {
     filterManager,
@@ -181,7 +190,8 @@ const Table = () => {
           sort: debouncedFilterState.order.sort,
           dir: debouncedFilterState.order.dir,
           ...(debouncedFilterState.extraFilter &&
-            debouncedFilterState.extraFilter.type && { //inverte para pegar o mapa pelo valor e nao pela chave
+            debouncedFilterState.extraFilter.type && {
+              //inverte para pegar o mapa pelo valor e nao pela chave
               type: invert(CastMemberTypeMap)[
                 debouncedFilterState.extraFilter.type
               ],
@@ -206,50 +216,93 @@ const Table = () => {
     }
   }
 
-  return (
-    <DefaultTable
-      title={"Membros de Elenco"}
-      columns={filterManager.columns}
-      data={data}
-      loading={loading}
-      debounceSearchTime={debouncedSearchTime}
-      ref={tableRef}
-      options={{
-        serverSideFilterList,
-        serverSide: true,
-        searchText: filterState.search as any,
-        page: filterState.pagination.page - 1,
-        rowsPerPage: filterState.pagination.per_page,
-        rowsPerPageOptions: rowsPerPageOptions,
-        count: totalRecords,
-        customToolbar: () => {
-          return (
-            <FilterResetButton
-              handleClick={() => filterManager.resetFilter()}
-            />
-          );
-        },
-        onFilterChange: (column, filterList, type) => {
-          const columnIndex = columns.findIndex((c) => c.name === column);
+  async function deleteRows(confirmed: boolean) {
+    if (!confirmed) {
+      setOpenDeleteDialog(false);
+      return;
+    }
 
-          if (columnIndex && filterList[columnIndex]) {
-            filterManager.changeExtraFilter({
-              [column]: filterList[columnIndex].length
-                ? filterList[columnIndex][0]
-                : null,
-            });
-          } else {
-            filterManager.clearExtraFilter();
-          }
-        },
-        onSearchChange: (value) => filterManager.changeSearch(value),
-        onChangePage: (page) => filterManager.changePage(page),
-        onChangeRowsPerPage: (per_page) =>
-          filterManager.changeRowsPerPage(per_page),
-        onColumnSortChange: (changedColumn: string, direction: string) =>
-          filterManager.changeSort(changedColumn, direction),
-      }}
-    />
+    try {
+      const ids = rowsToDelete.data
+        .map((value) => data[value.index].id)
+        .join(",");
+
+      await castMemberHttp.deleteCollection({ ids });
+
+      if (
+        rowsToDelete.data.length === debouncedFilterState.pagination.per_page &&
+        debouncedFilterState.pagination.page > 1
+      ) {
+        const page = debouncedFilterState.pagination.page - 2;
+        filterManager.changePage(page);
+      } else {
+        await getData();
+      }
+
+      setOpenDeleteDialog(false);
+
+      enqueueSnackbar("Registros excluidos com sucesso!", {
+        variant: "success",
+      });
+    } catch (e) {
+      console.log(e);
+      enqueueSnackbar("Não foi possível excluir os registros", {
+        variant: "error",
+      });
+    }
+  }
+
+  return (
+    <React.Fragment>
+      <DeleteDialog open={openDeleteDialog} handleClose={deleteRows} />
+      <DefaultTable
+        title={"Membros de Elenco"}
+        columns={filterManager.columns}
+        data={data}
+        loading={loading}
+        debounceSearchTime={debouncedSearchTime}
+        ref={tableRef}
+        options={{
+          serverSideFilterList,
+          serverSide: true,
+          searchText: filterState.search as any,
+          page: filterState.pagination.page - 1,
+          rowsPerPage: filterState.pagination.per_page,
+          rowsPerPageOptions: rowsPerPageOptions,
+          count: totalRecords,
+          customToolbar: () => {
+            return (
+              <FilterResetButton
+                handleClick={() => filterManager.resetFilter()}
+              />
+            );
+          },
+          onFilterChange: (column, filterList, type) => {
+            const columnIndex = columns.findIndex((c) => c.name === column);
+
+            if (columnIndex && filterList[columnIndex]) {
+              filterManager.changeExtraFilter({
+                [column]: filterList[columnIndex].length
+                  ? filterList[columnIndex][0]
+                  : null,
+              });
+            } else {
+              filterManager.clearExtraFilter();
+            }
+          },
+          onSearchChange: (value) => filterManager.changeSearch(value),
+          onChangePage: (page) => filterManager.changePage(page),
+          onChangeRowsPerPage: (per_page) =>
+            filterManager.changeRowsPerPage(per_page),
+          onColumnSortChange: (changedColumn: string, direction: string) =>
+            filterManager.changeSort(changedColumn, direction),
+          onRowsDelete: (rowsDeleted) => {
+            setRowsToDelete(rowsDeleted as any);
+            return false;
+          },
+        }}
+      />
+    </React.Fragment>
   );
 };
 
