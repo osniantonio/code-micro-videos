@@ -4,9 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Resources\VideoResource;
 use App\Models\Video;
-use App\Rules\GenresHasCategoriesRule;
-use Illuminate\Http\Request;
+use App\Rules\GenreHasCategoriesRule;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
+use App\Rules\GenresHasCategoriesRule;
 
 class VideoController extends BasicCrudController
 {
@@ -17,7 +18,7 @@ class VideoController extends BasicCrudController
         $this->rules = [
             'title' => 'required|max:255',
             'description' => 'required',
-            'year_launched' => 'required|date_format:Y|min:1',
+            'year_launched' => 'required|date_format:Y',
             'opened' => 'boolean',
             'rating' => 'required|in:' . implode(',', Video::RATING_LIST),
             'duration' => 'required|integer',
@@ -25,26 +26,18 @@ class VideoController extends BasicCrudController
             'genres_id' => [
                 'required',
                 'array',
-                'exists:genres,id,deleted_at,NULL',
+                'exists:genres,id,deleted_at,NULL'
             ],
             'cast_members_id' => [
                 'required',
-                 'array',
-                 'exists:cast_members,id,deleted_at,NULL',
+                'array',
+                'exists:cast_members,id,deleted_at,NULL'
             ],
-            'thumb_file' => 'image|max:' . Video::THUMB_FILE_MAX_SIZE, //max é kilobytes
-            'banner_file' => 'image|max:' . Video::BANNER_FILE_MAX_SIZE, //max é kilobytes
-            'trailer_file' => 'mimetypes:video/mp4|max:' . Video::TRAILER_FILE_MAX_SIZE, //max é kilobytes
-            'video_file' => 'mimetypes:video/mp4|max:' . Video::VIDEO_FILE_MAX_SIZE, //max é kilobytes
+            'video_file' => 'mimetypes:video/mp4|max:' . Video::VIDEO_FILE_MAX_SIZE,
+            'thumb_file' => 'image|max:' . Video::THUMB_FILE_MAX_SIZE,
+            'banner_file' => 'image|max:' . Video::BANNER_FILE_MAX_SIZE,
+            'trailer_file' => 'mimetypes:video/mp4|max:' . Video::TRAILER_FILE_MAX_SIZE,
         ];
-    }
-
-    protected function addRuleIfGenreHasCategories(Request $request)
-    {
-        $categoriesId = collect($request->get('categories_id'))->toArray();
-        $this->rules['genres_id'][] = new GenresHasCategoriesRule(
-            $categoriesId
-        );
     }
 
     public function store(Request $request)
@@ -61,20 +54,18 @@ class VideoController extends BasicCrudController
     {
         $obj = $this->findOrFail($id);
         $this->addRuleIfGenreHasCategories($request);
-        $validatedData = $this->validate($request, $this->rulesUpdate());
+        $validatedData = $this->validate($request, $request->isMethod('PUT') ? $this->rulesUpdate() : $this->rulesPatch());
         $obj->update($validatedData);
         $resource = $this->resource();
         return new $resource($obj);
     }
 
-    protected function resource()
+    protected function addRuleIfGenreHasCategories(Request $request)
     {
-        return VideoResource::class;
-    }
-
-    protected function resourceCollection()
-    {
-        return $this->resource();
+        $categoriesId = is_array($request->get('categories_id')) ? $request->get('categories_id') : [];
+        $this->rules['genres_id'][] = new GenresHasCategoriesRule(
+            $categoriesId
+        );
     }
 
     protected function model()
@@ -92,8 +83,25 @@ class VideoController extends BasicCrudController
         return $this->rules;
     }
 
+    protected function resource()
+    {
+        return VideoResource::class;
+    }
+
+    protected function resourceCollection()
+    {
+        return $this->resource();
+    }
+
     protected function queryBuilder(): Builder
     {
-        return parent::queryBuilder()->with('genres.categories');
+        $action = \Route::getCurrentRoute()->getAction()['uses'];
+        return parent::queryBuilder()->with(
+            [
+                strpos($action, 'index') !== false ? 'genres' : 'genres.categories',
+                'categories',
+                'castMembers'
+            ]
+        );
     }
 }

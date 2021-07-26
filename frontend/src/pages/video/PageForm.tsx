@@ -1,12 +1,11 @@
-import * as React from 'react';
+import Form from "./form";
+import { useParams } from 'react-router-dom';
 import {Page} from "../../components/Page";
-import { useParams } from 'react-router';
-import { Form } from './form';
 
 const PageForm = () => {
-    const id = useParams();
+    const { id }: any = useParams();
     return (
-        <Page title={!id ? 'Criar videos' : 'Editar videos'}>
+        <Page title={!id ? "Criar vídeo" : "Editar vídeo"}>
             <Form />
         </Page>
     );

@@ -42,29 +42,34 @@ const UploadAction: React.FC<UploadActionProps> = (props) => {
     setShow(isFinished(upload));
   }, [upload]);
 
-  return (
+  return debouncedShow ? (
     <Fade in={true} timeout={{ enter: 1000 }}>
       <ListItemSecondaryAction>
-        <span>
-          {
+        <span hidden={hover}>
+          {upload.progress === 1 && !error && (
             <IconButton className={classes.successIcon}>
               <CheckCircleIcon />
             </IconButton>
-          }
-          {
+          )}
+          {error && (
             <IconButton className={classes.errorIcon}>
               <ErrorIcon />
             </IconButton>
-          }
+          )}
         </span>
-        <span>
-          <IconButton color={"primary"} edge={"end"}>
+        <span hidden={!hover}>
+          <IconButton
+            color={"primary"}
+            onClick={() =>
+              dispatch(Creators.removeUpload({ id: upload.video.id }))
+            }
+          >
             <DeleteIcon />
           </IconButton>
         </span>
       </ListItemSecondaryAction>
     </Fade>
-  );
+  ) : null;
 };
 
 export default UploadAction;

@@ -1,19 +1,17 @@
-// @flow
 import * as React from "react";
-import { FormControlProps } from "@material-ui/core/FormControl";
-import { Button, FormControl } from "@material-ui/core";
-
-import CloudUploadIcon from "@material-ui/core/SvgIcon/SvgIcon";
+import FormControl, { FormControlProps } from "@material-ui/core/FormControl";
+import { Button } from "@material-ui/core";
+import CloudUploadIcon from "@material-ui/icons/CloudUpload";
 import InputFile, { InputFileComponent } from "../../../components/InputFile";
-import { MutableRefObject, useImperativeHandle, useRef } from "react";
-import { RefAttributes } from "react";
+import { useImperativeHandle, useRef } from "react";
+import { MutableRefObject } from "react";
 
-interface UploadFieldProps extends RefAttributes<UploadFieldComponent> {
-  accept: string;
+interface UploadFieldProps {
   label: string;
+  accept: string;
   setValue: (value) => void;
-  disabled?: boolean;
   error?: any;
+  disabled?: boolean;
   FormControlProps?: FormControlProps;
 }
 
@@ -27,7 +25,7 @@ export const UploadField = React.forwardRef<
 >((props, ref) => {
   const fileRef = useRef() as MutableRefObject<InputFileComponent>;
 
-  const { accept, label, setValue, disabled, error } = props;
+  const { label, accept, setValue, disabled, error } = props;
 
   useImperativeHandle(ref, () => ({
     clear: () => fileRef.current.clear(),
@@ -47,6 +45,7 @@ export const UploadField = React.forwardRef<
           label: label,
           InputLabelProps: { shrink: true },
           style: { backgroundColor: "#ffffff" },
+          disabled: disabled === true,
         }}
         InputFileProps={{
           accept,
@@ -54,6 +53,7 @@ export const UploadField = React.forwardRef<
             const files = event.target.files as any;
             files.length && setValue(files[0]);
           },
+          disabled: disabled === true,
         }}
         ButtonFile={
           <Button
@@ -61,6 +61,7 @@ export const UploadField = React.forwardRef<
             variant={"contained"}
             color={"primary"}
             onClick={() => fileRef.current.openWindow()}
+            disabled={disabled === true}
           >
             Adicionar
           </Button>

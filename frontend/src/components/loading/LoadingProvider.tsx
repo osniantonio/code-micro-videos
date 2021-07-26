@@ -7,23 +7,13 @@ import {
   removeGlobalRequestInterceptor,
   removeGlobalResponseInterceptor,
 } from "../../util/http";
-import { omit } from "lodash";
 
 export const LoadingProvider = (props) => {
   const [loading, setLoading] = useState(false);
   const [countRequest, setCountRequest] = useState(0);
 
-  /** Evitar registro duplicado de interceptors */
-  /**
-   * IMPORTANTE
-   * Deve-se usar o useMemo, pois o mesmo não tem relação com ciclo de vida, sendo executado primeiro
-   * já o useEffect pode ser executado muito depois, ou seja, algumas requests iniciais não teriam ainda
-   * os interceptors.
-   *
-   * */
   useMemo(() => {
     let isSubscribed = true;
-
     const requestsIds = addGlobalRequestInterceptor((config) => {
       if (
         isSubscribed &&

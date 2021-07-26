@@ -42,7 +42,7 @@ export const Form = () => {
     watch,
     trigger,
     formState
-  } = useForm({
+  } = useForm<{ name, type }>({
     resolver: yupResolver(validationSchema),
   });
 

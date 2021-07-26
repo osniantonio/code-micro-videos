@@ -1,93 +1,90 @@
 import * as React from "react";
-import AsyncAutoComplete, {
+import { FormControl, FormControlProps, Typography } from "@material-ui/core";
+import useCollectionManager from "../../../hooks/useCollectionManager";
+import castMemberHttp from "../../../util/http/cast-member-http";
+import {
+  AsyncAutoComplete,
   AsyncAutoCompleteComponent,
 } from "../../../components/AsyncAutoComplete";
-import {
-  FormControl,
-  FormHelperText,
-  Grid,
-  FormControlProps,
-  Typography,
-} from "@material-ui/core";
-import castMemberHttp from "../../../util/http/cast-member-http";
+import GridSelected from "../../../components/GridSelected";
+import GridSelectedItem from "../../../components/GridSelectedItem";
+import FormHelperText from "@material-ui/core/FormHelperText";
 import {
   MutableRefObject,
   RefAttributes,
+  useCallback,
   useImperativeHandle,
   useRef,
 } from "react";
 import useHttpHandled from "../../../hooks/useHttpHandle";
-import useCollectionManager from "../../../hooks/useCollectionManager";
-import GridSelected from "../../../components/GridSelected";
-import GridSelectedItem from "../../../components/GridSelectedItem";
 
 interface CastMemberFieldProps extends RefAttributes<CastMemberFieldComponent> {
   castMembers: any[];
   setCastMembers: (cast_members) => void;
   error: any;
   disabled?: boolean;
-  FormControlProps?: FormControlProps
+  FormControlProps?: FormControlProps;
 }
 
 export interface CastMemberFieldComponent {
   clear: () => void;
 }
 
-const CastMemberField = React.forwardRef<
+export const CastMemberField = React.forwardRef<
   CastMemberFieldComponent,
   CastMemberFieldProps
 >((props, ref) => {
   const { castMembers, setCastMembers, error, disabled } = props;
 
-  const autocompleteHttp = useHttpHandled();
+  const autoCompleteHttp = useHttpHandled();
   const { addItem, removeItem } = useCollectionManager(
     castMembers,
     setCastMembers
   );
-  const autocompleteRef =
+
+  const autoCompleteRef =
     useRef() as MutableRefObject<AsyncAutoCompleteComponent>;
 
-  function fetchOptions(searchText) {
-    return autocompleteHttp(
-      castMemberHttp.list({
-        queryParams: {
-          search: searchText,
-          all: "",
-        },
-      })
-    ).then((data) => data.data);
-  }
+  const fetchOptions = useCallback(
+    (searchText) => {
+      return autoCompleteHttp(
+        castMemberHttp.list({ queryParams: { search: searchText, all: "" } })
+      )
+        .then((data) => data.data)
+        .catch((error) => console.log(error));
+    },
+    [autoCompleteHttp]
+  );
 
   useImperativeHandle(ref, () => ({
-    clear: () => autocompleteRef.current.clear(),
+    clear: () => autoCompleteRef.current.clear(),
   }));
 
   return (
-    <>
+    <React.Fragment>
       <AsyncAutoComplete
-        ref={autocompleteRef}
+        ref={autoCompleteRef}
         fetchOptions={fetchOptions}
-        AutocompleteProps={{
-          //autoSelect:true,
-          clearOnEscape: true,
-          freeSolo: true,
-          getOptionLabel: (option) => option.name,
-          getOptionSelected: (option, value) => option.id === value.id,
-          onChange: (event, value) => addItem(value),
-          disabled,
-        }}
         TextFieldProps={{
-          label: "Elenco",
+          label: "Membros de elenco",
           error: error !== undefined,
         }}
+        AutocompleteProps={{
+          // autoSelect: true,
+          clearOnEscape: true,
+          freeSolo: true,
+          getOptionSelected: (option, value) => option.id === value.id,
+          getOptionLabel: (option) => option.name,
+          onChange: (event, value) => addItem(value),
+          disabled: disabled,
+        }}
       />
-
       <FormControl
-        margin={"normal"}
-        fullWidth
         error={error !== undefined}
         disabled={disabled === true}
         {...props.FormControlProps}
+        fullWidth
+        margin={"normal"}
       >
         <GridSelected>
           {castMembers.map((castMember, key) => (
@@ -96,15 +93,12 @@ const CastMemberField = React.forwardRef<
               onDelete={() => removeItem(castMember)}
               xs={6}
             >
-              <Typography noWrap={true}>{castMember.name}</Typography>
+              <Typography>{castMember.name}</Typography>
             </GridSelectedItem>
           ))}
         </GridSelected>
-
         {error && <FormHelperText>{error.message}</FormHelperText>}
       </FormControl>
-    </>
+    </React.Fragment>
   );
 });
-
-export default CastMemberField;
