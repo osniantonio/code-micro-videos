@@ -115,6 +115,7 @@ const Table = () => {
   const [data, setData] = useState<Video[]>([]);
   const subscribed = useRef(true);
   const tableRef = useRef() as React.MutableRefObject<MuiDataTableRefComponent>;
+  // eslint-disable-next-line
   const [categories, setCategories] = useState<Category[]>();
   const {
     openDeleteDialog,
@@ -210,6 +211,7 @@ const Table = () => {
     return () => {
       subscribed.current = false;
     };
+    // eslint-disable-next-line
   }, [enqueueSnackbar]);
 
   const filteredSearch = filterManager.clearSearchText(
@@ -224,11 +226,13 @@ const Table = () => {
     return () => {
       subscribed.current = false;
     };
+    // eslint-disable-next-line
   }, [
     filteredSearch,
     debouncedFilterState.pagination.page,
     debouncedFilterState.pagination.per_page,
     debouncedFilterState.order,
+    // eslint-disable-next-line
     JSON.stringify(debouncedFilterState.extraFilter),
   ]);
 

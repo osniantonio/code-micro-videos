@@ -130,6 +130,7 @@ const Table = () => {
     return () => {
       subscribed.current = false;
     };
+    // eslint-disable-next-line
   }, [
     filteredSearch,
     debouncedFilterState.pagination.page,

@@ -58,7 +58,7 @@ export default function useFilter(options: UseFilterOptions) {
 
   useEffect(() => {
     filterManager.replaceHistory();
-  }, []);
+  }, []); // eslint-disable-line
 
   return {
     columns: filterManager.columns,

@@ -172,11 +172,13 @@ const Table = () => {
     return () => {
       subscribed.current = false;
     };
+    // eslint-disable-next-line
   }, [
     filteredSearch,
     debouncedFilterState.pagination.page,
     debouncedFilterState.pagination.per_page,
     debouncedFilterState.order,
+    // eslint-disable-next-line
     JSON.stringify(debouncedFilterState.extraFilter),
   ]);
 
@@ -191,7 +193,6 @@ const Table = () => {
           dir: debouncedFilterState.order.dir,
           ...(debouncedFilterState.extraFilter &&
             debouncedFilterState.extraFilter.type && {
-              //inverte para pegar o mapa pelo valor e nao pela chave
               type: invert(CastMemberTypeMap)[
                 debouncedFilterState.extraFilter.type
               ],
