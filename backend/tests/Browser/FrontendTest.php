@@ -4,7 +4,6 @@ namespace Tests\Browser;
 
 use Tests\DuskTestCase;
 use Laravel\Dusk\Browser;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
 
 class FrontendTest extends DuskTestCase
 {
@@ -17,8 +16,8 @@ class FrontendTest extends DuskTestCase
     {
         $this->browse(function (Browser $browser) {
             $browser->visit('/admin/categories')
-                ->waitForText('Listagem de categorias', 3)
-                ->assertSee('Listagem de categorias');
+                ->waitForText('Listar categorias', 3)
+                ->assertSee('Listar categorias');
         });
     }
 }
